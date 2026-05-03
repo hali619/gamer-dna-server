@@ -9,44 +9,56 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#111;display:flex;flex-direction:column;align-items:center;padding:20px 0 40px;min-height:100vh;font-family:'Roboto Condensed','Microsoft JhengHei',sans-serif}
-
 .loading{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:40vh}
 .spinner{width:36px;height:36px;border:2px solid rgba(255,255,255,0.15);border-top:2px solid #fff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-txt{font-family:monospace;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:4px}
 
 /* 卡片 */
-#card{width:375px;background:#fff;position:relative;overflow:hidden;display:none}
-#card::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.04) 1px,transparent 1px);background-size:18px 18px;pointer-events:none;z-index:0}
+#card{
+  width:375px;background:#fff;position:relative;overflow:hidden;display:none;
+  background-image:linear-gradient(rgba(0,0,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.04) 1px,transparent 1px);
+  background-size:18px 18px;
+}
 .cn{position:absolute;width:18px;height:18px;z-index:3}
 .ctl{top:8px;left:8px;border-top:1.5px solid #111;border-left:1.5px solid #111}
 .ctr{top:8px;right:8px;border-top:1.5px solid #111;border-right:1.5px solid #111}
 .cbl{bottom:8px;left:8px;border-bottom:1.5px solid #111;border-left:1.5px solid #111}
 .cbr{bottom:8px;right:8px;border-bottom:1.5px solid #111;border-right:1.5px solid #111}
 .inn{position:relative;z-index:1;padding:18px 18px 20px}
+
+/* Header */
 .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .hl{font-family:'Share Tech Mono',monospace;font-size:9px;color:#111;letter-spacing:3px}
 .hr{font-family:'Share Tech Mono',monospace;font-size:8px;color:#999;letter-spacing:2px}
 .hline{width:100%;height:1px;background:#111;position:relative;margin-bottom:10px}
 .hline::before,.hline::after{content:'';position:absolute;width:5px;height:5px;background:#111;border-radius:50%;top:-2px}
 .hline::before{left:0}.hline::after{right:0}
-.ab{border:1px solid rgba(0,0,0,0.2);padding:10px 12px;position:relative;background:rgba(255,255,255,0.8)}
-.ab::before{content:'ARCHETYPE DETECTED';position:absolute;top:-7px;left:10px;font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;letter-spacing:2px;background:#fff;padding:0 4px}
-.ab::after{content:'';position:absolute;top:8px;right:8px;width:10px;height:10px;border-top:1px solid rgba(0,0,0,0.2);border-right:1px solid rgba(0,0,0,0.2)}
+
+/* Archetype block */
+.ab{border:1px solid rgba(0,0,0,0.2);padding:10px 12px;position:relative;background:#fff;margin-bottom:0}
+.ab-label{position:absolute;top:-7px;left:10px;font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;letter-spacing:2px;background:#fff;padding:0 4px}
+.ab-corner{position:absolute;top:8px;right:8px;width:10px;height:10px;border-top:1px solid rgba(0,0,0,0.2);border-right:1px solid rgba(0,0,0,0.2)}
 .at{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .an{font-family:'Share Tech Mono',monospace;font-size:7px;color:#999;letter-spacing:2px;margin-bottom:2px}
 .aname{font-size:32px;font-weight:900;color:#111;line-height:0.9;letter-spacing:-1px}
 .atags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
 .tag{font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;border:1px solid #111;padding:2px 6px;letter-spacing:1px}
-.pw{width:100%;position:relative;background:#0a0a0a;overflow:hidden}
+
+/* 照片 */
+.pw{width:100%;background:#0a0a0a;overflow:hidden}
 .pw img{width:100%;display:block}
 .pp{width:100%;aspect-ratio:4/3;background:#111;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,0.15);letter-spacing:3px}
-.clw{padding:5px 0 0 12px}
-.cll{font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;letter-spacing:2px;background:#fff;display:inline-block;padding:1px 4px}
-.db{border:1px solid rgba(0,0,0,0.15);border-top:none;padding:10px 12px;position:relative;background:rgba(255,255,255,0.8)}
-.db::before{content:'CAPABILITY ANALYSIS';position:absolute;top:-7px;left:10px;font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;letter-spacing:2px;background:#fff;padding:0 4px}
-.db::after{content:'';position:absolute;top:8px;right:8px;width:10px;height:10px;border-top:1px solid rgba(0,0,0,0.15);border-right:1px solid rgba(0,0,0,0.15)}
+
+/* Capability block — 只用 HTML label，不用 ::before */
+.db-wrap{position:relative;margin-top:0}
+.db-label-row{padding:6px 0 0 10px}
+.db-label{font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;letter-spacing:2px;background:#fff;display:inline-block;padding:0 4px;position:relative;top:7px;z-index:1}
+.db{border:1px solid rgba(0,0,0,0.15);padding:10px 12px;position:relative;background:#fff}
+.db-corner{position:absolute;top:8px;right:8px;width:10px;height:10px;border-top:1px solid rgba(0,0,0,0.15);border-right:1px solid rgba(0,0,0,0.15)}
 .dt{font-size:11px;color:#333;line-height:1.75;margin-top:4px}
+
+/* 橫條圖 */
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgba(0,0,0,0.1);border-top:none}
 .si{padding:8px 10px;border-bottom:1px solid rgba(0,0,0,0.08);border-right:1px solid rgba(0,0,0,0.08)}
 .si:nth-child(2n){border-right:none}
@@ -55,15 +67,12 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;paddi
 .sb{height:2px;background:rgba(0,0,0,0.08);margin-bottom:3px}
 .sf{height:100%;background:#111;transition:width 1s ease}
 .sv{font-family:'Share Tech Mono',monospace;font-size:8px;color:#111;text-align:right}
-.rf{padding:16px 0 14px;display:flex;justify-content:center}
+
+/* ROG footer */
+.rf{padding:16px 0 14px;display:flex;justify-content:center;align-items:center}
 
 /* 下載按鈕 */
-#dl-btn{
-  display:none;width:375px;margin-top:14px;height:46px;
-  background:#fff;color:#111;border:none;
-  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;
-  cursor:pointer;
-}
+#dl-btn{display:none;width:375px;margin-top:14px;height:46px;background:#fff;color:#111;border:none;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;cursor:pointer}
 #dl-btn:active{opacity:0.7}
 .save-hint{display:none;font-family:monospace;font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-top:10px}
 </style>
@@ -85,8 +94,9 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;paddi
 <div class="save-hint" id="hint">或長按圖片儲存至相簿</div>
 
 <script>
-const ROG_SVG=`<svg width="110" height="66" viewBox="0 0 240 144" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 64.6633C0 64.6633 8.16511 90.0315 15.5878 98.4874C23.0105 106.943 49.4848 114.902 49.4848 114.902L0.247666 64.6633H0ZM214.762 0C195.958 0 168.247 4.22864 147.464 14.6742C130.391 23.1302 79.9171 81.5756 76.4531 85.3062C71.5047 90.7776 70.0189 92.0213 62.8436 89.2855C51.2147 85.0575 33.4016 73.617 33.4016 73.617C33.4016 73.617 52.9468 108.684 59.8747 119.13C70.5139 135.544 88.5767 144 88.5767 144C88.5767 144 75.2145 127.337 71.7505 120.125C68.534 113.41 72.494 107.689 91.5456 91.0259C122.721 63.4197 150.432 41.0367 177.896 24.6222C203.876 9.20257 218.473 4.97433 229.607 0.248947C226.885 0.248947 220.948 0.248947 214.762 0.248947V0ZM179.875 44.5183C136.575 69.14 79.4221 115.15 79.4221 115.15C95.7521 127.088 137.32 144 166.516 144C198.928 144 229.607 51.7309 229.607 51.7309C173.689 77.8449 136.575 100.228 136.575 100.228L195.215 79.8346C195.215 79.8346 176.658 127.585 155.38 127.585C130.638 127.585 101.939 114.404 101.939 114.404C151.671 75.855 228.37 40.788 232.576 38.5496C236.782 36.56 240 28.3528 240 24.6222C237.773 24.6222 208.579 28.3525 179.63 44.5183H179.875Z" fill="#686868"/></svg>`;
-const ROG_TEXT_SVG=`<svg width="180" height="22" viewBox="0 0 571 29" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M34.9375 28.0625C30.0208 28.0625 26.7292 28.0625 25.0625 28.0625C17.6042 19.5208 12.625 13.8333 10.125 11C16.9583 11 21.5208 11.0208 23.8125 11.0625C23.8125 8.60417 23.8125 6.77083 23.8125 5.5625C23.8125 5.39583 23.7708 5.14583 23.6875 4.8125C23.6458 4.47917 23.4375 4.3125 23.0625 4.3125C15.7708 4.3125 10.8958 4.3125 8.4375 4.3125C8.4375 16.1875 8.4375 24.1042 8.4375 28.0625C4.22917 28.0625 1.41667 28.0625 0 28.0625C0 15.8958 0 7.77083 0 3.6875C0 1.97917 0 0.833333 0 0.25C13.3333 0.25 23.3333 0.25 30 0.25C30.625 0.25 31.1042 0.520833 31.4375 1.0625C31.8125 1.60417 32 2.1875 32 2.8125C32 9.47917 32 13.9375 32 16.1875C28.25 16.1875 25.75 16.1875 24.5 16.1875C29.7083 22.1042 33.1875 26.0625 34.9375 28.0625ZM71.5625 28.0625C66.3125 28.0625 55.8542 28.0625 40.1875 28.0625C40.1875 26.3125 40.1875 22.8125 40.1875 17.5625C40.1875 14.6458 40.1875 8.79167 40.1875 0C45.3958 0 55.8542 0 71.5625 0C70.8542 0.708333 69.4375 2.10417 67.3125 4.1875C64.1875 4.1875 57.9167 4.1875 48.5 4.1875C48.5 5.47917 48.5 8.02083 48.5 11.8125C52.0417 11.8125 59.125 11.8125 69.75 11.8125C69.75 12.5625 69.75 14.0417 69.75 16.25C66.2083 16.25 59.125 16.25 48.5 16.25C48.5 17.5 48.5 20.0417 48.5 23.875C51.625 23.875 57.8958 23.875 67.3125 23.875C68.0208 24.5833 69.4375 25.9792 71.5625 28.0625ZM140.125 28.0625C134.917 28.0625 124.5 28.0625 108.875 28.0625C108.875 25.1458 108.875 19.3333 108.875 10.625C108.875 8.91667 108.875 5.45833 108.875 0.25C110.25 0.25 112.979 0.25 117.062 0.25C117.062 4.20833 117.062 12.1042 117.062 23.9375C119.562 23.9375 124.521 23.9375 131.938 23.9375C131.938 19.9792 131.938 12.0833 131.938 0.25C133.312 0.25 136.042 0.25 140.125 0.25C140.125 4.875 140.125 14.1458 140.125 28.0625ZM218.062 28.0625C216.688 28.0625 213.917 28.0625 209.75 28.0625C209.75 26.3125 209.75 22.8333 209.75 17.625C209.75 14.7083 209.75 8.91667 209.75 0.25C211.125 0.25 213.896 0.25 218.062 0.25C218.062 4.875 218.062 14.1458 218.062 28.0625ZM496.188 28.0625C490.938 28.0625 480.479 28.0625 464.812 28.0625C464.812 26.3125 464.812 22.8125 464.812 17.5625C464.812 14.6458 464.812 8.79167 464.812 0C470.021 0 480.479 0 496.188 0C495.479 0.708333 494.062 2.10417 491.938 4.1875C488.812 4.1875 482.542 4.1875 473.125 4.1875C473.125 5.47917 473.125 8.02083 473.125 11.8125C476.667 11.8125 483.75 11.8125 494.375 11.8125C494.375 12.5625 494.375 14.0417 494.375 16.25C490.833 16.25 483.75 16.25 473.125 16.25C473.125 17.5 473.125 20.0417 473.125 23.875C476.25 23.875 482.521 23.875 491.938 23.875C492.646 24.5833 494.062 25.9792 496.188 28.0625Z" fill="#686868"/></svg>`;
+const ROG_LOGO=`<svg width="110" height="66" viewBox="0 0 240 144" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 64.6633C0 64.6633 8.16511 90.0315 15.5878 98.4874C23.0105 106.943 49.4848 114.902 49.4848 114.902L0.247666 64.6633H0ZM214.762 0C195.958 0 168.247 4.22864 147.464 14.6742C130.391 23.1302 79.9171 81.5756 76.4531 85.3062C71.5047 90.7776 70.0189 92.0213 62.8436 89.2855C51.2147 85.0575 33.4016 73.617 33.4016 73.617C33.4016 73.617 52.9468 108.684 59.8747 119.13C70.5139 135.544 88.5767 144 88.5767 144C88.5767 144 75.2145 127.337 71.7505 120.125C68.534 113.41 72.494 107.689 91.5456 91.0259C122.721 63.4197 150.432 41.0367 177.896 24.6222C203.876 9.20257 218.473 4.97433 229.607 0.248947C226.885 0.248947 220.948 0.248947 214.762 0.248947V0ZM179.875 44.5183C136.575 69.14 79.4221 115.15 79.4221 115.15C95.7521 127.088 137.32 144 166.516 144C198.928 144 229.607 51.7309 229.607 51.7309C173.689 77.8449 136.575 100.228 136.575 100.228L195.215 79.8346C195.215 79.8346 176.658 127.585 155.38 127.585C130.638 127.585 101.939 114.404 101.939 114.404C151.671 75.855 228.37 40.788 232.576 38.5496C236.782 36.56 240 28.3528 240 24.6222C237.773 24.6222 208.579 28.3525 179.63 44.5183H179.875Z" fill="#686868"/></svg>`;
+
+const ROG_TEXT=`<svg width="100%" height="20" viewBox="0 0 571 29" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M34.9375 28.0625C30.0208 28.0625 26.7292 28.0625 25.0625 28.0625C17.6042 19.5208 12.625 13.8333 10.125 11C16.9583 11 21.5208 11.0208 23.8125 11.0625C23.8125 8.60417 23.8125 6.77083 23.8125 5.5625C23.8125 5.39583 23.7708 5.14583 23.6875 4.8125C23.6458 4.47917 23.4375 4.3125 23.0625 4.3125C15.7708 4.3125 10.8958 4.3125 8.4375 4.3125C8.4375 16.1875 8.4375 24.1042 8.4375 28.0625C4.22917 28.0625 1.41667 28.0625 0 28.0625C0 15.8958 0 7.77083 0 3.6875C0 1.97917 0 0.833333 0 0.25C13.3333 0.25 23.3333 0.25 30 0.25C30.625 0.25 31.1042 0.520833 31.4375 1.0625C31.8125 1.60417 32 2.1875 32 2.8125C32 9.47917 32 13.9375 32 16.1875C28.25 16.1875 25.75 16.1875 24.5 16.1875C29.7083 22.1042 33.1875 26.0625 34.9375 28.0625ZM71.5625 28.0625C66.3125 28.0625 55.8542 28.0625 40.1875 28.0625C40.1875 26.3125 40.1875 22.8125 40.1875 17.5625C40.1875 14.6458 40.1875 8.79167 40.1875 0C45.3958 0 55.8542 0 71.5625 0C70.8542 0.708333 69.4375 2.10417 67.3125 4.1875C64.1875 4.1875 57.9167 4.1875 48.5 4.1875C48.5 5.47917 48.5 8.02083 48.5 11.8125C52.0417 11.8125 59.125 11.8125 69.75 11.8125C69.75 12.5625 69.75 14.0417 69.75 16.25C66.2083 16.25 59.125 16.25 48.5 16.25C48.5 17.5 48.5 20.0417 48.5 23.875C51.625 23.875 57.8958 23.875 67.3125 23.875C68.0208 24.5833 69.4375 25.9792 71.5625 28.0625ZM81.8125 28.0625C80.3958 28.0625 77.6042 28.0625 73.4375 28.0625C73.4375 25.1458 73.4375 19.3333 73.4375 10.625C73.4375 8.91667 73.4375 5.45833 73.4375 0.25C78.2292 0.25 87.8333 0.25 102.25 0.25C102.833 0.25 103.292 0.458333 103.625 0.875C103.958 1.33333 104.146 1.83333 104.188 2.375C104.188 6.125 104.188 11.7292 104.188 19.1875C100.479 19.1875 93.0208 19.1875 81.8125 19.1875C81.8125 20.6458 81.8125 23.6042 81.8125 28.0625ZM81.75 15.0625C84.125 15.0625 88.8542 15.0625 95.9375 15.0625C95.9375 13.4792 95.9375 10.3333 95.9375 5.625C95.9375 4.95833 95.8333 4.58333 95.625 4.5C95.4167 4.375 95.2708 4.3125 95.1875 4.3125C92.1875 4.3125 87.7083 4.3125 81.75 4.3125C81.75 6.10417 81.75 9.6875 81.75 15.0625ZM140.125 28.0625C134.917 28.0625 124.5 28.0625 108.875 28.0625C108.875 25.1458 108.875 19.3333 108.875 10.625C108.875 8.91667 108.875 5.45833 108.875 0.25C110.25 0.25 112.979 0.25 117.062 0.25C117.062 4.20833 117.062 12.1042 117.062 23.9375C119.562 23.9375 124.521 23.9375 131.938 23.9375C131.938 19.9792 131.938 12.0833 131.938 0.25C133.312 0.25 136.042 0.25 140.125 0.25C140.125 4.875 140.125 14.1458 140.125 28.0625ZM144.938 28.0625C144.938 25.1458 144.938 19.3333 144.938 10.625C144.938 8.91667 144.938 5.45833 144.938 0.25C149.271 0.25 157.958 0.25 171 0.25C171.625 0.25 172.125 0.479167 172.5 0.9375C172.833 1.39583 173 2.02083 173 2.8125C173 4.60417 173 7.3125 173 10.9375C173.417 10.9375 174.229 10.9375 175.438 10.9375C175.438 13.7708 175.438 19.4792 175.438 28.0625C170.354 28.0625 160.188 28.0625 144.938 28.0625ZM153.25 10.9375C155.583 10.9375 160.208 10.9375 167.125 10.9375C167.125 10.0208 167.125 8.22917 167.125 5.5625C167.125 5.52083 167.104 5.3125 167.062 4.9375C166.979 4.5625 166.75 4.375 166.375 4.375C163.458 4.375 159.083 4.375 153.25 4.375C153.25 5.45833 153.25 7.64583 153.25 10.9375ZM153.25 23.875C155.583 23.875 160.208 23.875 167.125 23.875C167.125 22.4167 167.125 19.4583 167.125 15C164.833 15 160.208 15 153.25 15C153.25 16.5 153.25 19.4583 153.25 23.875ZM205.062 28.0625C200.938 28.0625 192.688 28.0625 180.312 28.0625C180.312 25.3542 180.312 19.9375 180.312 11.8125C180.312 9.89583 180.312 6.04167 180.312 0.25C181.688 0.25 184.458 0.25 188.625 0.25C188.625 4.20833 188.625 12.1042 188.625 23.9375C192 23.9375 198.729 23.9375 208.812 23.9375C208.188 24.6458 206.938 26.0208 205.062 28.0625ZM218.062 28.0625C216.688 28.0625 213.917 28.0625 209.75 28.0625C209.75 26.3125 209.75 22.8333 209.75 17.625C209.75 14.7083 209.75 8.91667 209.75 0.25C211.125 0.25 213.896 0.25 218.062 0.25C218.062 4.875 218.062 14.1458 218.062 28.0625ZM253.438 28.0625C248.938 28.0625 239.875 28.0625 226.25 28.0625C226.25 25.1458 226.25 19.3333 226.25 10.625C226.25 8.91667 226.25 5.45833 226.25 0.25C231.458 0.25 241.896 0.25 257.562 0.25C256.854 0.916667 255.458 2.27083 253.375 4.3125C250.292 4.3125 244.062 4.3125 234.688 4.3125C234.688 7.5625 234.688 14.0833 234.688 23.875C238.521 23.875 246.167 23.875 257.625 23.875C256.917 24.5833 255.521 25.9792 253.438 28.0625ZM302.188 28.0625C290.771 28.0625 283.167 28.0625 279.375 28.0625C274.958 23.0625 272.021 19.7292 270.562 18.0625C270.562 11.3958 270.562 6.9375 270.562 4.6875C270.562 2.4375 270.562 0.958333 270.562 0.25C283.729 0.25 293.604 0.25 300.188 0.25C300.812 0.25 301.292 0.458333 301.625 0.875C302 1.33333 302.188 1.83333 302.188 2.375C302.188 15.2083 302.188 23.7708 302.188 28.0625ZM293.875 4.375C286.375 4.375 281.375 4.375 278.875 4.375C278.875 10.2917 278.875 14.25 278.875 16.25C282.125 20.0833 284.312 22.625 285.438 23.875C289.646 23.875 292.458 23.875 293.875 23.875C293.875 14.125 293.875 7.625 293.875 4.375ZM315.75 28.0625C314.375 28.0625 311.604 28.0625 307.438 28.0625C307.438 25.1458 307.438 19.3333 307.438 10.625C307.438 8.91667 307.438 5.45833 307.438 0.25C312.562 0.25 322.771 0.25 338.062 0.25C337.438 0.916667 336.167 2.27083 334.25 4.3125C331.167 4.3125 325 4.3125 315.75 4.3125C315.75 5.3125 315.75 7.29167 315.75 10.25C319.333 10.25 326.438 10.25 337.062 10.25C336.479 10.9583 335.333 12.3542 333.625 14.4375C330.667 14.4375 324.708 14.4375 315.75 14.4375C315.75 16.6875 315.75 21.2292 315.75 28.0625ZM381.25 28.0625C375.958 28.0625 365.396 28.0625 349.562 28.0625C349.562 25.1458 349.562 19.3333 349.562 10.625C349.562 8.91667 349.562 5.45833 349.562 0.25C355.021 0.25 365.979 0.25 382.438 0.25C381.729 0.958333 380.271 2.39583 378.062 4.5625C374.688 4.5625 368 4.5625 358 4.5625C358 7.8125 358 14.25 358 23.875C360.5 23.875 365.479 23.875 372.938 23.875C372.938 22.0417 372.938 18.375 372.938 12.875C374.312 12.875 377.083 12.875 381.25 12.875C381.25 15.4167 381.25 20.4792 381.25 28.0625ZM419.25 28.25C417.875 28.25 415.104 28.25 410.938 28.25C410.938 26.2917 410.938 22.3542 410.938 16.4375C408.438 16.4375 403.479 16.4375 396.062 16.4375C396.062 18.3958 396.062 22.3333 396.062 28.25C394.646 28.25 391.833 28.25 387.625 28.25C387.625 25.3333 387.625 19.5417 387.625 10.875C387.625 9.125 387.625 5.64583 387.625 0.4375C392.583 0.4375 402.458 0.4375 417.25 0.4375C417.875 0.4375 418.354 0.708333 418.688 1.25C419.062 1.79167 419.25 2.375 419.25 3C419.25 8.58333 419.25 17 419.25 28.25ZM396.188 12.25C398.604 12.25 403.458 12.25 410.75 12.25C410.75 11.1667 410.75 9.02083 410.75 5.8125C410.75 5.64583 410.708 5.375 410.625 5C410.542 4.66667 410.312 4.5 409.938 4.5C406.896 4.5 402.312 4.5 396.188 4.5C396.188 5.79167 396.188 8.375 396.188 12.25ZM425.25 28.0625C425.25 15.8958 425.25 7.77083 425.25 3.6875C425.25 1.97917 425.25 0.833333 425.25 0.25C433.833 5.79167 439.542 9.5 442.375 11.375C450.958 5.79167 456.688 2.08333 459.562 0.25C459.562 14.1667 459.562 23.4375 459.562 28.0625C455.396 28.0625 452.625 28.0625 451.25 28.0625C451.25 20.1042 451.25 14.7917 451.25 12.125C446.833 14.9583 443.875 16.8333 442.375 17.75C438 14.9583 435.062 13.0833 433.562 12.125C433.562 20.0833 433.562 25.3958 433.562 28.0625C429.396 28.0625 426.625 28.0625 425.25 28.0625ZM496.188 28.0625C490.938 28.0625 480.479 28.0625 464.812 28.0625C464.812 26.3125 464.812 22.8125 464.812 17.5625C464.812 14.6458 464.812 8.79167 464.812 0C470.021 0 480.479 0 496.188 0C495.479 0.708333 494.062 2.10417 491.938 4.1875C488.812 4.1875 482.542 4.1875 473.125 4.1875C473.125 5.47917 473.125 8.02083 473.125 11.8125C476.667 11.8125 483.75 11.8125 494.375 11.8125C494.375 12.5625 494.375 14.0417 494.375 16.25C490.833 16.25 483.75 16.25 473.125 16.25C473.125 17.5 473.125 20.0417 473.125 23.875C476.25 23.875 482.521 23.875 491.938 23.875C492.646 24.5833 494.062 25.9792 496.188 28.0625ZM533.125 28.0625C528.208 28.0625 524.917 28.0625 523.25 28.0625C515.792 19.5208 510.812 13.8333 508.312 11C515.146 11 519.708 11.0208 522 11.0625C522 8.60417 522 6.77083 522 5.5625C522 5.39583 521.958 5.14583 521.875 4.8125C521.833 4.47917 521.625 4.3125 521.25 4.3125C513.958 4.3125 509.083 4.3125 506.625 4.3125C506.625 16.1875 506.625 24.1042 506.625 28.0625C502.417 28.0625 499.604 28.0625 498.188 28.0625C498.188 15.8958 498.188 7.77083 498.188 3.6875C498.188 1.97917 498.188 0.833333 498.188 0.25C511.521 0.25 521.521 0.25 528.188 0.25C528.812 0.25 529.292 0.520833 529.625 1.0625C530 1.60417 530.188 2.1875 530.188 2.8125C530.188 9.47917 530.188 13.9375 530.188 16.1875C526.438 16.1875 523.938 16.1875 522.688 16.1875C527.896 22.1042 531.375 26.0625 533.125 28.0625ZM569.625 28.0625C565.083 28.0625 556.042 28.0625 542.5 28.0625C541.625 27.3542 539.896 25.9167 537.312 23.75C541.271 23.75 549.25 23.75 561.25 23.75C561.25 22.5 561.25 19.9583 561.25 16.125C557.417 16.125 549.771 16.125 538.312 16.125C538.312 13.4583 538.312 8.16667 538.312 0.25C543.604 0.25 554.208 0.25 570.125 0.25C569.5 0.916667 568.271 2.29167 566.438 4.375C563.104 4.375 556.5 4.375 546.625 4.375C546.625 5.625 546.625 8.14583 546.625 11.9375C550.458 11.9375 558.125 11.9375 569.625 11.9375C569.625 14.6042 569.625 19.9792 569.625 28.0625Z" fill="#686868"/></svg>`;
 
 const TYPE_NUM={tactical:'01',speedy:'02',burst:'03',sniper:'04',builder:'05',futurist:'06'};
 const TYPE_EN={tactical:'TACTICAL COMMANDER',speedy:'SPEED HUNTER',burst:'BURST BREAKER',sniper:'PRECISION SNIPER',builder:'CREATIVE BUILDER',futurist:'FUTURE CONTROLLER'};
@@ -94,12 +104,11 @@ const TYPE_NAMES={tactical:'戰術指揮者',speedy:'極速獵手',burst:'爆發
 
 async function init(){
   const id=location.pathname.split('/').pop();
-  if(!id) return showErr('無效的連結');
+  if(!id)return showErr('無效的連結');
   try{
     const res=await fetch(`/api/result/${id}`);
     if(!res.ok){const e=await res.json();return showErr(e.error||'找不到此結果');}
-    const data=await res.json();
-    render(data);
+    render(await res.json());
   }catch(e){showErr('載入失敗');}
 }
 
@@ -107,33 +116,53 @@ function render(data){
   const{type,typeName,tags,desc,scores,photo,id}=data;
   const num=TYPE_NUM[type]||'01';
   const en=TYPE_EN[type]||'';
-  const max=Math.max(...Object.values(scores||{}));
+  const vals=Object.values(scores||{});
+  const max=vals.length?Math.max(...vals):1;
 
   document.getElementById('card-inner').innerHTML=`
-    <div class="hdr"><div class="hl">▶ DNA LAB RESULT OUTPUT</div><div class="hr">SESSION #${id}</div></div>
+    <div class="hdr">
+      <div class="hl">▶ DNA LAB RESULT OUTPUT</div>
+      <div class="hr">SESSION #${id}</div>
+    </div>
     <div class="hline"></div>
+
     <div class="ab">
+      <span class="ab-label">ARCHETYPE DETECTED</span>
+      <div class="ab-corner"></div>
       <div class="at">
         <div>
           <div class="an">ARCHETYPE ${num} —— ${en}</div>
           <div class="aname">${typeName}</div>
           <div class="atags">${(tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
         </div>
-        <div>${ROG_SVG}</div>
+        <div>${ROG_LOGO}</div>
       </div>
     </div>
+
     <div class="pw">
-      ${photo?`<img src="${photo}" id="photo-img"/>`:`<div class="pp">USER SCAN</div>`}
+      ${photo?`<img src="${photo}" crossorigin="anonymous"/>`:`<div class="pp">USER SCAN</div>`}
     </div>
-    <div class="clw"><span class="cll">CAPABILITY ANALYSIS</span></div>
-    <div class="db"><div class="dt">${desc}</div></div>
+
+    <div class="db-wrap">
+      <div class="db-label-row"><span class="db-label">CAPABILITY ANALYSIS</span></div>
+      <div class="db">
+        <div class="db-corner"></div>
+        <div class="dt">${desc}</div>
+      </div>
+    </div>
+
     <div class="sg">
       ${Object.entries(scores||{}).map(([t,v])=>{
         const pct=max>0?Math.round((v/max)*100):0;
-        return `<div class="si"><div class="sn">${TYPE_NAMES[t]||t}</div><div class="sb"><div class="sf" style="width:0%" data-w="${pct}%"></div></div><div class="sv">${pct}%</div></div>`;
+        return `<div class="si">
+          <div class="sn">${TYPE_NAMES[t]||t}</div>
+          <div class="sb"><div class="sf" style="width:0%" data-w="${pct}%"></div></div>
+          <div class="sv">${pct}%</div>
+        </div>`;
       }).join('')}
     </div>
-    <div class="rf">${ROG_TEXT_SVG}</div>
+
+    <div class="rf">${ROG_TEXT}</div>
   `;
 
   document.getElementById('loading').style.display='none';
@@ -141,16 +170,15 @@ function render(data){
   document.getElementById('dl-btn').style.display='block';
   document.getElementById('hint').style.display='block';
 
-  // 橫條圖動畫
   setTimeout(()=>{
     document.querySelectorAll('.sf').forEach(b=>b.style.width=b.dataset.w);
   },400);
 
-  // 下載按鈕
   document.getElementById('dl-btn').addEventListener('click',async()=>{
     const btn=document.getElementById('dl-btn');
+    const hint=document.getElementById('hint');
     btn.style.display='none';
-    document.getElementById('hint').style.display='none';
+    hint.style.display='none';
     try{
       const canvas=await html2canvas(document.getElementById('card'),{
         useCORS:true,allowTaint:true,scale:2,backgroundColor:'#ffffff'
@@ -161,14 +189,13 @@ function render(data){
       a.click();
     }catch(e){console.error(e);}
     btn.style.display='block';
-    document.getElementById('hint').style.display='block';
+    hint.style.display='block';
   });
 }
 
 function showErr(msg){
   document.getElementById('loading').innerHTML=`<div style="font-size:24px;margin-bottom:8px;color:#fff">⚠</div><div class="loading-txt">${msg}</div>`;
 }
-
 init();
 </script>
 </body>
