@@ -2,168 +2,185 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>玩家基因鑑定結果</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNA LAB RESULT</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--ink:#111;--ink-m:#555;--ink-l:#999;--bg:#fff;--panel:rgba(255,255,255,0.7)}
-html,body{width:100%;height:100%;background:#111;font-family:'Roboto Condensed','Microsoft JhengHei',sans-serif;overflow:hidden}
-.page{width:100%;height:100vh;background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column}
-.page::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.06) 1px,transparent 1px);background-size:20px 20px;pointer-events:none;z-index:0}
-.corner{position:absolute;width:16px;height:16px;z-index:3}
-.c-tl{top:8px;left:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink)}
-.c-tr{top:8px;right:8px;border-top:1.5px solid var(--ink);border-right:1.5px solid var(--ink)}
-.c-bl{bottom:8px;left:8px;border-bottom:1.5px solid var(--ink);border-left:1.5px solid var(--ink)}
-.c-br{bottom:8px;right:8px;border-bottom:1.5px solid var(--ink);border-right:1.5px solid var(--ink)}
-.inner{position:relative;z-index:1;padding:10px 14px 8px;display:flex;flex-direction:column;height:100%;gap:6px}
-.header{display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.sys{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--ink);letter-spacing:3px}
-.sys-r{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--ink-l);letter-spacing:2px}
-.h-line{width:100%;height:1px;background:var(--ink);position:relative;flex-shrink:0}
-.h-line::before,.h-line::after{content:'';position:absolute;width:4px;height:4px;background:var(--ink);border-radius:50%;top:-1.5px}
-.h-line::before{left:0}.h-line::after{right:0}
-.top-row{display:flex;gap:8px;align-items:stretch;flex-shrink:0}
-.photo-wrap{width:36%;flex-shrink:0;position:relative;overflow:hidden;background:#000;aspect-ratio:3/4}
-.photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-.photo-placeholder{width:100%;height:100%;background:#0a0a0a;display:flex;align-items:center;justify-content:center}
-.ph-txt{font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:2px}
-.photo-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);animation:scanAnim 3s linear infinite;pointer-events:none}
-@keyframes scanAnim{0%{top:0}100%{top:100%}}
-.photo-corner{position:absolute;width:10px;height:10px}
-.pc-tl{top:0;left:0;border-top:1.5px solid rgba(255,255,255,0.7);border-left:1.5px solid rgba(255,255,255,0.7)}
-.pc-tr{top:0;right:0;border-top:1.5px solid rgba(255,255,255,0.7);border-right:1.5px solid rgba(255,255,255,0.7)}
-.pc-bl{bottom:0;left:0;border-bottom:1.5px solid rgba(255,255,255,0.7);border-left:1.5px solid rgba(255,255,255,0.7)}
-.pc-br{bottom:0;right:0;border-bottom:1.5px solid rgba(255,255,255,0.7);border-right:1.5px solid rgba(255,255,255,0.7)}
-.type-info{flex:1;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(0,0,0,0.2);padding:8px 10px;background:var(--panel);position:relative}
-.type-info::before{content:'ARCHETYPE DETECTED';position:absolute;top:-6px;left:8px;font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--ink);letter-spacing:2px;background:var(--bg);padding:0 4px}
-.type-num{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--ink-l);letter-spacing:2px;margin-bottom:2px}
-.type-name{font-size:26px;font-weight:900;color:var(--ink);line-height:0.88;letter-spacing:-0.5px}
-.type-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
-.tag{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--ink);border:1px solid var(--ink);padding:2px 5px;letter-spacing:1px}
-.type-icon{align-self:flex-end}
-.desc{font-size:10px;color:var(--ink-m);line-height:1.6;padding:6px 8px;border:1px solid rgba(0,0,0,0.1);background:var(--panel);flex-shrink:0}
-.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;flex-shrink:0}
-.score-item{background:var(--panel);border:0.5px solid rgba(0,0,0,0.1);padding:4px 6px}
-.score-name{font-family:'Share Tech Mono',monospace;font-size:6.5px;color:var(--ink-l);letter-spacing:1px;margin-bottom:2px}
-.score-bar-bg{height:2px;background:rgba(0,0,0,0.08);overflow:hidden;margin-bottom:2px}
-.score-bar-fill{height:100%;background:var(--ink);transition:width 1.2s ease}
-.score-val{font-family:'Share Tech Mono',monospace;font-size:6.5px;color:var(--ink);text-align:right}
-.bottom-row{display:flex;gap:6px;align-items:center;flex-shrink:0}
-.download-btn{flex:1;height:38px;background:var(--ink);color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.download-btn:active{opacity:0.75}
-.footer-col{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
-.footer-brand{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--ink-l);letter-spacing:2px}
-.save-hint{font-family:'Share Tech Mono',monospace;font-size:6px;color:#ccc;letter-spacing:1px}
-.loading{width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#fff}
-.loading-txt{font-family:'Share Tech Mono',monospace;font-size:11px;color:#999;letter-spacing:4px}
-.spinner{width:32px;height:32px;border:2px solid rgba(0,0,0,0.08);border-top:2px solid #111;border-radius:50%;animation:spin 1s linear infinite}
+body{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Roboto Condensed','Microsoft JhengHei',sans-serif}
+
+/* 載入中畫面 */
+#loading{display:flex;flex-direction:column;align-items:center;gap:16px;color:#fff}
+.spinner{width:36px;height:36px;border:2px solid rgba(255,255,255,0.15);border-top:2px solid #fff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-family:monospace;font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:4px}
+
+/* 結果圖片 */
+#result-img{display:none;max-width:100%;width:390px;box-shadow:0 0 40px rgba(0,0,0,0.6)}
+.hint{font-family:monospace;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-top:14px;display:none}
+
+/* 隱藏的卡片（用來截圖）*/
+#card-wrap{
+  position:fixed;top:0;left:0;
+  width:390px;
+  background:#fff;
+  visibility:hidden;
+  pointer-events:none;
+  z-index:-1;
+}
 </style>
 </head>
 <body>
-<div id="page">
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <div class="loading-txt">LOADING DNA DATA...</div>
-  </div>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="loading-txt">GENERATING...</div>
 </div>
+
+<img id="result-img" alt="DNA Result Card"/>
+<div class="hint" id="hint">長按圖片儲存至相簿</div>
+
+<!-- 用來截圖的隱藏卡片 -->
+<div id="card-wrap"></div>
+
 <script>
-const TYPE_ICONS={tactical:`<circle cx="16" cy="16" r="13" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="16" r="5" stroke="#111" stroke-width="1.8"/><line x1="16" y1="3" x2="16" y2="11" stroke="#111" stroke-width="1.8"/><line x1="16" y1="21" x2="16" y2="29" stroke="#111" stroke-width="1.8"/><line x1="3" y1="16" x2="11" y2="16" stroke="#111" stroke-width="1.8"/><line x1="21" y1="16" x2="29" y2="16" stroke="#111" stroke-width="1.8"/>`,speedy:`<polyline points="2,26 8,10 14,18 22,6" stroke="#111" stroke-width="2" fill="none" stroke-linejoin="round"/><polygon points="26,4 20,5 23,10" fill="#111"/><line x1="2" y1="29" x2="30" y2="29" stroke="#111" stroke-width="1.2"/>`,burst:`<polygon points="16,2 30,16 16,30 2,16" stroke="#111" stroke-width="1.8" fill="none"/><polygon points="16,9 23,16 16,23 9,16" fill="rgba(0,0,0,0.15)" stroke="#111" stroke-width="1.2"/><line x1="16" y1="2" x2="16" y2="9" stroke="#111" stroke-width="1.8"/><line x1="23" y1="16" x2="30" y2="16" stroke="#111" stroke-width="1.8"/>`,sniper:`<rect x="2" y="12" width="16" height="8" stroke="#111" stroke-width="1.8"/><line x1="18" y1="16" x2="28" y2="16" stroke="#111" stroke-width="2.5"/><circle cx="29" cy="16" r="2.5" fill="#111"/><line x1="8" y1="5" x2="8" y2="12" stroke="#111" stroke-width="1.2"/><line x1="8" y1="20" x2="8" y2="27" stroke="#111" stroke-width="1.2"/>`,builder:`<rect x="1" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="1" y="18" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="18" width="13" height="13" stroke="#111" stroke-width="1" stroke-dasharray="2 1.5"/><line x1="14" y1="7.5" x2="18" y2="7.5" stroke="#111" stroke-width="1.2"/><line x1="7.5" y1="14" x2="7.5" y2="18" stroke="#111" stroke-width="1.2"/>`,futurist:`<circle cx="16" cy="16" r="10" stroke="#111" stroke-width="1.8"/><path d="M16 6 C20 6,24 11,24 16 C24 21,20 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><path d="M16 6 C12 6,8 11,8 16 C8 21,12 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><line x1="6" y1="16" x2="26" y2="16" stroke="#111" stroke-width="1.2"/><line x1="16" y1="1" x2="16" y2="6" stroke="#111" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="31" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="1" r="2" fill="#111"/><circle cx="16" cy="31" r="2" fill="#111"/>`};
+const ROG_SVG=`<svg width="130" height="78" viewBox="0 0 240 144" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 64.6633C0 64.6633 8.16511 90.0315 15.5878 98.4874C23.0105 106.943 49.4848 114.902 49.4848 114.902L0.247666 64.6633H0ZM214.762 0C195.958 0 168.247 4.22864 147.464 14.6742C130.391 23.1302 79.9171 81.5756 76.4531 85.3062C71.5047 90.7776 70.0189 92.0213 62.8436 89.2855C51.2147 85.0575 33.4016 73.617 33.4016 73.617C33.4016 73.617 52.9468 108.684 59.8747 119.13C70.5139 135.544 88.5767 144 88.5767 144C88.5767 144 75.2145 127.337 71.7505 120.125C68.534 113.41 72.494 107.689 91.5456 91.0259C122.721 63.4197 150.432 41.0367 177.896 24.6222C203.876 9.20257 218.473 4.97433 229.607 0.248947C226.885 0.248947 220.948 0.248947 214.762 0.248947V0ZM179.875 44.5183C136.575 69.14 79.4221 115.15 79.4221 115.15C95.7521 127.088 137.32 144 166.516 144C198.928 144 229.607 51.7309 229.607 51.7309C173.689 77.8449 136.575 100.228 136.575 100.228L195.215 79.8346C195.215 79.8346 176.658 127.585 155.38 127.585C130.638 127.585 101.939 114.404 101.939 114.404C151.671 75.855 228.37 40.788 232.576 38.5496C236.782 36.56 240 28.3528 240 24.6222C237.773 24.6222 208.579 28.3525 179.63 44.5183H179.875Z" fill="#686868"/></svg>`;
+
+const ROG_TEXT_SVG=`<svg width="200" height="24" viewBox="0 0 571 29" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M34.9375 28.0625C30.0208 28.0625 26.7292 28.0625 25.0625 28.0625C17.6042 19.5208 12.625 13.8333 10.125 11C16.9583 11 21.5208 11.0208 23.8125 11.0625C23.8125 8.60417 23.8125 6.77083 23.8125 5.5625C23.8125 5.39583 23.7708 5.14583 23.6875 4.8125C23.6458 4.47917 23.4375 4.3125 23.0625 4.3125C15.7708 4.3125 10.8958 4.3125 8.4375 4.3125C8.4375 16.1875 8.4375 24.1042 8.4375 28.0625C4.22917 28.0625 1.41667 28.0625 0 28.0625C0 15.8958 0 7.77083 0 3.6875C0 1.97917 0 0.833333 0 0.25C13.3333 0.25 23.3333 0.25 30 0.25C30.625 0.25 31.1042 0.520833 31.4375 1.0625C31.8125 1.60417 32 2.1875 32 2.8125C32 9.47917 32 13.9375 32 16.1875C28.25 16.1875 25.75 16.1875 24.5 16.1875C29.7083 22.1042 33.1875 26.0625 34.9375 28.0625ZM71.5625 28.0625C66.3125 28.0625 55.8542 28.0625 40.1875 28.0625C40.1875 26.3125 40.1875 22.8125 40.1875 17.5625C40.1875 14.6458 40.1875 8.79167 40.1875 0C45.3958 0 55.8542 0 71.5625 0C70.8542 0.708333 69.4375 2.10417 67.3125 4.1875C64.1875 4.1875 57.9167 4.1875 48.5 4.1875C48.5 5.47917 48.5 8.02083 48.5 11.8125C52.0417 11.8125 59.125 11.8125 69.75 11.8125C69.75 12.5625 69.75 14.0417 69.75 16.25C66.2083 16.25 59.125 16.25 48.5 16.25C48.5 17.5 48.5 20.0417 48.5 23.875C51.625 23.875 57.8958 23.875 67.3125 23.875C68.0208 24.5833 69.4375 25.9792 71.5625 28.0625ZM140.125 28.0625C134.917 28.0625 124.5 28.0625 108.875 28.0625C108.875 25.1458 108.875 19.3333 108.875 10.625C108.875 8.91667 108.875 5.45833 108.875 0.25C110.25 0.25 112.979 0.25 117.062 0.25C117.062 4.20833 117.062 12.1042 117.062 23.9375C119.562 23.9375 124.521 23.9375 131.938 23.9375C131.938 19.9792 131.938 12.0833 131.938 0.25C133.312 0.25 136.042 0.25 140.125 0.25C140.125 4.875 140.125 14.1458 140.125 28.0625ZM218.062 28.0625C216.688 28.0625 213.917 28.0625 209.75 28.0625C209.75 26.3125 209.75 22.8333 209.75 17.625C209.75 14.7083 209.75 8.91667 209.75 0.25C211.125 0.25 213.896 0.25 218.062 0.25C218.062 4.875 218.062 14.1458 218.062 28.0625ZM569.625 28.0625C565.083 28.0625 556.042 28.0625 542.5 28.0625C541.625 27.3542 539.896 25.9167 537.312 23.75C541.271 23.75 549.25 23.75 561.25 23.75C561.25 22.5 561.25 19.9583 561.25 16.125C557.417 16.125 549.771 16.125 538.312 16.125C538.312 13.4583 538.312 8.16667 538.312 0.25C543.604 0.25 554.208 0.25 570.125 0.25C569.5 0.916667 568.271 2.29167 566.438 4.375C563.104 4.375 556.5 4.375 546.625 4.375C546.625 5.625 546.625 8.14583 546.625 11.9375C550.458 11.9375 558.125 11.9375 569.625 11.9375C569.625 14.6042 569.625 19.9792 569.625 28.0625Z" fill="#686868"/></svg>`;
+
 const TYPE_NUM={tactical:'01',speedy:'02',burst:'03',sniper:'04',builder:'05',futurist:'06'};
 const TYPE_EN={tactical:'TACTICAL COMMANDER',speedy:'SPEED HUNTER',burst:'BURST BREAKER',sniper:'PRECISION SNIPER',builder:'CREATIVE BUILDER',futurist:'FUTURE CONTROLLER'};
 const TYPE_NAMES={tactical:'戰術指揮者',speedy:'極速獵手',burst:'爆發破局者',sniper:'精準狙擊手',builder:'創造建構者',futurist:'未來操控者'};
 
-async function init(){
-  const id=location.pathname.split('/').pop();
-  if(!id) return showError('無效的連結');
-  try{
-    const res=await fetch(`/api/result/${id}`);
-    if(!res.ok){const err=await res.json();return showError(err.error||'找不到此結果');}
-    render(await res.json());
-  }catch(e){showError('載入失敗，請確認網路連線');}
-}
-
-function showError(msg){
-  document.getElementById('loading').innerHTML=`<div style="font-size:20px">⚠</div><div class="loading-txt" style="color:#555">${msg}</div>`;
-}
-
-function render(data){
+function buildCard(data){
   const{type,typeName,tags,desc,scores,photo,id}=data;
   const num=TYPE_NUM[type]||'01';
   const en=TYPE_EN[type]||'';
-  const icon=TYPE_ICONS[type]||TYPE_ICONS.tactical;
   const max=Math.max(...Object.values(scores||{}));
 
-  const html=`
-  <div class="page" id="result-page">
-    <div class="corner c-tl"></div><div class="corner c-tr"></div>
-    <div class="corner c-bl"></div><div class="corner c-br"></div>
-    <div class="inner">
-      <div class="header">
-        <div class="sys">▶ DNA LAB &nbsp; RESULT</div>
-        <div class="sys-r">SESSION #${id}</div>
-      </div>
-      <div class="h-line"></div>
-      <div class="top-row">
-        <div class="photo-wrap">
-          ${photo?`<img src="${photo}" alt="Cyber Scan"/>`:`<div class="photo-placeholder"><div class="ph-txt">NO SCAN</div></div>`}
-          <div class="photo-scan"></div>
-          <div class="photo-corner pc-tl"></div><div class="photo-corner pc-tr"></div>
-          <div class="photo-corner pc-bl"></div><div class="photo-corner pc-br"></div>
-        </div>
-        <div class="type-info">
+  return `
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+    #card{width:390px;background:#fff;font-family:'Roboto Condensed','Microsoft JhengHei',sans-serif;position:relative;overflow:hidden}
+    #card::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.04) 1px,transparent 1px);background-size:18px 18px;pointer-events:none;z-index:0}
+    .cn{position:absolute;width:18px;height:18px;z-index:3}
+    .ctl{top:8px;left:8px;border-top:1.5px solid #111;border-left:1.5px solid #111}
+    .ctr{top:8px;right:8px;border-top:1.5px solid #111;border-right:1.5px solid #111}
+    .cbl{bottom:8px;left:8px;border-bottom:1.5px solid #111;border-left:1.5px solid #111}
+    .cbr{bottom:8px;right:8px;border-bottom:1.5px solid #111;border-right:1.5px solid #111}
+    .inn{position:relative;z-index:1;padding:18px 18px 20px}
+    .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .hl{font-family:'Share Tech Mono',monospace;font-size:9px;color:#111;letter-spacing:3px}
+    .hr{font-family:'Share Tech Mono',monospace;font-size:8px;color:#999;letter-spacing:2px}
+    .hline{width:100%;height:1px;background:#111;position:relative;margin-bottom:10px}
+    .hline::before,.hline::after{content:'';position:absolute;width:5px;height:5px;background:#111;border-radius:50%;top:-2px}
+    .hline::before{left:0}.hline::after{right:0}
+    .ab{border:1px solid rgba(0,0,0,0.2);padding:10px 12px;position:relative;background:rgba(255,255,255,0.8)}
+    .ab::before{content:'ARCHETYPE DETECTED';position:absolute;top:-7px;left:10px;font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;letter-spacing:2px;background:#fff;padding:0 4px}
+    .ab::after{content:'';position:absolute;top:8px;right:8px;width:10px;height:10px;border-top:1px solid rgba(0,0,0,0.2);border-right:1px solid rgba(0,0,0,0.2)}
+    .at{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+    .an{font-family:'Share Tech Mono',monospace;font-size:7px;color:#999;letter-spacing:2px;margin-bottom:2px}
+    .aname{font-size:32px;font-weight:900;color:#111;line-height:0.9;letter-spacing:-1px}
+    .atags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+    .tag{font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;border:1px solid #111;padding:2px 6px;letter-spacing:1px}
+    .pw{width:100%;position:relative;background:#0a0a0a;overflow:hidden}
+    .pw img{width:100%;display:block}
+    .pp{width:100%;aspect-ratio:4/3;background:#111;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,0.15);letter-spacing:3px}
+    .clw{padding:5px 0 0 12px}
+    .cll{font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;letter-spacing:2px;background:#fff;display:inline-block;padding:1px 4px}
+    .db{border:1px solid rgba(0,0,0,0.15);border-top:none;padding:10px 12px;position:relative;background:rgba(255,255,255,0.8)}
+    .db::before{content:'CAPABILITY ANALYSIS';position:absolute;top:-7px;left:10px;font-family:'Share Tech Mono',monospace;font-size:7px;color:#111;letter-spacing:2px;background:#fff;padding:0 4px}
+    .db::after{content:'';position:absolute;top:8px;right:8px;width:10px;height:10px;border-top:1px solid rgba(0,0,0,0.15);border-right:1px solid rgba(0,0,0,0.15)}
+    .dt{font-size:11px;color:#333;line-height:1.75;margin-top:4px}
+    .sg{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgba(0,0,0,0.1);border-top:none}
+    .si{padding:8px 10px;border-bottom:1px solid rgba(0,0,0,0.08);border-right:1px solid rgba(0,0,0,0.08)}
+    .si:nth-child(2n){border-right:none}
+    .si:nth-last-child(-n+2){border-bottom:none}
+    .sn{font-family:'Share Tech Mono',monospace;font-size:7px;color:#999;letter-spacing:1px;margin-bottom:4px}
+    .sb{height:2px;background:rgba(0,0,0,0.08);margin-bottom:3px}
+    .sf{height:100%;background:#111}
+    .sv{font-family:'Share Tech Mono',monospace;font-size:8px;color:#111;text-align:right}
+    .rf{padding:16px 0 14px;display:flex;justify-content:center}
+  </style>
+  <div id="card">
+    <div class="cn ctl"></div><div class="cn ctr"></div>
+    <div class="cn cbl"></div><div class="cn cbr"></div>
+    <div class="inn">
+      <div class="hdr"><div class="hl">▶ DNA LAB RESULT OUTPUT</div><div class="hr">SESSION #${id}</div></div>
+      <div class="hline"></div>
+      <div class="ab">
+        <div class="at">
           <div>
-            <div class="type-num">ARCHETYPE ${num} ── ${en}</div>
-            <div class="type-name">${typeName}</div>
-            <div class="type-tags">${(tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+            <div class="an">ARCHETYPE ${num} —— ${en}</div>
+            <div class="aname">${typeName}</div>
+            <div class="atags">${(tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
           </div>
-          <div class="type-icon"><svg width="36" height="36" viewBox="0 0 32 32" fill="none">${icon}</svg></div>
+          <div>${ROG_SVG}</div>
         </div>
       </div>
-      <div class="desc">${desc}</div>
-      <div class="score-grid">
+      <div class="pw">
+        ${photo?`<img src="${photo}" crossorigin="anonymous"/>`:`<div class="pp">USER SCAN</div>`}
+      </div>
+      <div class="clw"><span class="cll">CAPABILITY ANALYSIS</span></div>
+      <div class="db">
+        <div class="dt">${desc}</div>
+      </div>
+      <div class="sg">
         ${Object.entries(scores||{}).map(([t,v])=>{
           const pct=max>0?Math.round((v/max)*100):0;
-          return `<div class="score-item"><div class="score-name">${TYPE_NAMES[t]||t}</div><div class="score-bar-bg"><div class="score-bar-fill" style="width:0%" data-w="${pct}%"></div></div><div class="score-val">${pct}%</div></div>`;
+          return `<div class="si"><div class="sn">${TYPE_NAMES[t]||t}</div><div class="sb"><div class="sf" style="width:${pct}%"></div></div><div class="sv">${pct}%</div></div>`;
         }).join('')}
       </div>
-      <div class="bottom-row">
-        <button class="download-btn" id="dl-btn">↓ &nbsp; 下載結果卡片</button>
-        <div class="footer-col">
-          <div class="footer-brand">ROG × GAMER DNA LAB</div>
-          <div class="save-hint">長按圖片可儲存</div>
-        </div>
-      </div>
+      <div class="rf">${ROG_TEXT_SVG}</div>
     </div>
   </div>`;
+}
 
-  document.getElementById('loading').remove();
-  document.getElementById('page').insertAdjacentHTML('beforeend',html);
+async function init(){
+  const id=location.pathname.split('/').pop();
+  if(!id) return showErr('無效的連結');
+  try{
+    const res=await fetch(`/api/result/${id}`);
+    if(!res.ok){const e=await res.json();return showErr(e.error||'找不到此結果');}
+    const data=await res.json();
 
-  setTimeout(()=>{
-    document.querySelectorAll('.score-bar-fill').forEach(b=>b.style.width=b.dataset.w);
-  },400);
+    // 建立隱藏卡片
+    const wrap=document.getElementById('card-wrap');
+    wrap.innerHTML=buildCard(data);
 
-  document.getElementById('dl-btn').addEventListener('click',async()=>{
-    const btn=document.getElementById('dl-btn');
-    btn.textContent='截圖中...';
-    btn.style.opacity='0.6';
-    btn.style.pointerEvents='none';
-    try{
-      const canvas=await html2canvas(document.getElementById('result-page'),{
-        useCORS:true,allowTaint:true,scale:2,backgroundColor:'#ffffff'
+    // 等字體與圖片載入
+    await document.fonts.ready;
+    if(data.photo){
+      await new Promise(r=>{
+        const img=wrap.querySelector('img');
+        if(!img||img.complete)return r();
+        img.onload=r;img.onerror=r;
       });
-      const a=document.createElement('a');
-      a.href=canvas.toDataURL('image/jpeg',0.95);
-      a.download='gamer-dna-result.jpg';
-      a.click();
-    }catch(e){console.error(e);}
-    btn.textContent='↓   下載結果卡片';
-    btn.style.opacity='1';
-    btn.style.pointerEvents='auto';
-  });
+    }
+    // 延遲一點確保渲染完成
+    await new Promise(r=>setTimeout(r,300));
+
+    // 截圖
+    const canvas=await html2canvas(wrap.querySelector('#card'),{
+      useCORS:true,allowTaint:true,scale:2,backgroundColor:'#ffffff'
+    });
+
+    // 顯示結果圖片
+    const imgEl=document.getElementById('result-img');
+    imgEl.src=canvas.toDataURL('image/jpeg',0.95);
+    imgEl.style.display='block';
+
+    document.getElementById('hint').style.display='block';
+    document.getElementById('loading').style.display='none';
+
+  }catch(e){
+    console.error(e);
+    showErr('載入失敗');
+  }
+}
+
+function showErr(msg){
+  document.getElementById('loading').innerHTML=`<div style="font-size:20px;margin-bottom:8px">⚠</div><div class="loading-txt">${msg}</div>`;
 }
 
 init();
