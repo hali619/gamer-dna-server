@@ -92,7 +92,7 @@ app.post('/api/save', (req, res) => {
   if (!type || !typeName) return res.status(400).json({ error: '缺少基因類型資料' });
 
   const id = uuidv4().split('-')[0];
-  const expireAt = Date.now() + 1000 * 60 * 60 * 24 * 7; // 7天
+  const expireAt = Date.now() + 1000 * 60 * 60 * 24 * 3; // 3天
 
   store.set(id, { id, photo: photo || null, type, typeName, tags: tags || [], desc: desc || '', scores: scores || {}, createdAt: Date.now(), expireAt });
 
