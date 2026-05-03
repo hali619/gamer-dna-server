@@ -77,12 +77,12 @@ html, body {
 #screen-intro { justify-content:center; }
 .intro-sys { font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--ink); letter-spacing:7px; margin-bottom:8px; }
 .intro-sys-sub { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:5px; margin-bottom:60px; }
-.intro-title { font-size:130px; font-weight:900; color:var(--ink); line-height:0.86; text-transform:uppercase; letter-spacing:-2px; }
-.intro-title-zh { font-size:38px; color:var(--ink-mid); letter-spacing:12px; margin-top:20px; margin-bottom:48px; }
+.intro-title { font-size:160px; font-weight:900; color:var(--ink); line-height:0.86; text-transform:uppercase; letter-spacing:-2px; }
+.intro-title-zh { font-size:38px; color:var(--ink-mid); letter-spacing:20px; margin-top:20px; margin-bottom:48px; }
 .intro-divider { width:100%; height:2px; background:var(--ink); margin-bottom:60px; position:relative; }
 .intro-divider::before,.intro-divider::after { content:''; position:absolute; width:8px; height:8px; background:var(--ink); border-radius:50%; top:-3px; }
 .intro-divider::before { left:0; } .intro-divider::after { right:0; }
-.intro-desc { font-size:28px; color:var(--ink-mid); line-height:1.7; letter-spacing:2px; margin-bottom:120px; padding-left:20px; border-left:3px solid var(--ink); }
+.intro-desc { font-size:28px; color:var(--ink-mid); line-height:1.7; letter-spacing:2px; margin-bottom:0; padding-left:20px; border-left:3px solid var(--ink); flex-shrink:0; }
 .intro-meta { display:flex; gap:60px; margin-bottom:100px; }
 .meta-item { display:flex; flex-direction:column; gap:6px; }
 .meta-num { font-size:72px; font-weight:900; color:var(--ink); line-height:1; }
@@ -176,18 +176,19 @@ html, body {
 
 .result-top { display:flex; gap:32px; align-items:flex-start; margin-bottom:32px; flex-shrink:0; }
 .result-photo-wrap {
-  width:260px; height:260px; flex-shrink:0;
-  border:2px solid var(--ink); overflow:hidden; position:relative; background:#ddd;
+  width:280px; height:320px; flex-shrink:0;
+  border:2px solid var(--ink); overflow:hidden; position:relative; background:#111;
 }
 .result-photo-wrap img { width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(100%) contrast(1.1); }
 .result-photo-wrap::after { content:''; position:absolute; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(0,0,0,0.3),transparent); animation:scanAnim 3s linear infinite; pointer-events:none; }
 .no-photo { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--ink-light); letter-spacing:2px; }
 
-.result-right { flex:1; display:flex; flex-direction:column; gap:10px; padding-top:4px; }
+.result-right { flex:1; display:flex; flex-direction:column; gap:10px; padding-top:4px; position:relative; }
 .result-icon-wrap { width:100px; height:100px; border:2px solid var(--ink); display:flex; align-items:center; justify-content:center; position:relative; flex-shrink:0; }
 .result-icon-wrap::before { content:''; position:absolute; top:-1px; right:-1px; width:14px; height:14px; border-top:2px solid var(--ink); border-right:2px solid var(--ink); }
 .result-type-num { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--ink-light); letter-spacing:4px; }
-.result-name { font-size:58px; font-weight:900; color:var(--ink); line-height:0.92; letter-spacing:-1px; }
+.result-name { font-size:80px; font-weight:900; color:var(--ink); line-height:0.88; letter-spacing:-2px; }
+
 
 .result-tags { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; flex-shrink:0; }
 .result-tag { font-family:'Share Tech Mono',monospace; font-size:15px; color:var(--ink); border:1.5px solid var(--ink); padding:5px 16px; letter-spacing:2px; }
@@ -217,7 +218,7 @@ html, body {
   display:flex; align-items:center; gap:32px;
   background:rgba(255,255,255,0.35);
   position:relative; flex-shrink:0;
-  margin-bottom:200px;
+  margin-bottom:40px;
 }
 .qr-section::before {
   content:'SCAN TO SAVE';
@@ -257,14 +258,23 @@ html, body {
 
 <!-- ══ INTRO ══ -->
 <div class="screen active" id="screen-intro">
-  <div class="intro-sys">▶ DNA LAB &nbsp; SYSTEM ONLINE</div>
-  <div class="intro-sys-sub">PLAYER ARCHETYPE ANALYSIS &nbsp; v2.6</div>
-  <div class="intro-title">GAMER<br>DNA</div>
-  <div class="intro-title-zh">玩家基因鑑定系統</div>
-  <div class="intro-divider"></div>
-  <div class="intro-desc">每一位玩家都有屬於自己的戰鬥基因。<br>透過 10 道情境問題，找出你的玩家原型。</div>
-
-  <button class="big-btn" onclick="goCamera()">▶ &nbsp; 開始鑑定</button>
+  <!-- ▶ DNA LAB SYSTEM ONLINE  Y=660 -->
+  <div style="position:absolute; top:660px; left:80px; font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--ink); letter-spacing:7px;">▶ DNA LAB &nbsp; SYSTEM ONLINE</div>
+  <!-- PLAYER ARCHETYPE ANALYSIS v2.6  Y=710 -->
+  <div style="position:absolute; top:710px; left:80px; font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:5px;">PLAYER ARCHETYPE ANALYSIS &nbsp; v2.6</div>
+  <!-- GAMER  Y=760 -->
+  <div style="position:absolute; top:760px; left:80px; font-family:'Roboto Condensed',sans-serif; font-size:160px; font-weight:900; color:var(--ink); line-height:0.86; letter-spacing:-2px;">GAMER<br>DNA</div>
+  <!-- 玩家基因鑑定系統  Y=1090 -->
+  <div style="position:absolute; top:1090px; left:80px; font-size:38px; color:var(--ink-mid); letter-spacing:20px;">玩 家 基 因 鑑 定 系 統</div>
+  <!-- divider  Y=1160 -->
+  <div style="position:absolute; top:1160px; left:80px; right:80px; height:2px; background:var(--ink);">
+    <div style="position:absolute; width:8px; height:8px; background:var(--ink); border-radius:50%; top:-3px; left:0;"></div>
+    <div style="position:absolute; width:8px; height:8px; background:var(--ink); border-radius:50%; top:-3px; right:0;"></div>
+  </div>
+  <!-- desc  Y=1220 -->
+  <div style="position:absolute; top:1220px; left:80px; font-size:28px; color:var(--ink-mid); line-height:1.7; letter-spacing:2px; padding-left:20px; border-left:3px solid var(--ink);">每一位玩家都有屬於自己的戰鬥基因。<br>透過 10 道情境問題，找出你的玩家原型。</div>
+  <!-- button  Y=1430  920x140 -->
+  <button class="big-btn" style="position:absolute; top:1430px; left:80px; width:920px; height:140px; font-size:48px; letter-spacing:12px;" onclick="goCamera()">▶ &nbsp; 開始鑑定</button>
 </div>
 
 <!-- ══ CAMERA ══ -->
@@ -289,9 +299,9 @@ html, body {
     </div>
     <div class="countdown-label" id="countdown-label">準備好後按下拍照</div>
   </div>
-  <div class="cam-btns">
-    <button class="big-btn outline" style="width:220px;font-size:28px;letter-spacing:4px;height:120px" onclick="skipPhoto()">略過</button>
-    <button class="big-btn" style="flex:1;font-size:32px;letter-spacing:6px;height:120px" id="shoot-btn" onclick="startCountdown()">📷 &nbsp; 拍照</button>
+  <div class="cam-btns" style="position:absolute; top:1430px; left:80px; right:80px; width:920px;">
+    <button class="big-btn outline" style="width:220px;font-size:28px;letter-spacing:4px;height:140px" onclick="skipPhoto()">略過</button>
+    <button class="big-btn" style="flex:1;font-size:32px;letter-spacing:6px;height:140px" id="shoot-btn" onclick="startCountdown()">📷 &nbsp; 拍照</button>
   </div>
 </div>
 
@@ -329,6 +339,8 @@ html, body {
       </div>
       <div class="result-type-num" id="r-type-num"></div>
       <div class="result-name"     id="r-name"></div>
+      <div style="position:absolute;bottom:0;right:0;"><svg width="200" height="120" viewBox="0 0 240 144" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 64.6633C0 64.6633 8.16511 90.0315 15.5878 98.4874C23.0105 106.943 49.4848 114.902 49.4848 114.902L0.247666 64.6633H0ZM214.762 0C195.958 0 168.247 4.22864 147.464 14.6742C130.391 23.1302 79.9171 81.5756 76.4531 85.3062C71.5047 90.7776 70.0189 92.0213 62.8436 89.2855C51.2147 85.0575 33.4016 73.617 33.4016 73.617C33.4016 73.617 52.9468 108.684 59.8747 119.13C70.5139 135.544 88.5767 144 88.5767 144C88.5767 144 75.2145 127.337 71.7505 120.125C68.534 113.41 72.494 107.689 91.5456 91.0259C122.721 63.4197 150.432 41.0367 177.896 24.6222C203.876 9.20257 218.473 4.97433 229.607 0.248947C226.885 0.248947 220.948 0.248947 214.762 0.248947V0ZM179.875 44.5183C136.575 69.14 79.4221 115.15 79.4221 115.15C95.7521 127.088 137.32 144 166.516 144C198.928 144 229.607 51.7309 229.607 51.7309C173.689 77.8449 136.575 100.228 136.575 100.228L195.215 79.8346C195.215 79.8346 176.658 127.585 155.38 127.585C130.638 127.585 101.939 114.404 101.939 114.404C151.671 75.855 228.37 40.788 232.576 38.5496C236.782 36.56 240 28.3528 240 24.6222C237.773 24.6222 208.579 28.3525 179.63 44.5183H179.875Z" fill="#686868"/></svg></div>
+
     </div>
   </div>
   <div class="result-tags"    id="r-tags"></div>
@@ -346,7 +358,7 @@ html, body {
       </div>
     </div>
 
-  <button class="big-btn outline" style="margin-top:auto;flex-shrink:0" onclick="restart()">↺ &nbsp; 重新鑑定</button>
+  <button class="big-btn outline" style="position:absolute;top:1720px;left:80px;width:920px;height:120px;font-size:42px;letter-spacing:8px;color:#111111 !important;background:#ffffff !important;border:2px solid #111111;" onclick="restart()">重新鑑定</button>
 </div>
 
 </div>
