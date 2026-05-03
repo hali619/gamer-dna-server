@@ -39,7 +39,7 @@ async function generateCyberFace(base64Image) {
   `;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash-preview-05-20',
+    model: 'gemini-2.5-flash-image',
     contents: {
       parts: [
         { text: prompt },
