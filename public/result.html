@@ -2,236 +2,168 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>玩家基因鑑定結果</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--ink:#111;--ink-m:#555;--ink-l:#999;--bg:#fff;--panel:rgba(255,255,255,0.7)}
-body{background:#111;font-family:'Roboto Condensed','Microsoft JhengHei',sans-serif;min-height:100vh;display:flex;justify-content:center}
-.page{width:100%;max-width:480px;background:var(--bg);position:relative;overflow:hidden;min-height:100vh}
-.page::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.06) 1px,transparent 1px),linear-gradient(rgba(0,0,0,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.025) 1px,transparent 1px);background-size:24px 24px,24px 24px,8px 8px,8px 8px;pointer-events:none;z-index:0}
-.corner{position:absolute;width:20px;height:20px;z-index:2}
-.c-tl{top:10px;left:10px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink)}
-.c-tr{top:10px;right:10px;border-top:1.5px solid var(--ink);border-right:1.5px solid var(--ink)}
-.c-bl{bottom:10px;left:10px;border-bottom:1.5px solid var(--ink);border-left:1.5px solid var(--ink)}
-.c-br{bottom:10px;right:10px;border-bottom:1.5px solid var(--ink);border-right:1.5px solid var(--ink)}
-.inner{position:relative;z-index:1;padding:20px 20px 32px;display:flex;flex-direction:column;gap:0}
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.sys{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--ink);letter-spacing:4px}
-.sys-r{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--ink-l);letter-spacing:2px}
-.divider{width:100%;height:1.5px;background:var(--ink);position:relative;margin-bottom:14px}
-.divider::before,.divider::after{content:'';position:absolute;width:5px;height:5px;background:var(--ink);border-radius:50%;top:-1.5px}
-.divider::before{left:0}.divider::after{right:0}
-
-/* top annotation */
-.ann-top{border:1.5px solid rgba(0,0,0,0.25);padding:12px 14px;margin-bottom:0;position:relative;background:var(--panel)}
-.ann-top::before{content:'ARCHETYPE DETECTED';position:absolute;top:-8px;left:12px;font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--ink);letter-spacing:2px;background:var(--bg);padding:0 5px}
-.ann-top::after{content:'';position:absolute;top:8px;right:8px;width:12px;height:12px;border-top:1px solid rgba(0,0,0,0.18);border-right:1px solid rgba(0,0,0,0.18)}
-.ann-top-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.type-num{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--ink-l);letter-spacing:3px;margin-bottom:4px}
-.type-name{font-size:32px;font-weight:900;color:var(--ink);line-height:0.9;letter-spacing:-0.5px}
-.type-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.tag{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--ink);border:1px solid var(--ink);padding:3px 8px;letter-spacing:1px}
-
-/* photo */
-.photo-wrap{width:100%;position:relative;overflow:hidden;background:#000;border-left:1.5px solid rgba(0,0,0,0.2);border-right:1.5px solid rgba(0,0,0,0.2)}
-.photo-wrap img{width:100%;display:block;filter:contrast(1.05)}
-.photo-placeholder{width:100%;aspect-ratio:1;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.ph-txt{font-family:'Share Tech Mono',monospace;font-size:12px;color:rgba(255,255,255,0.2);letter-spacing:3px}
-.photo-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);animation:scanAnim 4s linear infinite;pointer-events:none}
+html,body{width:100%;height:100%;background:#111;font-family:'Roboto Condensed','Microsoft JhengHei',sans-serif;overflow:hidden}
+.page{width:100%;height:100vh;background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.page::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.06) 1px,transparent 1px);background-size:20px 20px;pointer-events:none;z-index:0}
+.corner{position:absolute;width:16px;height:16px;z-index:3}
+.c-tl{top:8px;left:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink)}
+.c-tr{top:8px;right:8px;border-top:1.5px solid var(--ink);border-right:1.5px solid var(--ink)}
+.c-bl{bottom:8px;left:8px;border-bottom:1.5px solid var(--ink);border-left:1.5px solid var(--ink)}
+.c-br{bottom:8px;right:8px;border-bottom:1.5px solid var(--ink);border-right:1.5px solid var(--ink)}
+.inner{position:relative;z-index:1;padding:10px 14px 8px;display:flex;flex-direction:column;height:100%;gap:6px}
+.header{display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.sys{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--ink);letter-spacing:3px}
+.sys-r{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--ink-l);letter-spacing:2px}
+.h-line{width:100%;height:1px;background:var(--ink);position:relative;flex-shrink:0}
+.h-line::before,.h-line::after{content:'';position:absolute;width:4px;height:4px;background:var(--ink);border-radius:50%;top:-1.5px}
+.h-line::before{left:0}.h-line::after{right:0}
+.top-row{display:flex;gap:8px;align-items:stretch;flex-shrink:0}
+.photo-wrap{width:36%;flex-shrink:0;position:relative;overflow:hidden;background:#000;aspect-ratio:3/4}
+.photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-placeholder{width:100%;height:100%;background:#0a0a0a;display:flex;align-items:center;justify-content:center}
+.ph-txt{font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:2px}
+.photo-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);animation:scanAnim 3s linear infinite;pointer-events:none}
 @keyframes scanAnim{0%{top:0}100%{top:100%}}
-.photo-corner{position:absolute;width:16px;height:16px}
-.pc-tl{top:0;left:0;border-top:2px solid rgba(255,255,255,0.6);border-left:2px solid rgba(255,255,255,0.6)}
-.pc-tr{top:0;right:0;border-top:2px solid rgba(255,255,255,0.6);border-right:2px solid rgba(255,255,255,0.6)}
-.pc-bl{bottom:0;left:0;border-bottom:2px solid rgba(255,255,255,0.6);border-left:2px solid rgba(255,255,255,0.6)}
-.pc-br{bottom:0;right:0;border-bottom:2px solid rgba(255,255,255,0.6);border-right:2px solid rgba(255,255,255,0.6)}
-.callout{position:absolute;display:flex;align-items:center;gap:6px}
-.callout.l{left:10px;flex-direction:row}
-.callout.r{right:10px;flex-direction:row-reverse}
-.callout-line{width:28px;height:1px;background:rgba(255,255,255,0.45);flex-shrink:0}
-.callout-text{font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,255,255,0.65);letter-spacing:1px;white-space:nowrap}
-.unit-badge{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.2);padding:4px 10px}
-.unit-id{font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,0.75);letter-spacing:2px}
-
-/* bottom */
-.ann-bot{border:1.5px solid rgba(0,0,0,0.25);border-top:none;padding:14px 14px 12px;position:relative;background:var(--panel)}
-.ann-bot::before{content:'CAPABILITY ANALYSIS';position:absolute;top:-8px;left:12px;font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--ink);letter-spacing:2px;background:var(--bg);padding:0 5px}
-.ann-bot::after{content:'';position:absolute;top:8px;right:8px;width:12px;height:12px;border-top:1px solid rgba(0,0,0,0.18);border-right:1px solid rgba(0,0,0,0.18)}
-.desc{font-size:12px;color:var(--ink-m);line-height:1.75;padding:10px 12px;border:1px solid rgba(0,0,0,0.12);background:rgba(255,255,255,0.5);margin-bottom:12px}
-.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.score-item{background:rgba(255,255,255,0.5);border:0.5px solid rgba(0,0,0,0.12);padding:7px 9px}
-.score-name{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--ink-l);letter-spacing:1px;margin-bottom:4px}
-.score-bar-bg{height:2px;background:rgba(0,0,0,0.08);overflow:hidden;margin-bottom:3px}
+.photo-corner{position:absolute;width:10px;height:10px}
+.pc-tl{top:0;left:0;border-top:1.5px solid rgba(255,255,255,0.7);border-left:1.5px solid rgba(255,255,255,0.7)}
+.pc-tr{top:0;right:0;border-top:1.5px solid rgba(255,255,255,0.7);border-right:1.5px solid rgba(255,255,255,0.7)}
+.pc-bl{bottom:0;left:0;border-bottom:1.5px solid rgba(255,255,255,0.7);border-left:1.5px solid rgba(255,255,255,0.7)}
+.pc-br{bottom:0;right:0;border-bottom:1.5px solid rgba(255,255,255,0.7);border-right:1.5px solid rgba(255,255,255,0.7)}
+.type-info{flex:1;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(0,0,0,0.2);padding:8px 10px;background:var(--panel);position:relative}
+.type-info::before{content:'ARCHETYPE DETECTED';position:absolute;top:-6px;left:8px;font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--ink);letter-spacing:2px;background:var(--bg);padding:0 4px}
+.type-num{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--ink-l);letter-spacing:2px;margin-bottom:2px}
+.type-name{font-size:26px;font-weight:900;color:var(--ink);line-height:0.88;letter-spacing:-0.5px}
+.type-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.tag{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--ink);border:1px solid var(--ink);padding:2px 5px;letter-spacing:1px}
+.type-icon{align-self:flex-end}
+.desc{font-size:10px;color:var(--ink-m);line-height:1.6;padding:6px 8px;border:1px solid rgba(0,0,0,0.1);background:var(--panel);flex-shrink:0}
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;flex-shrink:0}
+.score-item{background:var(--panel);border:0.5px solid rgba(0,0,0,0.1);padding:4px 6px}
+.score-name{font-family:'Share Tech Mono',monospace;font-size:6.5px;color:var(--ink-l);letter-spacing:1px;margin-bottom:2px}
+.score-bar-bg{height:2px;background:rgba(0,0,0,0.08);overflow:hidden;margin-bottom:2px}
 .score-bar-fill{height:100%;background:var(--ink);transition:width 1.2s ease}
-.score-val{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--ink);text-align:right}
-
-.footer{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.1)}
-.footer-brand{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--ink-l);letter-spacing:2px}
-.footer-coord{font-family:'Share Tech Mono',monospace;font-size:8px;color:#ccc;letter-spacing:1px}
-.save-hint{text-align:center;margin-top:14px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--ink-l);letter-spacing:3px}
-.download-btn{display:flex;width:100%;margin-top:12px;height:52px;background:var(--ink);color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:4px;cursor:pointer;text-decoration:none;align-items:center;justify-content:center}
+.score-val{font-family:'Share Tech Mono',monospace;font-size:6.5px;color:var(--ink);text-align:right}
+.bottom-row{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.download-btn{flex:1;height:38px;background:var(--ink);color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .download-btn:active{opacity:0.75}
-
-/* loading / error */
-.loading,.error{width:100%;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:#fff;position:relative;z-index:1}
-.loading-txt,.error-txt{font-family:'Share Tech Mono',monospace;font-size:13px;color:#999;letter-spacing:4px}
-.error-txt{color:#555}
-.spinner{width:40px;height:40px;border:2px solid rgba(0,0,0,0.08);border-top:2px solid #111;border-radius:50%;animation:spin 1s linear infinite}
+.footer-col{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.footer-brand{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--ink-l);letter-spacing:2px}
+.save-hint{font-family:'Share Tech Mono',monospace;font-size:6px;color:#ccc;letter-spacing:1px}
+.loading{width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#fff}
+.loading-txt{font-family:'Share Tech Mono',monospace;font-size:11px;color:#999;letter-spacing:4px}
+.spinner{width:32px;height:32px;border:2px solid rgba(0,0,0,0.08);border-top:2px solid #111;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-<div class="page" id="page">
-  <div class="corner c-tl"></div>
-  <div class="corner c-tr"></div>
-  <div class="corner c-bl"></div>
-  <div class="corner c-br"></div>
-
-  <!-- Loading state -->
+<div id="page">
   <div class="loading" id="loading">
     <div class="spinner"></div>
     <div class="loading-txt">LOADING DNA DATA...</div>
   </div>
 </div>
-
 <script>
-const TYPE_ICONS = {
-  tactical: `<circle cx="16" cy="16" r="13" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="16" r="5" stroke="#111" stroke-width="1.8"/><line x1="16" y1="3" x2="16" y2="11" stroke="#111" stroke-width="1.8"/><line x1="16" y1="21" x2="16" y2="29" stroke="#111" stroke-width="1.8"/><line x1="3" y1="16" x2="11" y2="16" stroke="#111" stroke-width="1.8"/><line x1="21" y1="16" x2="29" y2="16" stroke="#111" stroke-width="1.8"/>`,
-  speedy:   `<polyline points="2,26 8,10 14,18 22,6" stroke="#111" stroke-width="2" fill="none" stroke-linejoin="round"/><polygon points="26,4 20,5 23,10" fill="#111"/><line x1="2" y1="29" x2="30" y2="29" stroke="#111" stroke-width="1.2"/>`,
-  burst:    `<polygon points="16,2 30,16 16,30 2,16" stroke="#111" stroke-width="1.8" fill="none"/><polygon points="16,9 23,16 16,23 9,16" fill="rgba(0,0,0,0.15)" stroke="#111" stroke-width="1.2"/><line x1="16" y1="2" x2="16" y2="9" stroke="#111" stroke-width="1.8"/><line x1="23" y1="16" x2="30" y2="16" stroke="#111" stroke-width="1.8"/>`,
-  sniper:   `<rect x="2" y="12" width="16" height="8" stroke="#111" stroke-width="1.8"/><line x1="18" y1="16" x2="28" y2="16" stroke="#111" stroke-width="2.5"/><circle cx="29" cy="16" r="2.5" fill="#111"/><line x1="8" y1="5" x2="8" y2="12" stroke="#111" stroke-width="1.2"/><line x1="8" y1="20" x2="8" y2="27" stroke="#111" stroke-width="1.2"/>`,
-  builder:  `<rect x="1" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="1" y="18" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="18" width="13" height="13" stroke="#111" stroke-width="1" stroke-dasharray="2 1.5"/><line x1="14" y1="7.5" x2="18" y2="7.5" stroke="#111" stroke-width="1.2"/><line x1="7.5" y1="14" x2="7.5" y2="18" stroke="#111" stroke-width="1.2"/>`,
-  futurist: `<circle cx="16" cy="16" r="10" stroke="#111" stroke-width="1.8"/><path d="M16 6 C20 6,24 11,24 16 C24 21,20 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><path d="M16 6 C12 6,8 11,8 16 C8 21,12 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><line x1="6" y1="16" x2="26" y2="16" stroke="#111" stroke-width="1.2"/><line x1="16" y1="1" x2="16" y2="6" stroke="#111" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="31" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="1" r="2" fill="#111"/><circle cx="16" cy="31" r="2" fill="#111"/>`,
-};
-const TYPE_NUM = { tactical:'01', speedy:'02', burst:'03', sniper:'04', builder:'05', futurist:'06' };
-const TYPE_EN  = { tactical:'TACTICAL COMMANDER', speedy:'SPEED HUNTER', burst:'BURST BREAKER', sniper:'PRECISION SNIPER', builder:'CREATIVE BUILDER', futurist:'FUTURE CONTROLLER' };
-const TYPE_NAMES = { tactical:'戰術指揮者', speedy:'極速獵手', burst:'爆發破局者', sniper:'精準狙擊手', builder:'創造建構者', futurist:'未來操控者' };
-const CALLOUTS_L = ['NEURAL INTERFACE','TACTICAL CORE','COMMAND MODULE'];
-const CALLOUTS_R = ['STRATEGIC AI','DATA PROCESSOR','REFLEX ARRAY'];
-const CALLOUT_POS = [0.2, 0.45, 0.68];
+const TYPE_ICONS={tactical:`<circle cx="16" cy="16" r="13" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="16" r="5" stroke="#111" stroke-width="1.8"/><line x1="16" y1="3" x2="16" y2="11" stroke="#111" stroke-width="1.8"/><line x1="16" y1="21" x2="16" y2="29" stroke="#111" stroke-width="1.8"/><line x1="3" y1="16" x2="11" y2="16" stroke="#111" stroke-width="1.8"/><line x1="21" y1="16" x2="29" y2="16" stroke="#111" stroke-width="1.8"/>`,speedy:`<polyline points="2,26 8,10 14,18 22,6" stroke="#111" stroke-width="2" fill="none" stroke-linejoin="round"/><polygon points="26,4 20,5 23,10" fill="#111"/><line x1="2" y1="29" x2="30" y2="29" stroke="#111" stroke-width="1.2"/>`,burst:`<polygon points="16,2 30,16 16,30 2,16" stroke="#111" stroke-width="1.8" fill="none"/><polygon points="16,9 23,16 16,23 9,16" fill="rgba(0,0,0,0.15)" stroke="#111" stroke-width="1.2"/><line x1="16" y1="2" x2="16" y2="9" stroke="#111" stroke-width="1.8"/><line x1="23" y1="16" x2="30" y2="16" stroke="#111" stroke-width="1.8"/>`,sniper:`<rect x="2" y="12" width="16" height="8" stroke="#111" stroke-width="1.8"/><line x1="18" y1="16" x2="28" y2="16" stroke="#111" stroke-width="2.5"/><circle cx="29" cy="16" r="2.5" fill="#111"/><line x1="8" y1="5" x2="8" y2="12" stroke="#111" stroke-width="1.2"/><line x1="8" y1="20" x2="8" y2="27" stroke="#111" stroke-width="1.2"/>`,builder:`<rect x="1" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="1" y="18" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="18" width="13" height="13" stroke="#111" stroke-width="1" stroke-dasharray="2 1.5"/><line x1="14" y1="7.5" x2="18" y2="7.5" stroke="#111" stroke-width="1.2"/><line x1="7.5" y1="14" x2="7.5" y2="18" stroke="#111" stroke-width="1.2"/>`,futurist:`<circle cx="16" cy="16" r="10" stroke="#111" stroke-width="1.8"/><path d="M16 6 C20 6,24 11,24 16 C24 21,20 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><path d="M16 6 C12 6,8 11,8 16 C8 21,12 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><line x1="6" y1="16" x2="26" y2="16" stroke="#111" stroke-width="1.2"/><line x1="16" y1="1" x2="16" y2="6" stroke="#111" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="31" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="1" r="2" fill="#111"/><circle cx="16" cy="31" r="2" fill="#111"/>`};
+const TYPE_NUM={tactical:'01',speedy:'02',burst:'03',sniper:'04',builder:'05',futurist:'06'};
+const TYPE_EN={tactical:'TACTICAL COMMANDER',speedy:'SPEED HUNTER',burst:'BURST BREAKER',sniper:'PRECISION SNIPER',builder:'CREATIVE BUILDER',futurist:'FUTURE CONTROLLER'};
+const TYPE_NAMES={tactical:'戰術指揮者',speedy:'極速獵手',burst:'爆發破局者',sniper:'精準狙擊手',builder:'創造建構者',futurist:'未來操控者'};
 
-async function init() {
-  const id = location.pathname.split('/').pop();
-  if (!id) return showError('無效的連結');
-
-  try {
-    const res = await fetch(`/api/result/${id}`);
-    if (!res.ok) {
-      const err = await res.json();
-      return showError(err.error || '找不到此結果');
-    }
-    const data = await res.json();
-    render(data);
-  } catch(e) {
-    showError('載入失敗，請確認網路連線');
-  }
+async function init(){
+  const id=location.pathname.split('/').pop();
+  if(!id) return showError('無效的連結');
+  try{
+    const res=await fetch(`/api/result/${id}`);
+    if(!res.ok){const err=await res.json();return showError(err.error||'找不到此結果');}
+    render(await res.json());
+  }catch(e){showError('載入失敗，請確認網路連線');}
 }
 
-function showError(msg) {
-  document.getElementById('loading').innerHTML = `
-    <div class="error-txt" style="font-size:24px">⚠</div>
-    <div class="error-txt">${msg}</div>
-  `;
+function showError(msg){
+  document.getElementById('loading').innerHTML=`<div style="font-size:20px">⚠</div><div class="loading-txt" style="color:#555">${msg}</div>`;
 }
 
-function render(data) {
-  const { type, typeName, tags, desc, scores, photo } = data;
-  const num = TYPE_NUM[type] || '01';
-  const en  = TYPE_EN[type]  || '';
-  const icon = TYPE_ICONS[type] || TYPE_ICONS.tactical;
-  const maxScore = Math.max(...Object.values(scores || {}));
+function render(data){
+  const{type,typeName,tags,desc,scores,photo,id}=data;
+  const num=TYPE_NUM[type]||'01';
+  const en=TYPE_EN[type]||'';
+  const icon=TYPE_ICONS[type]||TYPE_ICONS.tactical;
+  const max=Math.max(...Object.values(scores||{}));
 
-  const html = `
-  <div class="inner">
-    <div class="header">
-      <div class="sys">▶ DNA LAB &nbsp; RESULT</div>
-      <div class="sys-r">SESSION #${data.id}</div>
-    </div>
-    <div class="divider"></div>
-
-    <div class="ann-top">
-      <div class="ann-top-inner">
-        <div>
-          <div class="type-num">ARCHETYPE ${num} ── ${en}</div>
-          <div class="type-name">${typeName}</div>
-          <div class="type-tags">${(tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-        </div>
-        <svg width="52" height="52" viewBox="0 0 32 32" fill="none" style="flex-shrink:0">${icon}</svg>
+  const html=`
+  <div class="page" id="result-page">
+    <div class="corner c-tl"></div><div class="corner c-tr"></div>
+    <div class="corner c-bl"></div><div class="corner c-br"></div>
+    <div class="inner">
+      <div class="header">
+        <div class="sys">▶ DNA LAB &nbsp; RESULT</div>
+        <div class="sys-r">SESSION #${id}</div>
       </div>
-    </div>
-
-    <div class="photo-wrap" id="photo-wrap">
-      ${photo
-        ? `<img src="${photo}" alt="Cyber Scan"/>`
-        : `<div class="photo-placeholder"><div class="ph-txt">NO SCAN</div></div>`
-      }
-      <div class="photo-scan"></div>
-      <div class="photo-corner pc-tl"></div>
-      <div class="photo-corner pc-tr"></div>
-      <div class="photo-corner pc-bl"></div>
-      <div class="photo-corner pc-br"></div>
-      ${CALLOUTS_L.map((t,i)=>`<div class="callout l" style="top:${CALLOUT_POS[i]*100}%"><div class="callout-line"></div><div class="callout-text">${t}</div></div>`).join('')}
-      ${CALLOUTS_R.map((t,i)=>`<div class="callout r" style="top:${(CALLOUT_POS[i]+0.07)*100}%"><div class="callout-line"></div><div class="callout-text">${t}</div></div>`).join('')}
-      <div class="unit-badge"><div class="unit-id">UNIT ID : ${num}-${type.slice(0,2).toUpperCase()}</div></div>
-    </div>
-
-    <div class="ann-bot">
+      <div class="h-line"></div>
+      <div class="top-row">
+        <div class="photo-wrap">
+          ${photo?`<img src="${photo}" alt="Cyber Scan"/>`:`<div class="photo-placeholder"><div class="ph-txt">NO SCAN</div></div>`}
+          <div class="photo-scan"></div>
+          <div class="photo-corner pc-tl"></div><div class="photo-corner pc-tr"></div>
+          <div class="photo-corner pc-bl"></div><div class="photo-corner pc-br"></div>
+        </div>
+        <div class="type-info">
+          <div>
+            <div class="type-num">ARCHETYPE ${num} ── ${en}</div>
+            <div class="type-name">${typeName}</div>
+            <div class="type-tags">${(tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+          </div>
+          <div class="type-icon"><svg width="36" height="36" viewBox="0 0 32 32" fill="none">${icon}</svg></div>
+        </div>
+      </div>
       <div class="desc">${desc}</div>
       <div class="score-grid">
         ${Object.entries(scores||{}).map(([t,v])=>{
-          const pct = maxScore>0 ? Math.round((v/maxScore)*100) : 0;
-          return `<div class="score-item">
-            <div class="score-name">${TYPE_NAMES[t]||t}</div>
-            <div class="score-bar-bg"><div class="score-bar-fill" style="width:0%" data-w="${pct}%"></div></div>
-            <div class="score-val">${pct}%</div>
-          </div>`;
+          const pct=max>0?Math.round((v/max)*100):0;
+          return `<div class="score-item"><div class="score-name">${TYPE_NAMES[t]||t}</div><div class="score-bar-bg"><div class="score-bar-fill" style="width:0%" data-w="${pct}%"></div></div><div class="score-val">${pct}%</div></div>`;
         }).join('')}
       </div>
+      <div class="bottom-row">
+        <button class="download-btn" id="dl-btn">↓ &nbsp; 下載結果卡片</button>
+        <div class="footer-col">
+          <div class="footer-brand">ROG × GAMER DNA LAB</div>
+          <div class="save-hint">長按圖片可儲存</div>
+        </div>
+      </div>
     </div>
-
-    <div class="footer">
-      <div class="footer-brand">ROG × GAMER DNA LAB</div>
-      <div class="footer-coord">25°07'N 121°28'E</div>
-    </div>
-    <div class="save-hint">長按圖片可儲存至手機相簿</div>
-  <a class="download-btn" id="download-btn">↓ &nbsp; 下載結果卡片</a>
   </div>`;
 
   document.getElementById('loading').remove();
-  document.getElementById('page').insertAdjacentHTML('beforeend', html);
+  document.getElementById('page').insertAdjacentHTML('beforeend',html);
 
-  setTimeout(() => {
-    document.querySelectorAll('.score-bar-fill').forEach(b => b.style.width = b.dataset.w);
-  }, 400);
+  setTimeout(()=>{
+    document.querySelectorAll('.score-bar-fill').forEach(b=>b.style.width=b.dataset.w);
+  },400);
 
-  // 下載整頁截圖
-  const dlBtn = document.getElementById('download-btn');
-  if (dlBtn) {
-    dlBtn.addEventListener('click', async () => {
-      dlBtn.textContent = '截圖中...';
-      dlBtn.style.opacity = '0.6';
-      dlBtn.style.pointerEvents = 'none';
-      try {
-        const canvas = await html2canvas(document.getElementById('page'), {
-          useCORS: true,
-          allowTaint: true,
-          scale: 2,
-          backgroundColor: '#ffffff'
-        });
-        const a = document.createElement('a');
-        a.href = canvas.toDataURL('image/jpeg', 0.95);
-        a.download = 'gamer-dna-result.jpg';
-        a.click();
-      } catch(e) {
-        console.error(e);
-      }
-      dlBtn.textContent = '↓   下載結果卡片';
-      dlBtn.style.opacity = '1';
-      dlBtn.style.pointerEvents = 'auto';
-    });
-  }
+  document.getElementById('dl-btn').addEventListener('click',async()=>{
+    const btn=document.getElementById('dl-btn');
+    btn.textContent='截圖中...';
+    btn.style.opacity='0.6';
+    btn.style.pointerEvents='none';
+    try{
+      const canvas=await html2canvas(document.getElementById('result-page'),{
+        useCORS:true,allowTaint:true,scale:2,backgroundColor:'#ffffff'
+      });
+      const a=document.createElement('a');
+      a.href=canvas.toDataURL('image/jpeg',0.95);
+      a.download='gamer-dna-result.jpg';
+      a.click();
+    }catch(e){console.error(e);}
+    btn.textContent='↓   下載結果卡片';
+    btn.style.opacity='1';
+    btn.style.pointerEvents='auto';
+  });
 }
 
 init();
