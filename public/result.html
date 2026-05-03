@@ -74,7 +74,6 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;paddi
 /* 下載按鈕 */
 #dl-btn{display:none;width:375px;margin-top:14px;height:46px;background:#fff;color:#111;border:none;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;cursor:pointer}
 #dl-btn:active{opacity:0.7}
-.save-hint{display:none;font-family:monospace;font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -167,7 +166,6 @@ function render(data){
   document.getElementById('loading').style.display='none';
   document.getElementById('card').style.display='block';
   document.getElementById('dl-btn').style.display='block';
-  document.getElementById('hint').style.display='block';
 
   setTimeout(()=>{
     document.querySelectorAll('.sf').forEach(b=>b.style.width=b.dataset.w);
@@ -175,9 +173,7 @@ function render(data){
 
   document.getElementById('dl-btn').addEventListener('click',async()=>{
     const btn=document.getElementById('dl-btn');
-    const hint=document.getElementById('hint');
     btn.style.display='none';
-    hint.style.display='none';
     try{
       const canvas=await html2canvas(document.getElementById('card'),{
         useCORS:true,allowTaint:true,scale:2,backgroundColor:'#ffffff'
@@ -188,7 +184,6 @@ function render(data){
       a.click();
     }catch(e){console.error(e);}
     btn.style.display='block';
-    hint.style.display='block';
   });
 }
 
