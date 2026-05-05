@@ -13,56 +13,84 @@ app.use(express.static('public'));
 
 
 // ════════════════════════════════════════
-// Gemini 機械臉生成
+// Gemini 機械臉生成（直接呼叫 REST API，不依賴 SDK 版本）
 // ════════════════════════════════════════
-const { GoogleGenAI } = require('@google/genai');
 
 async function generateCyberFace(base64Image) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY 環境變數未設定');
 
-  const ai = new GoogleGenAI({ apiKey });
-
   const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
 
-  const prompt = `
-    [SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
-    You are an advanced cybernetic diagnostic AI.
-    Generate a high-tech "Mechanical/Cybernetic Scan" version of the provided image.
-    Requirements:
-    1. STYLE: futuristic mechanical blueprint with cyan, orange, white lines on deep black background.
-    2. SUBJECT: Reveal cybernetic implants, robotic skeletons, and circuitry for persons.
-    3. CRITICAL: Maintain EXACT same pixel dimensions, composition, pose, silhouette.
-    4. BACKGROUND: Solid black.
-    5. DETAIL: Add technical annotations, grid lines, and data readouts.
-    6. NO TEXT RESPONSE: Return ONLY the encoded image data.
-  `;
+  const prompt = `You are an advanced cybernetic diagnostic AI.
+Transform this photo into a high-tech cybernetic X-ray scan illustration.
+Style: futuristic blueprint with glowing cyan and orange lines on solid black background.
+Show robotic skeleton, cybernetic implants, circuitry beneath the skin.
+Maintain the same pose and silhouette as the original photo.
+Add technical annotation labels and grid overlay.
+Output image only, no text explanation.`;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash-exp',
-    config: {
-      responseModalities: ['TEXT', 'IMAGE'],
-    },
-    contents: {
-      parts: [
-        { text: prompt },
-        { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
-      ],
-    },
-  });
+  // 依序嘗試可用的 model
+  const models = [
+    'gemini-2.0-flash-exp',
+    'gemini-2.0-flash-preview-image-generation',
+    'gemini-2.5-flash-preview-05-20',
+  ];
 
-  if (response.candidates && response.candidates.length > 0) {
-    const parts = response.candidates[0].content.parts;
-    for (const part of parts) {
-      if (part.inlineData && part.inlineData.data) {
-        const mime = part.inlineData.mimeType || 'image/png';
-        return `data:${mime};base64,${part.inlineData.data}`;
+  let lastError = null;
+
+  for (const model of models) {
+    try {
+      console.log(`[CYBER-SCAN] 嘗試 model: ${model}`);
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+      const body = {
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inline_data: { mime_type: 'image/jpeg', data: cleanBase64 } },
+          ]
+        }],
+        generationConfig: {
+          responseModalities: ['IMAGE', 'TEXT'],
+        }
+      };
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        const msg = data?.error?.message || JSON.stringify(data);
+        console.warn(`[CYBER-SCAN] ${model} 失敗: ${msg}`);
+        lastError = new Error(msg);
+        continue;
       }
+
+      const parts = data?.candidates?.[0]?.content?.parts || [];
+      for (const part of parts) {
+        if (part.inline_data?.data) {
+          const mime = part.inline_data.mime_type || 'image/png';
+          console.log(`[CYBER-SCAN] 成功！model=${model} mime=${mime}`);
+          return `data:${mime};base64,${part.inline_data.data}`;
+        }
+      }
+
+      const textPart = parts.find(p => p.text);
+      console.warn(`[CYBER-SCAN] ${model} 只回傳文字: ${textPart?.text?.slice(0,100)}`);
+      lastError = new Error('模型只回傳文字，未生成圖片');
+
+    } catch (err) {
+      console.warn(`[CYBER-SCAN] ${model} 例外: ${err.message}`);
+      lastError = err;
     }
-    const textPart = parts.find(p => p.text);
-    if (textPart) throw new Error('Gemini 回傳文字而非圖片，可能觸發安全過濾');
   }
-  throw new Error('Gemini 未回傳圖片');
+
+  throw lastError || new Error('所有 Gemini model 均失敗');
 }
 
 
