@@ -13,64 +13,125 @@ app.use(express.static('public'));
 
 
 // ════════════════════════════════════════
-// Gemini 機械臉生成
+// Gemini 機械臉生成（Node fetch，無需 SDK）
 // ════════════════════════════════════════
-const { GoogleGenAI } = require('@google/genai');
 
-async function generateCyberFace(base64Image) {
+// ── 六種類型對應的生成風格 Prompt ──
+const BASE_PROMPT = `[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
+You are the "ROG ELITE TEAM STYLIST."
+Generate a professional "ROG Esports Pro-Player" version of the subject with high aesthetic appeal.
+
+Requirements:
+1. STYLE: High-end 2.5D Digital Illustration / Cinematic Character Render. The style should be sleek, heroic, and incredibly handsome/beautiful, matching the aesthetic of premium esports promotional art.
+2. SUBJECT (PRO-PLAYER LOOK):
+   - LIKENESS: Maintain a stylized version of the subject's facial structure to ensure recognizability, but refine the features to be sharp, polished, and aesthetic.
+   - GROOMING: Give the subject a stylish, voluminous modern hairstyle with subtle "ROG Red" highlights. The skin should be flawless with professional studio lighting.
+   - APPAREL: Dress the subject in a heavy "ROG Tactical Pro-Jacket"—a high-tech team jersey featuring carbon-fiber textures, waterproof zippers, and glowing "Aura Sync" red piping.
+3. COLOR PALETTE: Strictly "ROG Red," "Midnight Black," and "Titanium Gray." Use cinematic rim-lighting to define the subject's silhouette.
+4. CRITICAL: Maintain the EXACT same pose, composition, and silhouette as the source image.
+5. BRANDING: The ROG "Fearless Eye" Logo must be prominently featured as a high-quality embroidery or glowing patch on the tactical jacket. Background: Deep black with subtle digital grid or "Cyber-dust" particles.
+6. NO TEXT RESPONSE: Return ONLY the encoded image data.`;
+
+const TYPE_STYLE = {
+  tactical: `
+TYPE OVERLAY — TACTICAL COMMANDER:
+- Expression: Cold, calculating, commanding authority. Eyes scanning the battlefield.
+- HUD/UI: Holographic "TACTICAL MATRIX" overlay — minimap grid, strategic waypoints, unit command icons floating around the subject.
+- Jacket detail: Shoulder epaulettes with rank insignia, integrated comms earpiece glowing red.
+- Rim light: Cold blue-white from above, symbolizing strategic clarity.
+- Particle FX: Faint chess-piece and crosshair motifs in the background dust.`,
+
+  speedy: `
+TYPE OVERLAY — SPEED HUNTER:
+- Expression: Hyper-focused, adrenaline rush, slight forward lean — about to launch.
+- HUD/UI: Holographic "VELOCITY SCANNER" — speed vectors, FPS counter (144Hz+), reaction-time arcs streaking past the subject.
+- Jacket detail: Aerodynamic panels, motion-stripe accents on sleeves, ventilation mesh glowing cyan.
+- Rim light: Electric cyan from the side, with motion-blur streaks trailing behind.
+- Particle FX: Speed lines and spark trails, kinetic energy radiating outward.`,
+
+  burst: `
+TYPE OVERLAY — BURST BREAKER:
+- Expression: Fierce, explosive, jaw set tight — the moment before impact.
+- HUD/UI: Holographic "POWER SURGE" readout — energy charge bars at CRITICAL%, damage multiplier, burst countdown timer.
+- Jacket detail: Heavy armor plating on shoulders, glowing red power conduits running down the arms.
+- Rim light: Intense red-orange from below, as if absorbing energy from the ground.
+- Particle FX: Shattered fragments and energy burst ripples exploding outward from the subject.`,
+
+  sniper: `
+TYPE OVERLAY — PRECISION SNIPER:
+- Expression: Eerily calm, one eye slightly narrowed, absolute stillness.
+- HUD/UI: Holographic "OPTICAL TARGETING v3.2" — precision crosshair overlay, wind/distance calculation data, heartbeat flatline stabilizer.
+- Jacket detail: Lightweight tactical coat, ghillie-texture collar detail, optical sensor badge on chest.
+- Rim light: Ice-blue single-side rim light, cold and surgical, deep shadow on the other side.
+- Particle FX: Laser dot particles, subtle rifle-scope ring motif in the background.`,
+
+  builder: `
+TYPE OVERLAY — CREATIVE BUILDER:
+- Expression: Confident smirk, head slightly tilted — always three steps ahead.
+- HUD/UI: Holographic "SYNTHESIS ENGINE" — modular build-tree nodes, circuit connection map, innovation matrix grid floating around hands.
+- Jacket detail: Jacket with modular panel attachments, colorful wiring accents (purple/green), interchangeable badge slots.
+- Rim light: Purple-green dual-side rim light, creative and dynamic.
+- Particle FX: Geometric shapes, hexagonal nodes, and blueprint line fragments assembling in the background.`,
+
+  futurist: `
+TYPE OVERLAY — FUTURE CONTROLLER:
+- Expression: Serene and visionary, eyes glowing faintly with a digital teal hue — already seeing tomorrow.
+- HUD/UI: Holographic "AI CORE SYNC 99%" — neural network visualization, data stream flows, adaptive algorithm patterns radiating from the subject.
+- Jacket detail: Smooth nano-material jacket with embedded LED matrix panels, AI-pattern woven into the fabric.
+- Rim light: Pure white and holographic teal, ethereal and otherworldly.
+- Particle FX: Binary code streams, neural node connections, and soft holographic light particles.`,
+};
+
+
+async function generateCyberFace(base64Image, type = 'tactical') {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY 環境變數未設定');
 
-  const ai = new GoogleGenAI({ apiKey });
-
   const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
 
-  const prompt = `
-[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
-      You are the "ROG ARSENAL TACTICAL AI," an elite diagnostic intelligence.
-      Generate a "ROG Stealth-Elite Internal Scan" with absolute color discipline.
+  const prompt = BASE_PROMPT + (TYPE_STYLE[type] || TYPE_STYLE.tactical);
+  console.log(`[CYBER-SCAN] type=${type}`);
 
-      Requirements:
-      1. STYLE: High-end industrial internal scan. The aesthetic must be sleek, professional, and powerful. 
-      2. COLOR PALETTE: **STRICTLY EXCLUSIVE TO ROG COLORS.** Use only "ROG Red" (#FF0000), "Deep Obsidian Black" (#000000), and "Cyber White" (#FFFFFF) for highlights. ABSOLUTELY NO CYAN, NO ORANGE, NO PINK, AND NO NATURAL SKIN TONES.
-      3. FACE (HEROIC SCAN FIDELITY): 
-         - **STYLING: The face must look HEROIC and SHARP. Eliminate all messy or organic circuit patterns that obscure the features.**
-         - **CONTOURS: Use only clean, ultra-thin "ROG Red" glowing lines to define the jawline, nose, and brow. The rest of the face should remain in deep, elegant shadows to maintain a sleek, handsome appearance and 100% recognizability.**
-         - **EYES: Replace eyes with twin "Aura Sync" glowing red optical sensors, styled as precision-engineered circular lenses with a clean white laser-flare.**
-      4. BODY (ROG FLAGSHIP HARDWARE): 
-         - **HARDWARE CONSTRUCTION: The torso must be a heavy, 3D-modeled assembly of "ROG Strix" and "ROG Maximus" flagship components.**
-         - **Include visible "Strix" metal heatsink fins, thick "Ryujin" liquid cooling pipes with red fluid, and carbon fiber plates. Ensure all mechanical parts have high-end metallic reflections.**
-      5. CRITICAL: Maintain EXACT pixel dimensions, composition, pose, and silhouette for direct overlay comparison. NO cropping or shifting.
-      6. BRANDING & TEXTURE: 
-         - The ROG "Fearless Eye" Logo must be the pulsating energy core in the center of the chest.
-         - Incorporate 45-degree diagonal "Cyber-Text" patterns on internal armor plates.
-         - Background: Solid Black.
-      7. DETAIL: Add sharp, minimalist holographic HUD readouts (FPS, Clock Speed, Core Temp) using a clean, modern ROG tactical font.
-      8. NO TEXT RESPONSE: Return ONLY the encoded image data.
-    `;
+  const MODEL = 'gemini-2.5-flash-image';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash-image',
-    contents: {
+  const body = {
+    contents: [{
       parts: [
         { text: prompt },
-        { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
-      ],
-    },
+        { inline_data: { mime_type: 'image/jpeg', data: cleanBase64 } },
+      ]
+    }],
+    generationConfig: {
+      responseModalities: ['IMAGE', 'TEXT'],
+    }
+  };
+
+  console.log(`[CYBER-SCAN] 呼叫 ${MODEL}...`);
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
 
-  if (response.candidates && response.candidates.length > 0) {
-    const parts = response.candidates[0].content.parts;
-    for (const part of parts) {
-      if (part.inlineData && part.inlineData.data) {
-        const mime = part.inlineData.mimeType || 'image/png';
-        console.log(`[CYBER-SCAN] 成功！mime=${mime}`);
-        return `data:${mime};base64,${part.inlineData.data}`;
-      }
-    }
-    const textPart = parts.find(p => p.text);
-    if (textPart) throw new Error(`模型回傳文字: ${textPart.text.substring(0, 100)}`);
+  const data = await res.json();
+
+  if (!res.ok) {
+    const msg = data?.error?.message || JSON.stringify(data).slice(0, 200);
+    throw new Error(`Gemini API 錯誤: ${msg}`);
   }
+
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+  for (const part of parts) {
+    if (part.inline_data?.data) {
+      const mime = part.inline_data.mime_type || 'image/png';
+      console.log(`[CYBER-SCAN] 成功！mime=${mime}`);
+      return `data:${mime};base64,${part.inline_data.data}`;
+    }
+  }
+
+  const textPart = parts.find(p => p.text);
+  if (textPart) throw new Error(`模型只回傳文字: ${textPart.text.slice(0, 100)}`);
   throw new Error('Gemini 未回傳圖片');
 }
 
@@ -81,12 +142,12 @@ async function generateCyberFace(base64Image) {
 // ── POST /api/cyber-scan ──
 // 接收用戶原始照片 → Gemini 生成機械臉 → 回傳
 app.post('/api/cyber-scan', async (req, res) => {
-  const { photo } = req.body;
+  const { photo, type } = req.body;
   if (!photo) return res.status(400).json({ error: '缺少照片資料' });
 
-  console.log('[CYBER-SCAN] 開始處理...');
+  console.log('[CYBER-SCAN] 開始處理... type=' + (type||'tactical'));
   try {
-    const cyberPhoto = await generateCyberFace(photo);
+    const cyberPhoto = await generateCyberFace(photo, type);
     console.log('[CYBER-SCAN] 生成成功');
     res.json({ cyberPhoto });
   } catch (err) {
