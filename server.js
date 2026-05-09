@@ -27,24 +27,26 @@ async function generateCyberFace(base64Image) {
 
   const prompt = `
 [SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
-You are the "ROG ARSENAL TACTICAL AI," a high-performance combat system diagnostic intelligence.
-      Generate an elite "ROG Cyber-Hardware Internal Scan" of the provided image.
+      You are the "ROG ARSENAL TACTICAL AI," an elite diagnostic intelligence.
+      Generate a "ROG Stealth-Elite Internal Scan" with absolute color discipline.
 
       Requirements:
-      1. STYLE: The output must look like a futuristic ROG industrial internal scan. Use high-contrast "ROG Red," "Electric Pink," and sharp "Cyber White" glowing lines on a deep black background. 
-      2. SUBJECT - FACE (CIRCUITRY SCAN): 
-         - **STYLING: Strictly follow the facial style of the reference image (cyber-scan-result3.png). Use ultra-fine, intricate circuit lines and data traces to define the facial structure and likeness. NO hardware components on the surface of the face.**
-         - **EYES: Replace eyes with high-precision "Aura Sync" glowing red sensors, styled as multi-layered circular optical lenses similar to the reference.**
-      3. SUBJECT - BODY (ROG HARDWARE ARCHITECTURE): 
-         - **HARDWARE FUSION: Reveal the deconstructed internal components of flagship ROG products. Show "Strix" GPU radiator fins, "Ryujin" liquid cooling pipes with flowing red coolant, and "Maximus" motherboard PCB textures forming the internal skeleton.**
-         - **CORE: In the center of the chest, integrate a pulsating, glowing ROG "Fearless Eye" logo as the primary energy core, radiating light through the internal mechanical structure.**
-      4. CRITICAL: The output MUST maintain the EXACT same pixel dimensions, composition, pose, and silhouette as the source image for a direct overlay comparison. Do not crop, zoom, or shift the subject.
-      5. BACKGROUND: Solid black.
-      6. DETAIL: 
-         - Add technical annotations, grid lines, and data readouts (FPS, Temp, Clock Speed) integrated into the subject's structure, using ROG’s signature angular "Digital Totem" font.
-         - Incorporate ROG's 45-degree diagonal slash patterns on major internal plates.
-      7. NO TEXT RESPONSE: Return ONLY the encoded image data.
-    ```
+      1. STYLE: High-end industrial internal scan. The aesthetic must be sleek, professional, and powerful. 
+      2. COLOR PALETTE: **STRICTLY EXCLUSIVE TO ROG COLORS.** Use only "ROG Red" (#FF0000), "Deep Obsidian Black" (#000000), and "Cyber White" (#FFFFFF) for highlights. ABSOLUTELY NO CYAN, NO ORANGE, NO PINK, AND NO NATURAL SKIN TONES.
+      3. FACE (HEROIC SCAN FIDELITY): 
+         - **STYLING: The face must look HEROIC and SHARP. Eliminate all messy or organic circuit patterns that obscure the features.**
+         - **CONTOURS: Use only clean, ultra-thin "ROG Red" glowing lines to define the jawline, nose, and brow. The rest of the face should remain in deep, elegant shadows to maintain a sleek, handsome appearance and 100% recognizability.**
+         - **EYES: Replace eyes with twin "Aura Sync" glowing red optical sensors, styled as precision-engineered circular lenses with a clean white laser-flare.**
+      4. BODY (ROG FLAGSHIP HARDWARE): 
+         - **HARDWARE CONSTRUCTION: The torso must be a heavy, 3D-modeled assembly of "ROG Strix" and "ROG Maximus" flagship components.**
+         - **Include visible "Strix" metal heatsink fins, thick "Ryujin" liquid cooling pipes with red fluid, and carbon fiber plates. Ensure all mechanical parts have high-end metallic reflections.**
+      5. CRITICAL: Maintain EXACT pixel dimensions, composition, pose, and silhouette for direct overlay comparison. NO cropping or shifting.
+      6. BRANDING & TEXTURE: 
+         - The ROG "Fearless Eye" Logo must be the pulsating energy core in the center of the chest.
+         - Incorporate 45-degree diagonal "Cyber-Text" patterns on internal armor plates.
+         - Background: Solid Black.
+      7. DETAIL: Add sharp, minimalist holographic HUD readouts (FPS, Clock Speed, Core Temp) using a clean, modern ROG tactical font.
+      8. NO TEXT RESPONSE: Return ONLY the encoded image data.
     `;
 
   const response = await ai.models.generateContent({
