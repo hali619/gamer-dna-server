@@ -2,6 +2,7 @@ const express = require('express');
 const cors    = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const path    = require('path');
+const fetch   = require('node-fetch'); // 確保有安裝 node-fetch@2
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -11,93 +12,67 @@ app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.static('public'));
 
-
 // ════════════════════════════════════════
-// Gemini 機械臉生成（Node fetch，無需 SDK）
+// ROG 電競風格定義 (System Instruction)
 // ════════════════════════════════════════
 
-// ── 六種類型對應的生成風格 Prompt ──
-const BASE_PROMPT = `Transform this photo into a cinematic ROG esports pro-player illustration.
-Output image only, no text.
+const BASE_PROMPT = `[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
+You are the "ROG ELITE TEAM STYLIST." Generate a high-end "ROG Esports Pro-Player" illustration of the subject.
 
-Style: High-end 2.5D digital illustration, cinematic character render, premium esports promotional art.
-Likeness: Maintain the subject's facial structure but refine features to be sharp and aesthetic.
-Grooming: Stylish modern hairstyle with subtle ROG Red highlights, flawless skin, studio lighting.
-Apparel: ROG Tactical Pro-Jacket with carbon-fiber textures, glowing Aura Sync red piping, ROG Fearless Eye logo as glowing chest patch.
-Color palette: ROG Red, Midnight Black, Titanium Gray. Cinematic rim-lighting.
-Pose: Maintain the EXACT same pose and composition as the source photo.
-Background: Deep black with subtle digital grid particles.`;
+Requirements:
+1. STYLE: High-end 2.5D digital illustration, cinematic character render, premium esports promotional art.
+2. LIKENESS: Maintain 100% facial structure of the subject in the photo. Refine features to be sharp, polished, and aesthetic (Heroic/Pro-player look).
+3. APPAREL: Dress the subject in a heavy "ROG Tactical Pro-Jacket" with carbon-fiber textures, glowing Aura Sync red piping, and the ROG logo as a glowing patch.
+4. COLOR: Strictly use ROG Brand Colors: ROG Red (#FF0000), Midnight Black (#000000), and Titanium Gray. 
+5. CRITICAL: Maintain the EXACT same pose and silhouette as the source photo for direct overlay.
+6. BACKGROUND: Solid deep black with subtle digital grid or ROG "Cyber-dust" particles.`;
 
 const TYPE_STYLE = {
-  tactical: `TYPE: TACTICAL COMMANDER.
-Expression: Cold, calculating, commanding authority.
-HUD: Holographic TACTICAL MATRIX with minimap grid and strategic waypoints floating around subject.
-Jacket detail: Shoulder epaulettes with rank insignia, comms earpiece glowing red.
-Rim light: Cold blue-white from above.
-Background: Faint crosshair and chess-piece motifs in particles.`,
-
-  speedy: `TYPE: SPEED HUNTER.
-Expression: Hyper-focused, adrenaline rush, slight forward lean.
-HUD: Holographic VELOCITY SCANNER with speed vectors and 144Hz FPS counter.
-Jacket detail: Aerodynamic panels, motion-stripe accents, ventilation mesh glowing cyan.
-Rim light: Electric cyan from the side with motion-blur streaks.
-Background: Speed lines and spark trails in particles.`,
-
-  burst: `TYPE: BURST BREAKER.
-Expression: Fierce and explosive, jaw set, moment before impact.
-HUD: Holographic POWER SURGE with energy bars at CRITICAL percent and damage multiplier.
-Jacket detail: Heavy armor plating on shoulders, glowing red power conduits on arms.
-Rim light: Intense red-orange from below.
-Background: Shattered fragments and energy burst ripples in particles.`,
-
-  sniper: `TYPE: PRECISION SNIPER.
-Expression: Eerily calm, one eye narrowed, absolute stillness.
-HUD: Holographic OPTICAL TARGETING with precision crosshair and heartbeat stabilizer.
-Jacket detail: Lightweight tactical coat, ghillie-texture collar, optical sensor badge.
-Rim light: Ice-blue single-side, deep shadow on the other side.
-Background: Laser dot particles and rifle-scope ring motif.`,
-
-  builder: `TYPE: CREATIVE BUILDER.
-Expression: Confident smirk, head slightly tilted.
-HUD: Holographic SYNTHESIS ENGINE with modular build-tree nodes and circuit map around hands.
-Jacket detail: Modular panel attachments, purple and green wiring accents.
-Rim light: Purple-green dual-side.
-Background: Hexagonal nodes and blueprint line fragments assembling.`,
-
-  futurist: `TYPE: FUTURE CONTROLLER.
-Expression: Serene and visionary, eyes glowing faintly with digital teal.
-HUD: Holographic AI CORE SYNC 99% with neural network visualization and data streams.
-Jacket detail: Nano-material jacket with embedded LED matrix panels.
-Rim light: Pure white and holographic teal, ethereal.
-Background: Binary code streams and neural node connections.`,
+  tactical: `TYPE: TACTICAL COMMANDER. Expression: Cold and commanding. HUD: Holographic tactical matrix and minimap. Rim light: Cold white.`,
+  speedy: `TYPE: SPEED HUNTER. Expression: Hyper-focused. HUD: Velocity scanner and FPS counter. Effects: Motion-blur light streaks. Rim light: Electric cyan.`,
+  burst: `TYPE: BURST BREAKER. Expression: Fierce. HUD: Power surge energy bars. Detail: Heavy armor plates. Rim light: Intense orange-red from below.`,
+  sniper: `TYPE: PRECISION SNIPER. Expression: Calm and steady. HUD: Optical targeting crosshair. Detail: Tactical hood/collar. Rim light: Ice-blue.`,
+  builder: `TYPE: CREATIVE BUILDER. Expression: Confident smirk. HUD: Synthesis engine nodes and circuit maps. Detail: Modular gear. Rim light: Purple-green accents.`,
+  futurist: `TYPE: FUTURE CONTROLLER. Expression: Visionary, glowing eyes. HUD: AI Core Sync neural network. Detail: LED matrix jacket. Rim light: Teal/White.`,
 };
 
+// ════════════════════════════════════════
+// Gemini API 呼叫函數
+// ════════════════════════════════════════
 
 async function generateCyberFace(base64Image, type = 'tactical') {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error('GEMINI_API_KEY 環境變數未設定');
+  if (!apiKey) throw new Error('GEMINI_API_KEY 未設定');
 
   const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
-
   const prompt = BASE_PROMPT + (TYPE_STYLE[type] || TYPE_STYLE.tactical);
-  console.log(`[CYBER-SCAN] type=${type}`);
 
-  const MODEL = 'gemini-2.5-flash-image';
+  // 支援 2.5-flash-image 或最新 gemini-3-flash
+  const MODEL = 'gemini-3-flash'; 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
 
   const body = {
     contents: [{
       parts: [
-        { inline_data: { mime_type: 'image/jpeg', data: cleanBase64 } },
         { text: prompt },
+        { inline_data: { mime_type: 'image/jpeg', data: cleanBase64 } },
       ]
     }],
     generationConfig: {
-      responseModalities: ['TEXT', 'IMAGE'],
-    }
+      response_modalities: ["IMAGE"], // 強制輸出影像
+      temperature: 0.8,
+      max_output_tokens: 2048
+    },
+    // 防止機械臉被誤判為血腥
+    safetySettings: [
+      { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+    ]
   };
 
-  console.log(`[CYBER-SCAN] 呼叫 ${MODEL}...`);
+  console.log(`[ROG-GEN] 正在生成類型: ${type}...`);
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -106,108 +81,75 @@ async function generateCyberFace(base64Image, type = 'tactical') {
 
   const data = await res.json();
 
-  // 詳細 log 幫助 debug
-  console.log('[CYBER-SCAN] HTTP status:', res.status);
-  console.log('[CYBER-SCAN] candidates count:', data?.candidates?.length);
-  const c0 = data?.candidates?.[0];
-  if (c0) {
-    console.log('[CYBER-SCAN] finishReason:', c0.finishReason);
-    console.log('[CYBER-SCAN] parts count:', c0?.content?.parts?.length);
-    (c0?.content?.parts || []).forEach((p, i) => {
-      if (p.text)        console.log(`[CYBER-SCAN] part[${i}] text:`, p.text.slice(0, 100));
-      if (p.inline_data) console.log(`[CYBER-SCAN] part[${i}] image mime:`, p.inline_data.mime_type);
-    });
-  } else {
-    console.log('[CYBER-SCAN] raw response:', JSON.stringify(data).slice(0, 400));
-  }
-
   if (!res.ok) {
-    const msg = data?.error?.message || JSON.stringify(data).slice(0, 200);
-    throw new Error(`Gemini API 錯誤: ${msg}`);
+    throw new Error(`Gemini API 錯誤: ${data.error?.message || '未知錯誤'}`);
   }
 
-  const parts = c0?.content?.parts || [];
-  for (const part of parts) {
-    if (part.inline_data?.data) {
-      const mime = part.inline_data.mime_type || 'image/png';
-      console.log(`[CYBER-SCAN] 成功！mime=${mime}`);
-      return `data:${mime};base64,${part.inline_data.data}`;
-    }
+  const candidate = data.candidates?.[0];
+  const parts = candidate?.content?.parts || [];
+  const imagePart = parts.find(p => p.inline_data);
+
+  if (imagePart && imagePart.inline_data?.data) {
+    const mime = imagePart.inline_data.mime_type || 'image/png';
+    return `data:${mime};base64,${imagePart.inline_data.data}`;
   }
 
-  const textPart = parts.find(p => p.text);
-  if (textPart) throw new Error(`模型只回傳文字: ${textPart.text.slice(0, 100)}`);
-  throw new Error(`Gemini 未回傳圖片 finishReason=${c0?.finishReason}`);
+  if (candidate?.finishReason === 'SAFETY') {
+    throw new Error('生成的內容被安全過濾器攔截，請嘗試不同的照片。');
+  }
+
+  throw new Error('模型未回傳圖片資料。');
 }
 
 // ════════════════════════════════════════
-// API Routes
+// API 路由
 // ════════════════════════════════════════
 
-// ── POST /api/cyber-scan ──
-// 接收用戶原始照片 → Gemini 生成機械臉 → 回傳
 app.post('/api/cyber-scan', async (req, res) => {
   const { photo, type } = req.body;
   if (!photo) return res.status(400).json({ error: '缺少照片資料' });
 
-  console.log('[CYBER-SCAN] 開始處理... type=' + (type||'tactical'));
+  // 防呆機制：確保 type 在定義內
+  const finalType = TYPE_STYLE[type] ? type : 'tactical';
+
   try {
-    const cyberPhoto = await generateCyberFace(photo, type);
-    console.log('[CYBER-SCAN] 生成成功');
+    const cyberPhoto = await generateCyberFace(photo, finalType);
     res.json({ cyberPhoto });
   } catch (err) {
-    console.error('[CYBER-SCAN] 失敗:', err.message);
+    console.error('[SERVER ERROR]:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-
-// ── POST /api/save ──
-// 儲存完整結果（含機械臉）→ 回傳分享 URL
 app.post('/api/save', (req, res) => {
   const { photo, type, typeName, tags, desc, scores } = req.body;
-  if (!type || !typeName) return res.status(400).json({ error: '缺少基因類型資料' });
-
   const id = uuidv4().split('-')[0];
-  const expireAt = Date.now() + 1000 * 60 * 60 * 24 * 3; // 3天
+  const expireAt = Date.now() + 1000 * 60 * 60 * 24 * 3; // 3天有效
 
-  store.set(id, { id, photo: photo || null, type, typeName, tags: tags || [], desc: desc || '', scores: scores || {}, createdAt: Date.now(), expireAt });
+  store.set(id, { id, photo, type, typeName, tags, desc, scores, createdAt: Date.now(), expireAt });
 
   const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
-  const url = `${baseUrl}/result/${id}`;
-  console.log(`[SAVE] id=${id} type=${type} hasPhoto=${!!photo}`);
-  res.json({ id, url });
+  res.json({ id, url: `${baseUrl}/result/${id}` });
 });
 
-
-// ── GET /api/result/:id ──
 app.get('/api/result/:id', (req, res) => {
   const data = store.get(req.params.id);
-  if (!data) return res.status(404).json({ error: '找不到此結果，可能已過期' });
-  if (Date.now() > data.expireAt) { store.delete(req.params.id); return res.status(410).json({ error: '此結果已過期' }); }
+  if (!data) return res.status(404).json({ error: '找不到結果' });
   res.json(data);
 });
 
-
-// ── GET /result/:id → 分享頁 ──
 app.get('/result/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'result.html'));
 });
 
-
-// ── GET /health ──
-app.get('/health', (req, res) => res.json({ status: 'ok', count: store.size }));
-
-
-// 定期清理
+// 定期清理過期資料
 setInterval(() => {
   const now = Date.now();
   for (const [id, data] of store.entries()) {
     if (now > data.expireAt) store.delete(id);
   }
-}, 1000 * 60 * 60);
-
+}, 3600000); // 每小時清理一次
 
 app.listen(PORT, () => {
-  console.log(`✅ Gamer DNA Server running on port ${PORT}`);
+  console.log(`✅ ROG Gamer DNA Server running on port ${PORT}`);
 });
