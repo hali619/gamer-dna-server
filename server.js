@@ -27,26 +27,24 @@ async function generateCyberFace(base64Image) {
 
   const prompt = `
 [SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
-You are the "ROG ARSENAL TACTICAL AI." 
-      Generate a high-precision "ROG Cyber-Mechanical Internal Scan" with a focus on "Translucent Biometrics."
+You are the "ROG ARSENAL TACTICAL AI," a high-performance combat system diagnostic intelligence.
+      Generate an elite "ROG Cyber-Hardware Internal Scan" of the provided image.
 
       Requirements:
-      1. STYLE: Futuristic X-ray diagnostic scan. Use a "layered" visual approach with a semi-translucent silhouette.
-      2. COLOR PALETTE: Signature "ROG Red" pulses and "Cyber Pink" data traces on a "Charcoal Black" base.
-      3. SUBJECT (FACE & BIOMETRICS): 
-         - **CRITICAL: The face must remain recognizable. Treat the skin as a "Semi-translucent Flexible PCB."**
-         - **Overlay delicate, hair-thin micro-circuitry and glowing golden/red data pathways over the facial contours without obscuring features.**
-         - **Eyes should be depicted as glowing optical sensors or "Aura Sync" RGB lenses, but maintaining the original gaze and expression.**
-      4. SUBJECT (BODY/MECHANICAL): 
-         - Beneath the translucent surface, reveal an intricate framework of metallic bones, cooling pipes, and fiber-optic cables.
-         - Show high-speed cooling fans or heatsink fins integrated into the torso or limbs.
-      5. CRITICAL: Maintain EXACT pixel dimensions, composition, pose, and silhouette. NO cropping or shifting.
-      6. BRANDING: 
-         - Integrate the ROG "Fearless Eye" Logo as a glowing internal energy core (e.g., in the chest or a major component).
-         - Background: Solid Black.
-         - Incorporate ROG's 45-degree diagonal slash patterns into the mechanical plates.
-      7. DETAIL: Add floating "Battle-Ready" holographic UI elements and diagnostic data (Temp, System Load, Neural Link status).
-      8. NO TEXT RESPONSE: Return ONLY the encoded image data.
+      1. STYLE: The output must look like a futuristic ROG industrial internal scan. Use high-contrast "ROG Red," "Electric Pink," and sharp "Cyber White" glowing lines on a deep black background. 
+      2. SUBJECT - FACE (CIRCUITRY SCAN): 
+         - **STYLING: Strictly follow the facial style of the reference image (cyber-scan-result3.png). Use ultra-fine, intricate circuit lines and data traces to define the facial structure and likeness. NO hardware components on the surface of the face.**
+         - **EYES: Replace eyes with high-precision "Aura Sync" glowing red sensors, styled as multi-layered circular optical lenses similar to the reference.**
+      3. SUBJECT - BODY (ROG HARDWARE ARCHITECTURE): 
+         - **HARDWARE FUSION: Reveal the deconstructed internal components of flagship ROG products. Show "Strix" GPU radiator fins, "Ryujin" liquid cooling pipes with flowing red coolant, and "Maximus" motherboard PCB textures forming the internal skeleton.**
+         - **CORE: In the center of the chest, integrate a pulsating, glowing ROG "Fearless Eye" logo as the primary energy core, radiating light through the internal mechanical structure.**
+      4. CRITICAL: The output MUST maintain the EXACT same pixel dimensions, composition, pose, and silhouette as the source image for a direct overlay comparison. Do not crop, zoom, or shift the subject.
+      5. BACKGROUND: Solid black.
+      6. DETAIL: 
+         - Add technical annotations, grid lines, and data readouts (FPS, Temp, Clock Speed) integrated into the subject's structure, using ROG’s signature angular "Digital Totem" font.
+         - Incorporate ROG's 45-degree diagonal slash patterns on major internal plates.
+      7. NO TEXT RESPONSE: Return ONLY the encoded image data.
+    ```
     `;
 
   const response = await ai.models.generateContent({
