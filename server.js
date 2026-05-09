@@ -106,12 +106,27 @@ async function generateCyberFace(base64Image, type = 'tactical') {
 
   const data = await res.json();
 
+  // 詳細 log 幫助 debug
+  console.log('[CYBER-SCAN] HTTP status:', res.status);
+  console.log('[CYBER-SCAN] candidates count:', data?.candidates?.length);
+  const c0 = data?.candidates?.[0];
+  if (c0) {
+    console.log('[CYBER-SCAN] finishReason:', c0.finishReason);
+    console.log('[CYBER-SCAN] parts count:', c0?.content?.parts?.length);
+    (c0?.content?.parts || []).forEach((p, i) => {
+      if (p.text)        console.log(`[CYBER-SCAN] part[${i}] text:`, p.text.slice(0, 100));
+      if (p.inline_data) console.log(`[CYBER-SCAN] part[${i}] image mime:`, p.inline_data.mime_type);
+    });
+  } else {
+    console.log('[CYBER-SCAN] raw response:', JSON.stringify(data).slice(0, 400));
+  }
+
   if (!res.ok) {
     const msg = data?.error?.message || JSON.stringify(data).slice(0, 200);
     throw new Error(`Gemini API 錯誤: ${msg}`);
   }
 
-  const parts = data?.candidates?.[0]?.content?.parts || [];
+  const parts = c0?.content?.parts || [];
   for (const part of parts) {
     if (part.inline_data?.data) {
       const mime = part.inline_data.mime_type || 'image/png';
@@ -122,7 +137,7 @@ async function generateCyberFace(base64Image, type = 'tactical') {
 
   const textPart = parts.find(p => p.text);
   if (textPart) throw new Error(`模型只回傳文字: ${textPart.text.slice(0, 100)}`);
-  throw new Error('Gemini 未回傳圖片');
+  throw new Error(`Gemini 未回傳圖片 finishReason=${c0?.finishReason}`);
 }
 
 // ════════════════════════════════════════
