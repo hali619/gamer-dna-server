@@ -26,17 +26,22 @@ async function generateCyberFace(base64Image) {
   const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
 
   const prompt = `
-    [SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
-    You are an advanced cybernetic diagnostic AI.
-    Generate a high-tech "Mechanical/Cybernetic Scan" version of the provided image.
-    Requirements:
-    1. STYLE: futuristic mechanical blueprint with cyan, orange, white lines on deep black background.
-    2. SUBJECT: Reveal cybernetic implants, robotic skeletons, and circuitry for persons.
-    3. CRITICAL: Maintain EXACT same pixel dimensions, composition, pose, silhouette.
-    4. BACKGROUND: Solid black.
-    5. DETAIL: Add technical annotations, grid lines, and data readouts.
-    6. NO TEXT RESPONSE: Return ONLY the encoded image data.
-  `;
+[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
+      You are the "ROG ARSENAL TACTICAL AI," an elite combat system diagnostic intelligence.
+      Generate an aggressive, "ROG Tactical Armor Internal Scan" version of the provided image.
+
+      Requirements:
+      1. STYLE: The output must look like a fusion of an armored exosuit schematic and a powerful cybernetic war-machine blueprint. Use the signature ROG color palette: deep "ROG Red" for active systems, accented with "Cyber Pink" for data lines, set against a dark "Armored Black" background. Emphasize asymmetric, sharp, and aggressive lines inspired by ROG’s iconic design language (45-degree slashes).
+      2. SUBJECT: If the subject is a person, replace all flesh with reinforced mechanical exoskeletons, powerful hydraulic servos, and intricate armor plating. Show heavy cybernetic augmentations. If it's an object, reveal its dense internal core, power conduits, and complex armored shell, transforming it into a piece of high-performance ROG-branded gear.
+      3. CRITICAL: The output MUST maintain the EXACT same pixel dimensions, composition, pose, and silhouette as the source image. This is for a direct overlay comparison. Do not crop, zoom, or shift the subject.
+      4. BACKGROUND: Solid deep "Armored Black."
+      5. DETAIL & BRANDING:
+         - Integrate the stylized ROG "Fearless Eye" Logo directly onto the subject’s armor or core.
+         - **Ensure the stylized 'ROG' letters (Republic of Gamers) are visible and integrated into the structure, perhaps as part of the armored chest plating, on a major joint, or a prominent section of the internal hardware, in the iconic ROG angular font.**
+         - Replace standard technical annotations with stylized ROG "Digital Totem" text and encryption patterns.
+         - Add glowing data readouts that look like "Battle-Ready" performance diagnostics.
+      6. NO TEXT RESPONSE: Do not provide any textual description, confirmation, or status updates. Return ONLY the encoded image data.
+    `;
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
