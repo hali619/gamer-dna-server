@@ -17,69 +17,59 @@ app.use(express.static('public'));
 // ════════════════════════════════════════
 
 // ── 六種類型對應的生成風格 Prompt ──
-const BASE_PROMPT = `[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
-You are the "ROG ELITE TEAM STYLIST."
-Generate a professional "ROG Esports Pro-Player" version of the subject with high aesthetic appeal.
+const BASE_PROMPT = `Transform this photo into a cinematic ROG esports pro-player illustration.
+Output image only, no text.
 
-Requirements:
-1. STYLE: High-end 2.5D Digital Illustration / Cinematic Character Render. The style should be sleek, heroic, and incredibly handsome/beautiful, matching the aesthetic of premium esports promotional art.
-2. SUBJECT (PRO-PLAYER LOOK):
-   - LIKENESS: Maintain a stylized version of the subject's facial structure to ensure recognizability, but refine the features to be sharp, polished, and aesthetic.
-   - GROOMING: Give the subject a stylish, voluminous modern hairstyle with subtle "ROG Red" highlights. The skin should be flawless with professional studio lighting.
-   - APPAREL: Dress the subject in a heavy "ROG Tactical Pro-Jacket"—a high-tech team jersey featuring carbon-fiber textures, waterproof zippers, and glowing "Aura Sync" red piping.
-3. COLOR PALETTE: Strictly "ROG Red," "Midnight Black," and "Titanium Gray." Use cinematic rim-lighting to define the subject's silhouette.
-4. CRITICAL: Maintain the EXACT same pose, composition, and silhouette as the source image.
-5. BRANDING: The ROG "Fearless Eye" Logo must be prominently featured as a high-quality embroidery or glowing patch on the tactical jacket. Background: Deep black with subtle digital grid or "Cyber-dust" particles.
-6. NO TEXT RESPONSE: Return ONLY the encoded image data.`;
+Style: High-end 2.5D digital illustration, cinematic character render, premium esports promotional art.
+Likeness: Maintain the subject's facial structure but refine features to be sharp and aesthetic.
+Grooming: Stylish modern hairstyle with subtle ROG Red highlights, flawless skin, studio lighting.
+Apparel: ROG Tactical Pro-Jacket with carbon-fiber textures, glowing Aura Sync red piping, ROG Fearless Eye logo as glowing chest patch.
+Color palette: ROG Red, Midnight Black, Titanium Gray. Cinematic rim-lighting.
+Pose: Maintain the EXACT same pose and composition as the source photo.
+Background: Deep black with subtle digital grid particles.`;
 
 const TYPE_STYLE = {
-  tactical: `
-TYPE OVERLAY — TACTICAL COMMANDER:
-- Expression: Cold, calculating, commanding authority. Eyes scanning the battlefield.
-- HUD/UI: Holographic "TACTICAL MATRIX" overlay — minimap grid, strategic waypoints, unit command icons floating around the subject.
-- Jacket detail: Shoulder epaulettes with rank insignia, integrated comms earpiece glowing red.
-- Rim light: Cold blue-white from above, symbolizing strategic clarity.
-- Particle FX: Faint chess-piece and crosshair motifs in the background dust.`,
+  tactical: `TYPE: TACTICAL COMMANDER.
+Expression: Cold, calculating, commanding authority.
+HUD: Holographic TACTICAL MATRIX with minimap grid and strategic waypoints floating around subject.
+Jacket detail: Shoulder epaulettes with rank insignia, comms earpiece glowing red.
+Rim light: Cold blue-white from above.
+Background: Faint crosshair and chess-piece motifs in particles.`,
 
-  speedy: `
-TYPE OVERLAY — SPEED HUNTER:
-- Expression: Hyper-focused, adrenaline rush, slight forward lean — about to launch.
-- HUD/UI: Holographic "VELOCITY SCANNER" — speed vectors, FPS counter (144Hz+), reaction-time arcs streaking past the subject.
-- Jacket detail: Aerodynamic panels, motion-stripe accents on sleeves, ventilation mesh glowing cyan.
-- Rim light: Electric cyan from the side, with motion-blur streaks trailing behind.
-- Particle FX: Speed lines and spark trails, kinetic energy radiating outward.`,
+  speedy: `TYPE: SPEED HUNTER.
+Expression: Hyper-focused, adrenaline rush, slight forward lean.
+HUD: Holographic VELOCITY SCANNER with speed vectors and 144Hz FPS counter.
+Jacket detail: Aerodynamic panels, motion-stripe accents, ventilation mesh glowing cyan.
+Rim light: Electric cyan from the side with motion-blur streaks.
+Background: Speed lines and spark trails in particles.`,
 
-  burst: `
-TYPE OVERLAY — BURST BREAKER:
-- Expression: Fierce, explosive, jaw set tight — the moment before impact.
-- HUD/UI: Holographic "POWER SURGE" readout — energy charge bars at CRITICAL%, damage multiplier, burst countdown timer.
-- Jacket detail: Heavy armor plating on shoulders, glowing red power conduits running down the arms.
-- Rim light: Intense red-orange from below, as if absorbing energy from the ground.
-- Particle FX: Shattered fragments and energy burst ripples exploding outward from the subject.`,
+  burst: `TYPE: BURST BREAKER.
+Expression: Fierce and explosive, jaw set, moment before impact.
+HUD: Holographic POWER SURGE with energy bars at CRITICAL percent and damage multiplier.
+Jacket detail: Heavy armor plating on shoulders, glowing red power conduits on arms.
+Rim light: Intense red-orange from below.
+Background: Shattered fragments and energy burst ripples in particles.`,
 
-  sniper: `
-TYPE OVERLAY — PRECISION SNIPER:
-- Expression: Eerily calm, one eye slightly narrowed, absolute stillness.
-- HUD/UI: Holographic "OPTICAL TARGETING v3.2" — precision crosshair overlay, wind/distance calculation data, heartbeat flatline stabilizer.
-- Jacket detail: Lightweight tactical coat, ghillie-texture collar detail, optical sensor badge on chest.
-- Rim light: Ice-blue single-side rim light, cold and surgical, deep shadow on the other side.
-- Particle FX: Laser dot particles, subtle rifle-scope ring motif in the background.`,
+  sniper: `TYPE: PRECISION SNIPER.
+Expression: Eerily calm, one eye narrowed, absolute stillness.
+HUD: Holographic OPTICAL TARGETING with precision crosshair and heartbeat stabilizer.
+Jacket detail: Lightweight tactical coat, ghillie-texture collar, optical sensor badge.
+Rim light: Ice-blue single-side, deep shadow on the other side.
+Background: Laser dot particles and rifle-scope ring motif.`,
 
-  builder: `
-TYPE OVERLAY — CREATIVE BUILDER:
-- Expression: Confident smirk, head slightly tilted — always three steps ahead.
-- HUD/UI: Holographic "SYNTHESIS ENGINE" — modular build-tree nodes, circuit connection map, innovation matrix grid floating around hands.
-- Jacket detail: Jacket with modular panel attachments, colorful wiring accents (purple/green), interchangeable badge slots.
-- Rim light: Purple-green dual-side rim light, creative and dynamic.
-- Particle FX: Geometric shapes, hexagonal nodes, and blueprint line fragments assembling in the background.`,
+  builder: `TYPE: CREATIVE BUILDER.
+Expression: Confident smirk, head slightly tilted.
+HUD: Holographic SYNTHESIS ENGINE with modular build-tree nodes and circuit map around hands.
+Jacket detail: Modular panel attachments, purple and green wiring accents.
+Rim light: Purple-green dual-side.
+Background: Hexagonal nodes and blueprint line fragments assembling.`,
 
-  futurist: `
-TYPE OVERLAY — FUTURE CONTROLLER:
-- Expression: Serene and visionary, eyes glowing faintly with a digital teal hue — already seeing tomorrow.
-- HUD/UI: Holographic "AI CORE SYNC 99%" — neural network visualization, data stream flows, adaptive algorithm patterns radiating from the subject.
-- Jacket detail: Smooth nano-material jacket with embedded LED matrix panels, AI-pattern woven into the fabric.
-- Rim light: Pure white and holographic teal, ethereal and otherworldly.
-- Particle FX: Binary code streams, neural node connections, and soft holographic light particles.`,
+  futurist: `TYPE: FUTURE CONTROLLER.
+Expression: Serene and visionary, eyes glowing faintly with digital teal.
+HUD: Holographic AI CORE SYNC 99% with neural network visualization and data streams.
+Jacket detail: Nano-material jacket with embedded LED matrix panels.
+Rim light: Pure white and holographic teal, ethereal.
+Background: Binary code streams and neural node connections.`,
 };
 
 
@@ -98,12 +88,12 @@ async function generateCyberFace(base64Image, type = 'tactical') {
   const body = {
     contents: [{
       parts: [
-        { text: prompt },
         { inline_data: { mime_type: 'image/jpeg', data: cleanBase64 } },
+        { text: prompt },
       ]
     }],
     generationConfig: {
-      responseModalities: ['IMAGE', 'TEXT'],
+      responseModalities: ['TEXT', 'IMAGE'],
     }
   };
 
