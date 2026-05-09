@@ -2,6 +2,7 @@ const express = require('express');
 const cors    = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const path    = require('path');
+const { GoogleGenAI } = require('@google/genai');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -36,70 +37,58 @@ const TYPE_STYLE = {
 };
 
 // ════════════════════════════════════════
-// Gemini API 呼叫函數
+// Gemini SDK 呼叫
 // ════════════════════════════════════════
 
 async function generateCyberFace(base64Image, type = 'tactical') {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY 未設定');
 
+  const ai = new GoogleGenAI({ apiKey });
   const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
   const prompt = BASE_PROMPT + '\n\n' + (TYPE_STYLE[type] || TYPE_STYLE.tactical);
 
-  const MODEL = 'gemini-2.5-flash-image';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
+  console.log(`[ROG-GEN] 生成類型: ${type}`);
 
-  const body = {
-    contents: [{
-      parts: [
-        { text: prompt },
-        { inline_data: { mime_type: 'image/jpeg', data: cleanBase64 } },
-      ]
-    }],
-    generationConfig: {
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash-image',
+    contents: [
+      {
+        role: 'user',
+        parts: [
+          { text: prompt },
+          { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
+        ],
+      },
+    ],
+    config: {
       responseModalities: ['TEXT', 'IMAGE'],
       temperature: 0.8,
+      safetySettings: [
+        { category: 'HARM_CATEGORY_HARASSMENT',       threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH',       threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+      ],
     },
-    safetySettings: [
-      { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_HATE_SPEECH',        threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',  threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT',  threshold: 'BLOCK_NONE' },
-    ]
-  };
-
-  console.log(`[ROG-GEN] 生成類型: ${type}`);
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
   });
 
-  const data = await res.json();
+  const parts = response.candidates?.[0]?.content?.parts || [];
+  const reason = response.candidates?.[0]?.finishReason;
+  console.log(`[ROG-GEN] finishReason=${reason} parts=[${parts.map(p => p.inlineData ? 'IMAGE' : 'TEXT').join(',')}]`);
 
-  if (!res.ok) {
-    throw new Error(`Gemini API 錯誤: ${data.error?.message || JSON.stringify(data).slice(0, 200)}`);
+  for (const part of parts) {
+    if (part.inlineData?.data) {
+      const mime = part.inlineData.mimeType || 'image/png';
+      console.log(`[ROG-GEN] 成功！mime=${mime}`);
+      return `data:${mime};base64,${part.inlineData.data}`;
+    }
   }
 
-  const candidate = data.candidates?.[0];
-  const parts = candidate?.content?.parts || [];
-
-  console.log(`[ROG-GEN] finishReason=${candidate?.finishReason} parts=[${parts.map(p => p.inline_data ? 'IMAGE' : 'TEXT').join(',')}]`);
-
-  const imagePart = parts.find(p => p.inline_data?.data);
-  if (imagePart) {
-    const mime = imagePart.inline_data.mime_type || 'image/png';
-    console.log(`[ROG-GEN] 成功！mime=${mime}`);
-    return `data:${mime};base64,${imagePart.inline_data.data}`;
-  }
-
-  if (candidate?.finishReason === 'SAFETY') {
-    throw new Error('內容被安全過濾器攔截，請換一張照片。');
-  }
-
+  if (reason === 'SAFETY') throw new Error('內容被安全過濾器攔截，請換一張照片。');
   const textPart = parts.find(p => p.text);
-  if (textPart) throw new Error(`模型只回傳文字: ${textPart.text.slice(0, 100)}`);
-  throw new Error(`未回傳圖片 finishReason=${candidate?.finishReason}`);
+  if (textPart) throw new Error(`模型只回傳文字(${reason}): ${textPart.text.slice(0, 150)}`);
+  throw new Error(`未回傳圖片 finishReason=${reason}`);
 }
 
 // ════════════════════════════════════════
@@ -109,9 +98,7 @@ async function generateCyberFace(base64Image, type = 'tactical') {
 app.post('/api/cyber-scan', async (req, res) => {
   const { photo, type } = req.body;
   if (!photo) return res.status(400).json({ error: '缺少照片資料' });
-
   const finalType = TYPE_STYLE[type] ? type : 'tactical';
-
   try {
     const cyberPhoto = await generateCyberFace(photo, finalType);
     res.json({ cyberPhoto });
@@ -125,9 +112,7 @@ app.post('/api/save', (req, res) => {
   const { photo, type, typeName, tags, desc, scores } = req.body;
   const id = uuidv4().split('-')[0];
   const expireAt = Date.now() + 1000 * 60 * 60 * 24 * 3;
-
   store.set(id, { id, photo, type, typeName, tags, desc, scores, createdAt: Date.now(), expireAt });
-
   const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
   console.log(`[SAVE] id=${id} type=${type} hasPhoto=${!!photo}`);
   res.json({ id, url: `${baseUrl}/result/${id}` });
@@ -147,7 +132,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', count: store.size });
 });
 
-// 每小時清理過期資料
 setInterval(() => {
   const now = Date.now();
   for (const [id, data] of store.entries()) {
