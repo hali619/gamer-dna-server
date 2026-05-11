@@ -16,62 +16,17 @@ app.use(express.static('public'));
 // ROG「爆發重裝 + 藝術人臉」視覺定義 (Aesthetic-Balance)
 // ════════════════════════════════════════
 
-// 1. BASE_PROMPT: 定義藝術臉孔與 Burst重裝。
-const BASE_PROMPT = `[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
-You are the "ROG ELITE TEAM STYLIST." Generate a high-end "ROG Esports Pro-Player" illustration of the subject.
+[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
+      You are the "ROG ELITE TEAM STYLIST." Generate a high-end "ROG Esports Pro-Player" illustration of the subject.
 
-Core Visual Specs:
-1. **THEME:** Power Overload, Energy Surge, Heavy Industrial. The entire collection embodies the "Burst Breaker" energy and weight.
-2. **FACE (ARTISTIC & RECOGNIZABLE):** - **MUST BE 100% RECOGNIZABLE HUMAN FACE.** - **MATERIAL:** NO realistic skin texture. Render the face as a "Polished Black Porcelain" surface, achieving a "Ceramic-smooth" and flawless look. It must look solid, clean, and handsome/beautiful.
-   - **LIKENESS:** The subject's exact contours and features are preserved, but in a refined, non-photorealistic finish. Think of a premium digital statue.
-3. **APPAREL (BURST ARMOR):** Dress the subject in "Heavy ROG Battle-Chassis." Integrate visible Strix GPU fins, Ryujin braided liquid-cooling tubes with internal red glow, and reinforced carbon-fiber plating. This is heavy armor.
-4. **EFFECTS:** Add intense energy particles and subtle "Melted Metal" effects at the edges of the armor plates.
-5. **CRITICAL:** Maintain EXACT same pose and composition for direct overlay.
-6. **COLOR:** Strictly ROG Red (#FF0000), Obsidian Black (#000000), and Titanium Gray.`;
-
-// 2. TYPE_STYLE: 在「爆發裝甲」下，六種角色的職能演繹。
-const TYPE_STYLE = {
-  // 戰術指揮：重裝爆發+矩陣資訊
-  tactical: `TYPE: TACTICAL COMMANDER.
-Expression: Cold, authoritative gaze.
-HUD: Massive Holographic "TACTICAL MATRIX" flashing RED with minimap grids.
-Rim Light: Pulsating white-hot from above.`,
-
-  // 速度獵手：重裝爆發+速度動態
-  speedy: `TYPE: SPEED HUNTER.
-Expression: Focused, single-side lighting.
-HUD: Holographic "VELOCITY SCANNER" with speed vectors and blurred "240Hz" text.
-Visual: Forward motion streaks in Electric Orange.
-Rim light: Electric cyan accents.`,
-
-  // 原生爆發：重裝爆發+核心過載 (原本 Burst 風格)
-  burst: `TYPE: ORIGINAL BURST-BREAKER.
-Expression: Fierce, explosive expression.
-HUD: Holographic "POWER SURGE" energy bars at 100% CRITICAL.
-Detail: Heatsinks Ventilating Heat (Steam). Internal conduit glow on chest and arms.
-Rim Light: Intense Lava-Orange from below.`,
-
-  // 精準狙擊：重裝爆發+靜態鎖定
-  sniper: `TYPE: PRECISION SNIPER.
-Expression: Eerily calm, one eye in deep shadow.
-HUD: A single, intense ROG-RED laser-dot projected onto the eye; precision OPTICAL TARGETING crosshair.
-Visual: Extreme high-contrast; vent steam vents from chest armor.
-Rim Light: Ice-blue single-side highlight.`,
-
-  // 創造建築師：重裝爆發+模組化拼貼
-  builder: `TYPE: CREATIVE BUILDER.
-Expression: Confident smirk.
-HUD: Holographic "SYNTHESIS ENGINE" build-nodes and modular build-tree.
-Visual: ROG components (fans, heatsinks) are seen ASSEMBLING around arms and torso.
-Rim Light: Purple-green energy accents.`,
-
-  // 未來控制：重裝爆發+數據全息
-  futurist: `TYPE: FUTURE OVERSEER.
-Expression: Serene and visionary gaze.
-HUD: Holographic "AI CORE SYNC 99%" with neural network visualization and data streams.
-Visual: Dissolving into subtle "Cyber-Dust" at the edges.
-Rim Light: Ethereal Teal and White halo.`,
-};
+      Core Visual Specs:
+      1. **THEME:** Power Overload, Energy Surge, Heavy Industrial. The entire collection embodies the "Burst Breaker" energy and weight.
+      2. **FACE (RECOGNIZABLE & WHITE JADE TONE):** - **STRICTLY 100% RECOGNIZABLE HUMAN FACE WITH HEALTHY SKIN TONE.** - **MATERIAL:** NO realistic skin texture. Render the face with a "Polished White Jade" or "Polished Ivory Porcelain" surface. This achieves a "Ceramic-smooth," flawless, and non-porous look while providing a healthy, fair complexion.
+         - **LIKENESS:** The subject's exact contours and features are preserved (looks like the person in the photo), but refined to be aesthetic (Heroic/Pro-player look). It should look solid, clean, and radiant.
+      3. **APPAREL (BURST ARMOR):** Dress the subject in "Heavy ROG Battle-Chassis." Integrate visible Strix GPU fins, Ryujin braided liquid-cooling tubes with internal red glow, and reinforced carbon-fiber plating. This is heavy armor.
+      4. **EFFECTS:** Scatter glowing "Melted Metal" sparks and subtle "Energy Ripples" around the silhouette.
+      5. **CRITICAL:** Maintain EXACT same pose and composition for direct overlay.
+      6. **COLOR:** Strictly ROG Red (#FF0000), Obsidian Black (#000000), and Titanium Gray.
 
 // ════════════════════════════════════════
 // Gemini SDK 呼叫
