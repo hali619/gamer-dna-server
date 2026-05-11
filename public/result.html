@@ -89,7 +89,7 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;paddi
   <div class="inn" id="card-inner"></div>
 </div>
 
-<button id="dl-btn">↓ &nbsp; 儲存結果卡片</button>
+<button id="dl-btn" id="dl-btn">↓ &nbsp; <span id="dl-txt">儲存結果卡片</span></button>
 
 <script>
 const ROG_LOGO=`<svg width="110" height="66" viewBox="0 0 240 144" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 64.6633C0 64.6633 8.16511 90.0315 15.5878 98.4874C23.0105 106.943 49.4848 114.902 49.4848 114.902L0.247666 64.6633H0ZM214.762 0C195.958 0 168.247 4.22864 147.464 14.6742C130.391 23.1302 79.9171 81.5756 76.4531 85.3062C71.5047 90.7776 70.0189 92.0213 62.8436 89.2855C51.2147 85.0575 33.4016 73.617 33.4016 73.617C33.4016 73.617 52.9468 108.684 59.8747 119.13C70.5139 135.544 88.5767 144 88.5767 144C88.5767 144 75.2145 127.337 71.7505 120.125C68.534 113.41 72.494 107.689 91.5456 91.0259C122.721 63.4197 150.432 41.0367 177.896 24.6222C203.876 9.20257 218.473 4.97433 229.607 0.248947C226.885 0.248947 220.948 0.248947 214.762 0.248947V0ZM179.875 44.5183C136.575 69.14 79.4221 115.15 79.4221 115.15C95.7521 127.088 137.32 144 166.516 144C198.928 144 229.607 51.7309 229.607 51.7309C173.689 77.8449 136.575 100.228 136.575 100.228L195.215 79.8346C195.215 79.8346 176.658 127.585 155.38 127.585C130.638 127.585 101.939 114.404 101.939 114.404C151.671 75.855 228.37 40.788 232.576 38.5496C236.782 36.56 240 28.3528 240 24.6222C237.773 24.6222 208.579 28.3525 179.63 44.5183H179.875Z" fill="#686868"/></svg>`;
@@ -98,7 +98,23 @@ const ROG_TEXT=`<svg width="100%" height="20" viewBox="0 0 571 29" fill="none" x
 
 const TYPE_NUM={tactical:'01',speedy:'02',burst:'03',sniper:'04',builder:'05',futurist:'06'};
 const TYPE_EN={tactical:'TACTICAL COMMANDER',speedy:'SPEED HUNTER',burst:'BURST BREAKER',sniper:'PRECISION SNIPER',builder:'CREATIVE BUILDER',futurist:'FUTURE CONTROLLER'};
-const TYPE_NAMES={tactical:'戰術指揮者',speedy:'極速獵手',burst:'爆發破局者',sniper:'精準狙擊手',builder:'創造建構者',futurist:'未來操控者'};
+const TYPE_NAMES={
+  zh:{tactical:'戰術指揮者',speedy:'極速獵手',burst:'爆發破局者',sniper:'精準狙擊手',builder:'創造建構者',futurist:'未來操控者'},
+  en:{tactical:'Tactical Commander',speedy:'Speed Hunter',burst:'Burst Breaker',sniper:'Precision Sniper',builder:'Creative Builder',futurist:'Future Controller'},
+};
+
+// 讀 URL ?lang= 參數，預設中文
+const lang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'zh';
+
+// 各 type 對應的完整資料（不依賴 server 回傳的中文）
+const TYPE_DATA = {
+  tactical:{ zh:{name:'戰術指揮者',tags:['#策略','#掌控','#全局意識']}, en:{name:'Tactical Commander',tags:['#Strategy','#Control','#Macro']} },
+  speedy:  { zh:{name:'極速獵手',  tags:['#反應','#機動','#快速出擊']}, en:{name:'Speed Hunter',      tags:['#Reaction','#Mobility','#Fast Strike']} },
+  burst:   { zh:{name:'爆發破局者',tags:['#效能','#侵略','#衝擊力']},   en:{name:'Burst Breaker',     tags:['#Power','#Aggression','#Impact']} },
+  sniper:  { zh:{name:'精準狙擊手',tags:['#準確','#專注','#時機掌握']}, en:{name:'Precision Sniper',  tags:['#Precision','#Focus','#Timing']} },
+  builder: { zh:{name:'創造建構者',tags:['#創造','#靈活','#組合思維']}, en:{name:'Creative Builder',  tags:['#Creative','#Flexible','#Systems']} },
+  futurist:{ zh:{name:'未來操控者',tags:['#AI','#適應','#次世代']},     en:{name:'Future Controller', tags:['#AI','#Adaptive','#Next-Gen']} },
+};
 
 async function init(){
   const id=location.pathname.split('/').pop();
@@ -111,9 +127,12 @@ async function init(){
 }
 
 function render(data){
-  const{type,typeName,tags,desc,scores,photo,id}=data;
+  const{type,desc,scores,photo,id}=data;
   const num=TYPE_NUM[type]||'01';
   const en=TYPE_EN[type]||'';
+  // 用 type key 從本地對照表取名稱和 tags，不依賴 server 回傳的中文
+  const typeName=(TYPE_DATA[type]||{})[lang]?.name || data.typeName || type;
+  const tags=(TYPE_DATA[type]||{})[lang]?.tags || data.tags || [];
   const vals=Object.values(scores||{});
   const max=vals.length?Math.max(...vals):1;
 
@@ -153,7 +172,7 @@ function render(data){
       ${Object.entries(scores||{}).map(([t,v])=>{
         const pct=max>0?Math.round((v/max)*100):0;
         return `<div class="si">
-          <div class="sn">${TYPE_NAMES[t]||t}</div>
+          <div class="sn">${(TYPE_NAMES[lang]||TYPE_NAMES.zh)[t]||t}</div>
           <div class="sb"><div class="sf" style="width:0%" data-w="${pct}%"></div></div>
           <div class="sv">${pct}%</div>
         </div>`;
@@ -166,6 +185,9 @@ function render(data){
   document.getElementById('loading').style.display='none';
   document.getElementById('card').style.display='block';
   document.getElementById('dl-btn').style.display='block';
+  // 下載按鈕語言
+  const dlTxt = document.getElementById('dl-txt');
+  if(dlTxt) dlTxt.textContent = lang==='en' ? 'SAVE RESULT CARD' : '儲存結果卡片';
 
   setTimeout(()=>{
     document.querySelectorAll('.sf').forEach(b=>b.style.width=b.dataset.w);

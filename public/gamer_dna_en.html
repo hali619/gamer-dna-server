@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080, initial-scale=1.0">
+<title>玩家基因鑑定系統</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --bg: #ffffff;
+  --ink: #111111;
+  --ink-mid: #555555;
+  --ink-light: #999999;
+  --white: rgba(255,255,255,0.55);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  width:100vw; height:100vh; overflow:hidden;
+  background:#ffffff;
+  font-family:'Roboto Condensed','Microsoft JhengHei',sans-serif;
+  touch-action:manipulation; cursor:default; user-select:none;
+}
+
+#app-wrapper {
+  width:1080px; height:1920px;
+  position:fixed; top:0; left:0;
+  transform-origin:top left;
+  background:var(--bg);
+  overflow:hidden;
+}
+
+.grid-bg {
+  position:absolute; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.09) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,0,0,0.09) 1px,transparent 1px),
+    linear-gradient(rgba(0,0,0,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,0,0,0.03) 1px,transparent 1px);
+  background-size:54px 54px,54px 54px,18px 18px,18px 18px;
+}
+
+.corners { position:absolute; inset:0; pointer-events:none; z-index:0; }
+.corner { position:absolute; width:64px; height:64px; }
+.corner::after { content:''; position:absolute; width:6px; height:6px; background:var(--ink); border-radius:50%; }
+.c-tl { top:44px; left:44px; border-top:2px solid var(--ink); border-left:2px solid var(--ink); }
+.c-tl::after { top:-3px; left:-3px; }
+.c-tr { top:44px; right:44px; border-top:2px solid var(--ink); border-right:2px solid var(--ink); }
+.c-tr::after { top:-3px; right:-3px; }
+.c-bl { bottom:44px; left:44px; border-bottom:2px solid var(--ink); border-left:2px solid var(--ink); }
+.c-bl::after { bottom:-3px; left:-3px; }
+.c-br { bottom:44px; right:44px; border-bottom:2px solid var(--ink); border-right:2px solid var(--ink); }
+.c-br::after { bottom:-3px; right:-3px; }
+
+.vert-label {
+  position:absolute; z-index:0; pointer-events:none;
+  font-family:'Share Tech Mono',monospace; font-size:14px;
+  color:rgba(0,0,0,0.15); letter-spacing:4px; writing-mode:vertical-rl;
+}
+.vl-left  { left:14px; top:200px; }
+.vl-right { right:14px; bottom:200px; }
+
+/* ── SCREENS ── */
+.screen {
+  position:absolute; inset:0; z-index:5;
+  display:flex; flex-direction:column;
+  padding:80px;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.35s ease;
+  overflow:hidden;
+}
+.screen.active { opacity:1; pointer-events:all; }
+
+/* ── INTRO ── */
+#screen-intro { justify-content:center; }
+.intro-sys { font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--ink); letter-spacing:7px; margin-bottom:8px; }
+.intro-sys-sub { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:5px; margin-bottom:60px; }
+.intro-title { font-size:160px; font-weight:900; color:var(--ink); line-height:0.86; text-transform:uppercase; letter-spacing:-2px; }
+.intro-title-zh { font-size:38px; color:var(--ink-mid); letter-spacing:20px; margin-top:20px; margin-bottom:48px; }
+.intro-divider { width:100%; height:2px; background:var(--ink); margin-bottom:60px; position:relative; }
+.intro-divider::before,.intro-divider::after { content:''; position:absolute; width:8px; height:8px; background:var(--ink); border-radius:50%; top:-3px; }
+.intro-divider::before { left:0; } .intro-divider::after { right:0; }
+.intro-desc { font-size:28px; color:var(--ink-mid); line-height:1.7; letter-spacing:2px; margin-bottom:0; padding-left:20px; border-left:3px solid var(--ink); flex-shrink:0; }
+.intro-meta { display:flex; gap:60px; margin-bottom:100px; }
+.meta-item { display:flex; flex-direction:column; gap:6px; }
+.meta-num { font-size:72px; font-weight:900; color:var(--ink); line-height:1; }
+.meta-label { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:4px; }
+
+.big-btn {
+  width:100%; height:140px;
+  border:2px solid var(--ink); background:var(--ink); color:var(--bg);
+  font-family:'Roboto Condensed',sans-serif; font-size:42px; font-weight:700; letter-spacing:10px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:opacity 0.15s;
+}
+.big-btn:active { opacity:0.7; }
+.big-btn.outline { background:transparent; color:var(--ink); }
+.big-btn.outline:active { background:var(--ink); color:var(--bg); }
+
+/* ── CAMERA ── */
+#screen-camera { justify-content:flex-start; align-items:center; gap:0; }
+.cam-sys { font-family:'Share Tech Mono',monospace; font-size:18px; color:var(--ink); letter-spacing:6px; margin-bottom:12px; align-self:flex-start; }
+.cam-sub { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:4px; margin-bottom:48px; align-self:flex-start; }
+
+.cam-frame {
+  width:860px; height:860px;
+  border:2px solid var(--ink);
+  position:relative; overflow:hidden;
+  background:#000; flex-shrink:0; margin-bottom:48px;
+}
+.cam-frame video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); display:block; }
+.cam-scan {
+  position:absolute; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);
+  animation:scanAnim 2.5s linear infinite; pointer-events:none;
+}
+@keyframes scanAnim { 0%{top:0} 100%{top:100%} }
+.cam-cross { position:absolute; inset:0; pointer-events:none; }
+.cam-cross::before { content:''; position:absolute; left:50%; top:0; bottom:0; width:1px; background:rgba(255,255,255,0.2); transform:translateX(-50%); }
+.cam-cross::after  { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:rgba(255,255,255,0.2); transform:translateY(-50%); }
+.cam-corner { position:absolute; width:40px; height:40px; }
+.cc-tl { top:0; left:0; border-top:3px solid rgba(255,255,255,0.7); border-left:3px solid rgba(255,255,255,0.7); }
+.cc-tr { top:0; right:0; border-top:3px solid rgba(255,255,255,0.7); border-right:3px solid rgba(255,255,255,0.7); }
+.cc-bl { bottom:0; left:0; border-bottom:3px solid rgba(255,255,255,0.7); border-left:3px solid rgba(255,255,255,0.7); }
+.cc-br { bottom:0; right:0; border-bottom:3px solid rgba(255,255,255,0.7); border-right:3px solid rgba(255,255,255,0.7); }
+
+.countdown-wrap { display:flex; flex-direction:column; align-items:center; gap:20px; margin-bottom:48px; }
+.countdown-ring { width:160px; height:160px; position:relative; }
+.countdown-ring svg { position:absolute; top:0; left:0; transform:rotate(-90deg); }
+.ring-bg  { fill:none; stroke:rgba(0,0,0,0.1); stroke-width:6; }
+.ring-fill{ fill:none; stroke:var(--ink); stroke-width:6; stroke-dasharray:515; stroke-dashoffset:0; transition:stroke-dashoffset 0.95s linear; }
+.countdown-num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:72px; font-weight:900; color:var(--ink); }
+.countdown-label { font-family:'Share Tech Mono',monospace; font-size:16px; color:var(--ink-light); letter-spacing:4px; }
+
+.cam-btns { display:flex; gap:20px; width:100%; }
+
+/* ── QUIZ ── */
+#screen-quiz { justify-content:flex-start; }
+.quiz-sys { font-family:'Share Tech Mono',monospace; font-size:16px; color:var(--ink-light); letter-spacing:5px; margin-bottom:12px; flex-shrink:0; }
+.quiz-top-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-shrink:0; }
+.home-btn { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--ink-light); letter-spacing:3px; background:transparent; border:1px solid rgba(0,0,0,0.2); padding:8px 18px; cursor:pointer; transition:all 0.15s; }
+.home-btn:active { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.progress-track { width:100%; height:3px; background:rgba(0,0,0,0.12); margin-bottom:14px; flex-shrink:0; }
+.progress-fill { height:100%; background:var(--ink); transition:width 0.4s ease; }
+.progress-dots { display:flex; gap:8px; margin-bottom:36px; flex-shrink:0; }
+.pdot { width:10px; height:10px; border:1.5px solid var(--ink); border-radius:50%; transition:background 0.3s; }
+.pdot.done { background:var(--ink); }
+.q-num-big { font-size:110px; font-weight:900; color:rgba(0,0,0,0.05); position:absolute; right:80px; top:110px; line-height:1; letter-spacing:-4px; pointer-events:none; font-family:'Roboto Condensed',sans-serif; }
+.q-card { background:var(--white); border:1.5px solid rgba(0,0,0,0.25); padding:44px 40px 38px; margin-bottom:200px; position:relative; flex-shrink:0; }
+.q-card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:var(--ink); }
+.q-card::after  { content:''; position:absolute; top:12px; right:12px; width:22px; height:22px; border-top:1.5px solid rgba(0,0,0,0.18); border-right:1.5px solid rgba(0,0,0,0.18); }
+.q-label { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:5px; margin-bottom:14px; }
+.q-text  { font-size:32px; font-weight:700; color:var(--ink); line-height:1.45; }
+
+.options { display:flex; flex-direction:column; gap:40px; flex:1; }
+.opt-btn { width:100%; min-height:200px; border:1.5px solid rgba(0,0,0,0.22); background:var(--white); display:flex; align-items:center; gap:28px; padding:0 30px; cursor:pointer; text-align:left; flex-shrink:0; transition:border-color 0.15s,background 0.15s; }
+.opt-btn.selected { border-color:var(--ink); background:var(--ink); }
+.opt-btn.selected .opt-key  { color:var(--bg); border-color:var(--bg); }
+.opt-btn.selected .opt-text { color:var(--bg); }
+.opt-key  { font-family:'Share Tech Mono',monospace; font-size:24px; font-weight:700; color:var(--ink); border:1.5px solid var(--ink); width:58px; height:58px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:color 0.15s,border-color 0.15s; }
+.opt-text { font-size:26px; color:var(--ink); line-height:1.45; transition:color 0.15s; }
+
+.quiz-nav { display:flex; gap:16px; margin-top:auto; flex-shrink:0; padding-top:20px; }
+.nav-btn { height:96px; border:1.5px solid var(--ink); background:transparent; cursor:pointer; font-family:'Share Tech Mono',monospace; font-size:20px; letter-spacing:5px; color:var(--ink); display:flex; align-items:center; justify-content:center; transition:background 0.15s,color 0.15s; }
+.nav-btn:active { background:var(--ink); color:var(--bg); }
+.nav-btn.prev-btn { width:180px; }
+.nav-btn.next-btn { flex:1; font-size:22px; }
+.nav-btn:disabled { opacity:0.22; pointer-events:none; }
+.nav-btn.next-btn.ready { background:var(--ink); color:var(--bg); }
+
+/* ── RESULT ── */
+#screen-result { padding-top:60px; overflow-y:auto; justify-content:flex-start; }
+.result-sys { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:5px; margin-bottom:32px; text-align:center; flex-shrink:0; }
+
+.result-top { display:flex; gap:32px; align-items:flex-start; margin-bottom:32px; flex-shrink:0; }
+.result-photo-wrap {
+  width:280px; height:320px; flex-shrink:0;
+  border:2px solid var(--ink); overflow:hidden; position:relative; background:#111;
+}
+.result-photo-wrap img { width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(100%) contrast(1.1); }
+.result-photo-wrap::after { content:''; position:absolute; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(0,0,0,0.3),transparent); animation:scanAnim 3s linear infinite; pointer-events:none; }
+.no-photo { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--ink-light); letter-spacing:2px; }
+
+.result-right { flex:1; display:flex; flex-direction:column; gap:10px; padding-top:4px; position:relative; }
+.result-icon-wrap { width:100px; height:100px; border:2px solid var(--ink); display:flex; align-items:center; justify-content:center; position:relative; flex-shrink:0; }
+.result-icon-wrap::before { content:''; position:absolute; top:-1px; right:-1px; width:14px; height:14px; border-top:2px solid var(--ink); border-right:2px solid var(--ink); }
+.result-type-num { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--ink-light); letter-spacing:4px; }
+.result-name { font-size:80px; font-weight:900; color:var(--ink); line-height:0.88; letter-spacing:-2px; }
+
+
+.result-tags { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; flex-shrink:0; }
+.result-tag { font-family:'Share Tech Mono',monospace; font-size:15px; color:var(--ink); border:1.5px solid var(--ink); padding:5px 16px; letter-spacing:2px; }
+
+.result-divider { width:100%; height:2px; background:var(--ink); margin-bottom:24px; position:relative; flex-shrink:0; }
+.result-divider::before,.result-divider::after { content:''; position:absolute; width:8px; height:8px; background:var(--ink); border-radius:50%; top:-3px; }
+.result-divider::before { left:0; } .result-divider::after { right:0; }
+
+.result-desc { font-size:24px; color:var(--ink-mid); line-height:1.75; margin-bottom:28px; padding:28px 30px; border:1px solid rgba(0,0,0,0.18); background:var(--white); flex-shrink:0; }
+
+.score-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:36px; flex-shrink:0; }
+.score-item { background:var(--white); border:1px solid rgba(0,0,0,0.15); padding:14px 16px; }
+.score-name { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--ink-light); letter-spacing:2px; margin-bottom:6px; }
+.score-bar-bg { height:3px; background:rgba(0,0,0,0.08); overflow:hidden; margin-bottom:4px; }
+.score-bar-fill { height:100%; background:var(--ink); transition:width 1s ease; }
+.score-val { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--ink); text-align:right; }
+
+/* flash */
+.flash-overlay { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:100; transition:opacity 0.06s; }
+.flash-overlay.on { opacity:1; }
+#capture-canvas { display:none; }
+
+/* ── QR SECTION ── */
+.qr-section {
+  border:1.5px solid rgba(0,0,0,0.3);
+  padding:36px 32px;
+  display:flex; align-items:center; gap:32px;
+  background:rgba(255,255,255,0.35);
+  position:relative; flex-shrink:0;
+  margin-bottom:40px;
+}
+.qr-section::before {
+  content:'SCAN TO SAVE';
+  position:absolute; top:-13px; left:20px;
+  font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--ink);
+  letter-spacing:3px; background:var(--bg); padding:0 10px;
+}
+.qr-section::after {
+  content:''; position:absolute; top:10px; right:10px;
+  width:18px; height:18px;
+  border-top:1.5px solid rgba(0,0,0,0.2); border-right:1.5px solid rgba(0,0,0,0.2);
+}
+.qr-code-wrap {
+  width:160px; height:160px; flex-shrink:0;
+  border:1.5px solid var(--ink);
+  display:flex; align-items:center; justify-content:center;
+  background:#fff; padding:10px;
+}
+.qr-info { flex:1; }
+.qr-info-title { font-size:34px; font-weight:700; color:var(--ink); letter-spacing:1px; margin-bottom:10px; }
+.qr-info-sub { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:2px; line-height:1.8; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div id="app-wrapper">
+
+<div class="grid-bg"></div>
+<div class="corners">
+  <div class="corner c-tl"></div><div class="corner c-tr"></div>
+  <div class="corner c-bl"></div><div class="corner c-br"></div>
+</div>
+<div class="vert-label vl-left">GAMER.DNA.ANALYSIS.SYSTEM</div>
+<div class="vert-label vl-right">FOR.THOSE.WHO.DARE</div>
+<div class="flash-overlay" id="flash"></div>
+<canvas id="capture-canvas" width="860" height="860"></canvas>
+
+<!-- ══ INTRO ══ -->
+<div class="screen active" id="screen-intro">
+  <!-- ▶ DNA LAB SYSTEM ONLINE  Y=660 -->
+  <div style="position:absolute; top:660px; left:80px; font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--ink); letter-spacing:7px;">▶ DNA LAB &nbsp; SYSTEM ONLINE</div>
+  <!-- PLAYER ARCHETYPE ANALYSIS v2.6  Y=710 -->
+  <div style="position:absolute; top:710px; left:80px; font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:5px;">PLAYER ARCHETYPE ANALYSIS &nbsp; v2.6</div>
+  <!-- GAMER  Y=760 -->
+  <div style="position:absolute; top:760px; left:80px; font-family:'Roboto Condensed',sans-serif; font-size:160px; font-weight:900; color:var(--ink); line-height:0.86; letter-spacing:-2px;">GAMER<br>DNA</div>
+  <!-- 玩家基因鑑定系統  Y=1090 -->
+  <div style="position:absolute; top:1080px; left:80px;">
+  <div style="font-size:36px; color:var(--ink-mid); letter-spacing:18px; margin-bottom:8px;">玩 家 基 因 鑑 定 系 統</div>
+  <div style="font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--ink-light); letter-spacing:6px;">PLAYER ARCHETYPE IDENTIFICATION SYSTEM</div>
+</div>
+  <!-- divider  Y=1160 -->
+  <div style="position:absolute; top:1160px; left:80px; right:80px; height:2px; background:var(--ink);">
+    <div style="position:absolute; width:8px; height:8px; background:var(--ink); border-radius:50%; top:-3px; left:0;"></div>
+    <div style="position:absolute; width:8px; height:8px; background:var(--ink); border-radius:50%; top:-3px; right:0;"></div>
+  </div>
+  <!-- desc  Y=1220 -->
+  <div style="position:absolute; top:1200px; left:80px; padding-left:20px; border-left:3px solid var(--ink);">
+  <div style="font-size:28px; color:var(--ink-mid); line-height:1.7; letter-spacing:2px;">每一位玩家都有屬於自己的戰鬥基因。<br>透過 10 道情境問題，找出你的玩家原型。</div>
+  <div style="font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--ink-light); letter-spacing:2px; line-height:1.8; margin-top:14px;">Every player carries a unique combat DNA.<br>Answer 10 scenario questions to reveal your archetype.</div>
+</div>
+  <!-- button  Y=1430  920x140 -->
+  <button class="big-btn" style="position:absolute; top:1430px; left:80px; width:920px; height:140px; font-size:48px; letter-spacing:12px;" onclick="goCamera()">▶ &nbsp; START</button>
+</div>
+
+<!-- ══ CAMERA ══ -->
+<div class="screen" id="screen-camera">
+  <div class="cam-sys">▶ IDENTITY SCAN</div>
+  <div class="cam-sub">BIOMETRIC CAPTURE &nbsp; STEP 01/02</div>
+  <div class="cam-frame" id="cam-frame">
+    <video id="cam-video" autoplay playsinline muted></video>
+    <div class="cam-scan"></div>
+    <div class="cam-cross"></div>
+    <div class="cam-corner cc-tl"></div><div class="cam-corner cc-tr"></div>
+    <div class="cam-corner cc-bl"></div><div class="cam-corner cc-br"></div>
+    <div id="cam-error-msg" style="display:none;position:absolute;inset:0;background:rgba(238,234,228,0.95);align-items:center;justify-content:center;text-align:center;padding:60px;font-family:Share Tech Mono,monospace;font-size:22px;color:#111;letter-spacing:2px;line-height:1.8;white-space:pre-line;"></div>
+  </div>
+  <div class="countdown-wrap">
+    <div class="countdown-ring">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle class="ring-bg"   cx="80" cy="80" r="72"/>
+        <circle class="ring-fill" id="ring-fill" cx="80" cy="80" r="72" stroke-dasharray="452" stroke-dashoffset="0"/>
+      </svg>
+      <div class="countdown-num" id="countdown-num">3</div>
+    </div>
+    <div class="countdown-label" id="countdown-label">READY? HIT SHOOT</div>
+  </div>
+  <div class="cam-btns" style="position:absolute; top:1430px; left:80px; right:80px; width:920px;">
+    <button class="big-btn outline" style="width:220px;font-size:28px;letter-spacing:4px;height:140px" onclick="skipPhoto()">SKIP</button>
+    <button class="big-btn" style="flex:1;font-size:32px;letter-spacing:6px;height:140px" id="shoot-btn" onclick="startCountdown()">📷 &nbsp; SHOOT</button>
+  </div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div class="screen" id="screen-quiz">
+  <div class="q-num-big" id="q-num-bg">01</div>
+  <div class="quiz-top-row">
+    <div class="quiz-sys" id="quiz-sys-label">QUESTION 01 / 10</div>
+    <button class="home-btn" onclick="restart()">⌂ HOME</button>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="progress-dots" id="progress-dots"></div>
+  <div class="q-card">
+    <div class="q-label" id="q-label">Q.01 ── SCENARIO ANALYSIS</div>
+    <div class="q-text"  id="q-text"></div>
+  </div>
+  <div class="options" id="options-container"></div>
+  <div class="quiz-nav">
+    <button class="nav-btn prev-btn" id="prev-btn" onclick="prevQ()" disabled>◀ PREV</button>
+    <button class="nav-btn next-btn" id="next-btn" onclick="nextQ()" disabled>NEXT ▶</button>
+  </div>
+</div>
+
+<!-- ══ RESULT ══ -->
+<div class="screen" id="screen-result">
+  <div class="result-sys">── DNA CLASSIFICATION COMPLETE ──</div>
+  <div class="result-top">
+    <div class="result-photo-wrap">
+      <div class="no-photo" id="no-photo-msg">NO SCAN</div>
+      <img id="result-photo" src="" style="display:none"/>
+    </div>
+    <div class="result-right">
+      <div class="result-icon-wrap">
+        <svg id="r-icon" width="66" height="66" viewBox="0 0 32 32" fill="none"></svg>
+      </div>
+      <div class="result-type-num" id="r-type-num"></div>
+      <div class="result-name"     id="r-name"></div>
+      <div style="position:absolute;bottom:0;right:0;"><svg width="200" height="120" viewBox="0 0 240 144" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 64.6633C0 64.6633 8.16511 90.0315 15.5878 98.4874C23.0105 106.943 49.4848 114.902 49.4848 114.902L0.247666 64.6633H0ZM214.762 0C195.958 0 168.247 4.22864 147.464 14.6742C130.391 23.1302 79.9171 81.5756 76.4531 85.3062C71.5047 90.7776 70.0189 92.0213 62.8436 89.2855C51.2147 85.0575 33.4016 73.617 33.4016 73.617C33.4016 73.617 52.9468 108.684 59.8747 119.13C70.5139 135.544 88.5767 144 88.5767 144C88.5767 144 75.2145 127.337 71.7505 120.125C68.534 113.41 72.494 107.689 91.5456 91.0259C122.721 63.4197 150.432 41.0367 177.896 24.6222C203.876 9.20257 218.473 4.97433 229.607 0.248947C226.885 0.248947 220.948 0.248947 214.762 0.248947V0ZM179.875 44.5183C136.575 69.14 79.4221 115.15 79.4221 115.15C95.7521 127.088 137.32 144 166.516 144C198.928 144 229.607 51.7309 229.607 51.7309C173.689 77.8449 136.575 100.228 136.575 100.228L195.215 79.8346C195.215 79.8346 176.658 127.585 155.38 127.585C130.638 127.585 101.939 114.404 101.939 114.404C151.671 75.855 228.37 40.788 232.576 38.5496C236.782 36.56 240 28.3528 240 24.6222C237.773 24.6222 208.579 28.3525 179.63 44.5183H179.875Z" fill="#686868"/></svg></div>
+
+    </div>
+  </div>
+  <div class="result-tags"    id="r-tags"></div>
+  <div class="result-divider"></div>
+  <div class="result-desc"    id="r-desc"></div>
+  <div class="score-grid"     id="r-scores"></div>
+
+  <div class="qr-section">
+      <div class="qr-code-wrap" id="qr-code-box" style="display:flex;align-items:center;justify-content:center;padding:4px">
+        <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Share Tech Mono',monospace;font-size:14px;color:#999;letter-spacing:2px">生成中...</div>
+      </div>
+      <div class="qr-info">
+        <div class="qr-info-title">取得照片</div>
+        <div class="qr-info-sub" id="qr-status">答題完成後自動生成</div>
+      </div>
+    </div>
+
+  <button class="big-btn outline" style="position:absolute;top:1720px;left:80px;width:920px;height:120px;font-size:42px;letter-spacing:8px;color:#111111 !important;background:#ffffff !important;border:2px solid #111111;" onclick="restart()">重新鑑定</button>
+</div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  { text:'Your team just lost a critical round. Your first reaction?', opts:[
+    { key:'A', text:'Immediately analyze the timing mistake and adjust the overall strategy', scores:{tactical:4,sniper:2} },
+    { key:'B', text:'Quickly adjust your positioning and speed to reset the rhythm', scores:{speedy:4,burst:1} },
+    { key:'C', text:'Initiate the next push right away and disrupt their momentum', scores:{burst:4,speedy:2} },
+    { key:'D', text:'Observe their patterns and wait for the perfect counter-moment', scores:{sniper:4,tactical:2} },
+  ]},
+  { text:'When picking a character, which type do you lean toward?', opts:[
+    { key:'A', text:'Commander — full information control, directs the team', scores:{tactical:5,builder:1} },
+    { key:'B', text:'Scout — fastest movement, maximum mobility', scores:{speedy:5} },
+    { key:'C', text:'Assault — highest burst damage, one-shot carry potential', scores:{burst:5} },
+    { key:'D', text:'Sniper — long-range precision, requires patience and observation', scores:{sniper:5} },
+  ]},
+  { text:'What is your usual role in team fights?', opts:[
+    { key:'A', text:'Call targets and decide when to push or pull back', scores:{tactical:5,sniper:1} },
+    { key:'B', text:'Flank and create chaos for your team to follow up', scores:{speedy:3,burst:2} },
+    { key:'C', text:'Lead the charge and break the line first', scores:{burst:4,speedy:1} },
+    { key:'D', text:'Deliver precise damage from a safe position', scores:{sniper:4,tactical:1} },
+  ]},
+  { text:'Facing a powerful new strategy you have never seen, you:', opts:[
+    { key:'A', text:'Quickly break down the logic and find the best counter', scores:{tactical:4,futurist:2} },
+    { key:'B', text:'Trust your instincts and adapt on the fly', scores:{speedy:4,burst:1} },
+    { key:'C', text:'Force through it — give them zero breathing room', scores:{burst:3,speedy:2} },
+    { key:'D', text:'Track their patterns and find a systematic opening', scores:{futurist:4,sniper:2} },
+  ]},
+  { text:'What is your favorite way to win a match?', opts:[
+    { key:'A', text:'Perfect deployment — they lose before they realize it', scores:{tactical:5,builder:1} },
+    { key:'B', text:'Speed and rhythm they simply cannot keep up with', scores:{speedy:4,burst:1} },
+    { key:'C', text:'A devastating strike at the moment they least expect', scores:{burst:4,sniper:1} },
+    { key:'D', text:'A combo they never anticipated, leaving them completely lost', scores:{builder:5,futurist:2} },
+  ]},
+  { text:'How do you prepare before an important match?', opts:[
+    { key:'A', text:'Study opponent history and build a targeted game plan', scores:{tactical:4,sniper:2} },
+    { key:'B', text:'Drill mechanics and reaction speed until fully in the zone', scores:{speedy:4} },
+    { key:'C', text:'No prep — trust instinct and willpower in the moment', scores:{burst:3,speedy:2} },
+    { key:'D', text:'Test unconventional strategies to find unexpected edges', scores:{builder:4,futurist:2} },
+  ]},
+  { text:'How do you view resource management in games?', opts:[
+    { key:'A', text:'Resources extend overall strategy and need precise allocation', scores:{tactical:5} },
+    { key:'B', text:'Enough to get by — mobility is always the top priority', scores:{speedy:4,burst:1} },
+    { key:'C', text:'Concentrate everything at the single most critical burst point', scores:{burst:4,tactical:1} },
+    { key:'D', text:'Stay flexible and keep adjusting to whatever the game demands', scores:{builder:3,futurist:3} },
+  ]},
+  { text:'Your attitude toward AI-assisted analysis tools?', opts:[
+    { key:'A', text:'Very useful — makes tactical planning sharper and faster', scores:{tactical:3,futurist:2} },
+    { key:'B', text:"Don't need them — my instincts and speed are the real weapon", scores:{speedy:4} },
+    { key:'C', text:'Love it — data is the key to finding hidden winning patterns', scores:{futurist:5,builder:1} },
+    { key:'D', text:'I check them, but always trust my own observation in the end', scores:{sniper:3,tactical:2} },
+  ]},
+  { text:'Facing a heavily defended opponent you cannot break through, you:', opts:[
+    { key:'A', text:'Wait patiently for their mistake — one gap is all you need', scores:{sniper:5,tactical:1} },
+    { key:'B', text:'Rapid movement creates multiple angles they struggle to cover', scores:{speedy:4,burst:1} },
+    { key:'C', text:'Apply relentless pressure until their structure collapses', scores:{burst:4} },
+    { key:'D', text:'Take an unconventional route that makes their whole defense useless', scores:{builder:4,futurist:2} },
+  ]},
+  { text:'How would you define your gaming style?', opts:[
+    { key:'A', text:'Meticulous planner — every decision has a clear reason behind it', scores:{tactical:5,sniper:1} },
+    { key:'B', text:'Speed-first intuitive — fast beats stable every time', scores:{speedy:5} },
+    { key:'C', text:'Burst breaker — go absolutely all out at the critical moment', scores:{burst:5} },
+    { key:'D', text:'Future-tech minded — fully embrace data and AI tools', scores:{futurist:5,builder:1} },
+  ]},
+];
+const TYPES = {
+  tactical:{ num:'01',name:'Tactical Commander',nameEn:'TACTICAL COMMANDER',tags:['#Strategy','#Control','#Macro'],desc:'You naturally command the big picture and find order in chaos. Before every move, you map out the terrain and prioritize team outcome over personal glory. You are the brain of the squad — direction, resource allocation, and timing are your core strengths. Pressure only makes you sharper.',icon:`<circle cx="16" cy="16" r="13" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="16" r="5" stroke="#111" stroke-width="1.8"/><line x1="16" y1="3" x2="16" y2="11" stroke="#111" stroke-width="1.8"/><line x1="16" y1="21" x2="16" y2="29" stroke="#111" stroke-width="1.8"/><line x1="3" y1="16" x2="11" y2="16" stroke="#111" stroke-width="1.8"/><line x1="21" y1="16" x2="29" y2="16" stroke="#111" stroke-width="1.8"/>` },
+  speedy:  { num:'02',name:'Speed Hunter',nameEn:'SPEED HUNTER',tags:['#Reaction','#Mobility','#Fast Strike'],desc:'Your reflexes fire a beat faster than everyone else — mobility is your birthright. You thrive in millisecond decisions, using pure speed to dictate the pace. By the time opponents are thinking, you have already made three moves.',icon:`<polyline points="2,26 8,10 14,18 22,6" stroke="#111" stroke-width="2" fill="none" stroke-linejoin="round"/><polygon points="26,4 20,5 23,10" fill="#111"/><line x1="2" y1="29" x2="30" y2="29" stroke="#111" stroke-width="1.2"/>` },
+  burst:   { num:'03',name:'Burst Breaker',nameEn:'BURST BREAKER',tags:['#Power','#Aggression','#Impact'],desc:'You are the disruptor — born to shatter stalemates. You concentrate firepower at critical nodes and unleash overwhelming force. Your rhythm: charge, burst, reset. You believe that initiating is always better than waiting.',icon:`<polygon points="16,2 30,16 16,30 2,16" stroke="#111" stroke-width="1.8" fill="none"/><polygon points="16,9 23,16 16,23 9,16" fill="rgba(0,0,0,0.15)" stroke="#111" stroke-width="1.2"/><line x1="16" y1="2" x2="16" y2="9" stroke="#111" stroke-width="1.8"/><line x1="23" y1="16" x2="30" y2="16" stroke="#111" stroke-width="1.8"/>` },
+  sniper:  { num:'04',name:'Precision Sniper',nameEn:'PRECISION SNIPER',tags:['#Precision','#Focus','#Timing'],desc:'You do not believe in luck — only precision. Every action is backed by thorough observation and calculation. You outlast anyone in patience, waiting for the perfect moment. One-shot kills are not coincidence — they are the inevitable result of preparation.',icon:`<rect x="2" y="12" width="16" height="8" stroke="#111" stroke-width="1.8"/><line x1="18" y1="16" x2="28" y2="16" stroke="#111" stroke-width="2.5"/><circle cx="29" cy="16" r="2.5" fill="#111"/><line x1="8" y1="5" x2="8" y2="12" stroke="#111" stroke-width="1.2"/><line x1="8" y1="20" x2="8" y2="27" stroke="#111" stroke-width="1.2"/>` },
+  builder: { num:'05',name:'Creative Builder',nameEn:'CREATIVE BUILDER',tags:['#Creative','#Flexible','#Systems'],desc:'You love designing systems and exploring every combination. You spot the gaps in conventional metas and craft unexpected playstyles that are both fascinating and impossible to counter — because you yourself are the unpredictable variable.',icon:`<rect x="1" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="1" y="18" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="18" width="13" height="13" stroke="#111" stroke-width="1" stroke-dasharray="2 1.5"/><line x1="14" y1="7.5" x2="18" y2="7.5" stroke="#111" stroke-width="1.2"/><line x1="7.5" y1="14" x2="7.5" y2="18" stroke="#111" stroke-width="1.2"/>` },
+  futurist:{ num:'06',name:'Future Controller',nameEn:'FUTURE CONTROLLER',tags:['#AI','#Adaptive','#Next-Gen'],desc:'You are the closest thing to human-machine symbiosis. You learn opponent behavior patterns in real time and adjust like an algorithm continuously optimizing. You are not thinking about this match — you are thinking about the next meta.',icon:`<circle cx="16" cy="16" r="10" stroke="#111" stroke-width="1.8"/><path d="M16 6 C20 6,24 11,24 16 C24 21,20 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><path d="M16 6 C12 6,8 11,8 16 C8 21,12 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><line x1="6" y1="16" x2="26" y2="16" stroke="#111" stroke-width="1.2"/><line x1="16" y1="1" x2="16" y2="6" stroke="#111" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="31" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="1" r="2" fill="#111"/><circle cx="16" cy="31" r="2" fill="#111"/>` },
+};
+const TYPE_ORDER = ['tactical','speedy','burst','sniper','builder','futurist'];
+const TYPE_NAMES = { tactical:'Tactical Commander',speedy:'Speed Hunter',burst:'Burst Breaker',sniper:'Precision Sniper',builder:'Creative Builder',futurist:'Future Controller' };
+
+let currentQ=0, answers={}, capturedPhoto=null, stream=null, countdownTimer=null, counting=false;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ── CAMERA ── */
+async function goCamera() {
+  showScreen('screen-camera');
+  resetCD(3);
+  document.getElementById('cam-error-msg').style.display = 'none';
+  document.getElementById('shoot-btn').disabled = true;
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showCamError('此瀏覽器不支援攝影機，請使用 Chrome 或 Edge 開啟');
+    return;
+  }
+  await tryCamera();
+}
+
+async function tryCamera() {
+  document.getElementById('cam-error-msg').style.display = 'none';
+  document.getElementById('shoot-btn').disabled = true;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode:'user', width:{ideal:860}, height:{ideal:860} }, audio:false
+    });
+    document.getElementById('cam-video').srcObject = stream;
+    document.getElementById('shoot-btn').disabled = false;
+  } catch(e) {
+    if (e.name === 'NotAllowedError') {
+      showCamError('攝影機權限被拒絕。\n請點擊瀏覽器網址列左側的鎖頭或攝影機圖示，\n允許攝影機存取後再試一次。');
+    } else if (e.name === 'NotFoundError') {
+      showCamError('找不到攝影機裝置，請確認攝影機已連接。');
+    } else if (e.name === 'NotReadableError') {
+      showCamError('攝影機被其他程式佔用，\n請關閉其他使用中的程式後再試。');
+    } else {
+      showCamError('無法啟動攝影機：' + e.message + '\n\n建議用 localhost 伺服器開啟此頁面。');
+    }
+  }
+}
+
+function showCamError(msg) {
+  const el = document.getElementById('cam-error-msg');
+  el.innerHTML = msg.replace(/\n/g,'<br>') + '<br><br><button onclick="tryCamera()" style="background:#ffffff;border:1.5px solid #111;padding:12px 28px;font-family:Share Tech Mono,monospace;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:8px;">再試一次</button>';
+  el.style.display = 'flex';
+  el.style.flexDirection = 'column';
+  el.style.alignItems = 'center';
+  document.getElementById('shoot-btn').disabled = true;
+}
+
+function stopCamera() {
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  if(countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; }
+  counting=false;
+}
+
+function resetCD(n) {
+  document.getElementById('countdown-num').textContent = n;
+  document.getElementById('countdown-label').textContent = 'READY? HIT SHOOT';
+  document.getElementById('ring-fill').style.strokeDashoffset = '0';
+  document.getElementById('shoot-btn').disabled = false;
+  counting=false;
+}
+
+function startCountdown() {
+  if(counting) return;
+  counting=true;
+  document.getElementById('shoot-btn').disabled=true;
+  const CIRC=452, TOTAL=3;
+  let rem=TOTAL;
+  document.getElementById('countdown-num').textContent=rem;
+  document.getElementById('countdown-label').textContent='正在倒數…';
+  countdownTimer=setInterval(()=>{
+    rem--;
+    document.getElementById('ring-fill').style.strokeDashoffset = CIRC*(1-rem/TOTAL);
+    if(rem<=0){ clearInterval(countdownTimer); countdownTimer=null; takePhoto(); }
+    else document.getElementById('countdown-num').textContent=rem;
+  },1000);
+}
+
+function takePhoto() {
+  const video=document.getElementById('cam-video');
+  const canvas=document.getElementById('capture-canvas');
+  const ctx=canvas.getContext('2d');
+  const flash=document.getElementById('flash');
+  flash.classList.add('on');
+  setTimeout(()=>flash.classList.remove('on'),200);
+  ctx.save(); ctx.translate(canvas.width,0); ctx.scale(-1,1);
+  ctx.drawImage(video,0,0,canvas.width,canvas.height);
+  ctx.restore();
+  capturedPhoto = canvas.toDataURL('image/jpeg',0.9); // 只存原始照片
+  document.getElementById('countdown-num').textContent='✓';
+  document.getElementById('countdown-label').textContent='拍攝完成！';
+  setTimeout(()=>{ stopCamera(); startQuiz(); },700);
+}
+
+function skipPhoto() { capturedPhoto=null; stopCamera(); startQuiz(); }
+
+/* ── QUIZ ── */
+function startQuiz() {
+  currentQ=0; answers={};
+  const c=document.getElementById('progress-dots'); c.innerHTML='';
+  QUESTIONS.forEach((_,i)=>{ const d=document.createElement('div'); d.className='pdot'; d.id='dot-'+i; c.appendChild(d); });
+  renderQ();
+  showScreen('screen-quiz');
+}
+
+function renderQ() {
+  const q=QUESTIONS[currentQ], sel=answers[currentQ];
+  const pct=Math.round((currentQ/QUESTIONS.length)*100);
+  document.getElementById('quiz-sys-label').textContent=`QUESTION ${String(currentQ+1).padStart(2,'0')} / ${QUESTIONS.length}`;
+  document.getElementById('q-num-bg').textContent=String(currentQ+1).padStart(2,'0');
+  document.getElementById('q-label').textContent=`Q.${String(currentQ+1).padStart(2,'0')} ── SCENARIO ANALYSIS`;
+  document.getElementById('q-text').textContent=q.text;
+  document.getElementById('progress-fill').style.width=pct+'%';
+  for(let i=0;i<QUESTIONS.length;i++){ const d=document.getElementById('dot-'+i); if(d) d.classList.toggle('done',i<currentQ); }
+  const con=document.getElementById('options-container'); con.innerHTML='';
+  q.opts.forEach(opt=>{ const b=document.createElement('button'); b.className='opt-btn'+(sel===opt.key?' selected':''); b.innerHTML=`<div class="opt-key">${opt.key}</div><div class="opt-text">${opt.text}</div>`; b.onclick=()=>selectOpt(opt.key); con.appendChild(b); });
+  document.getElementById('prev-btn').disabled=currentQ===0;
+  const nb=document.getElementById('next-btn'), isLast=currentQ===QUESTIONS.length-1;
+  nb.textContent=isLast?'ANALYZE ▶':'NEXT ▶';
+  nb.disabled=!sel; nb.classList.toggle('ready',!!sel);
+}
+
+function selectOpt(key){ answers[currentQ]=key; renderQ(); }
+function prevQ(){ if(currentQ>0){ currentQ--; renderQ(); } }
+function nextQ(){ if(!answers[currentQ]) return; if(currentQ<QUESTIONS.length-1){ currentQ++; renderQ(); } else showResult(); }
+
+/* ── RESULT ── */
+// ── API ──
+const API_URL = 'https://gamer-dna.zeabur.app';
+
+async function showResult() {
+  const totals={}; TYPE_ORDER.forEach(t=>totals[t]=0);
+  QUESTIONS.forEach((q,i)=>{ const opt=q.opts.find(o=>o.key===answers[i]); if(!opt) return; Object.entries(opt.scores).forEach(([t,v])=>{ totals[t]=(totals[t]||0)+v; }); });
+  const winner=Object.entries(totals).sort((a,b)=>b[1]-a[1])[0][0];
+  const type=TYPES[winner], max=Math.max(...Object.values(totals));
+
+  const img=document.getElementById('result-photo'), nm=document.getElementById('no-photo-msg');
+  if(capturedPhoto){ img.src=capturedPhoto; img.style.display='block'; nm.style.display='none'; }
+  else { img.style.display='none'; nm.style.display='flex'; }
+
+  document.getElementById('r-icon').innerHTML=type.icon;
+  document.getElementById('r-type-num').textContent=`ARCHETYPE ${type.num} ── ${type.nameEn}`;
+  document.getElementById('r-name').textContent=type.name;
+  document.getElementById('r-desc').textContent=type.desc;
+  document.getElementById('r-tags').innerHTML=type.tags.map(t=>`<div class="result-tag">${t}</div>`).join('');
+  document.getElementById('r-scores').innerHTML=TYPE_ORDER.map(t=>{ const p=max>0?Math.round((totals[t]/max)*100):0; return `<div class="score-item"><div class="score-name">${TYPE_NAMES[t]}</div><div class="score-bar-bg"><div class="score-bar-fill" style="width:0%" data-pct="${p}"></div></div><div class="score-val">${p}%</div></div>`; }).join('');
+
+  showScreen('screen-result');
+  document.getElementById('screen-result').scrollTop=0;
+  setTimeout(()=>{ document.querySelectorAll('.score-bar-fill').forEach(b=>{ b.style.width=b.dataset.pct+'%'; }); },300);
+
+  // ── 答完題才呼叫 Gemini 生成機械臉，再存檔拿 QR Code ──
+  generateQR(null);
+  document.getElementById('qr-status').textContent = 'AI 生成機械臉中...';
+
+  const scores = {};
+  TYPE_ORDER.forEach(t => { scores[t] = totals[t]; });
+
+  try {
+    // Step 1: call Gemini if photo was taken
+    let finalPhoto = capturedPhoto || null;
+    if (capturedPhoto) {
+      try {
+        const cyberRes = await fetch(`${API_URL}/api/cyber-scan`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ photo: capturedPhoto, type: winner })
+        });
+        const cyberData = await cyberRes.json();
+        if (cyberData.cyberPhoto) {
+          finalPhoto = cyberData.cyberPhoto;
+          // 更新結果頁的照片為機械臉
+          const img = document.getElementById('result-photo');
+          if (img) { img.src = finalPhoto; img.style.display='block'; }
+          const nm = document.getElementById('no-photo-msg');
+          if (nm) nm.style.display='none';
+        }
+      } catch(e) {
+        console.warn('機械臉生成失敗，使用原始照片', e);
+      }
+    }
+
+    document.getElementById('qr-status').textContent = 'Saving result...';
+
+    // Step 2: 存結果拿 QR Code
+    const saveRes = await fetch(`${API_URL}/api/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        photo: finalPhoto,
+        type: winner,
+        typeName: type.name,
+        tags: type.tags,
+        desc: type.desc,
+        scores
+      })
+    });
+    const saveData = await saveRes.json();
+    if (saveData.url) generateQR(saveData.url + '?lang=en');
+
+  } catch(e) {
+    console.warn('API 失敗', e);
+    document.getElementById('qr-status').textContent = '網路錯誤，無法生成 QR Code';
+  }
+}
+
+function generateQR(url) {
+  const el = document.getElementById('qr-code-box');
+  el.innerHTML = '';
+  if (!url) {
+    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:Share Tech Mono,monospace;font-size:14px;color:#999;letter-spacing:2px">生成中...</div>';
+    return;
+  }
+  document.getElementById('qr-status').textContent = 'Scan to get your result';
+  new QRCode(el, {
+    text: url,
+    width: 150, height: 150,
+    colorDark: '#111111',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+}
+
+function restart(){ capturedPhoto=null; currentQ=0; answers={}; showScreen('screen-intro'); }
+
+/* ── SCALE ── */
+function scaleApp(){
+  const w=document.getElementById('app-wrapper');
+  const s=Math.min(window.innerWidth/1080,window.innerHeight/1920);
+  const ox=(window.innerWidth-1080*s)/2, oy=(window.innerHeight-1920*s)/2;
+  w.style.transform=`translate(${ox}px,${oy}px) scale(${s})`;
+}
+scaleApp(); window.addEventListener('resize',scaleApp);
+</script>
+</body>
+</html>
