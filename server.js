@@ -57,7 +57,7 @@ async function generateCyberFace(base64Image, type = 'tactical') {
 
   // 注意：這裡應確保使用的是官方推薦的 generationConfig 格式
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash', // 建議嘗試 gemini-3-flash 或繼續使用 gemini-2.5-flash-image
+    model: 'gemini-2.5-flash-image', // 建議嘗試 gemini-3-flash 或繼續使用 gemini-2.5-flash-image
     contents: [
       {
         role: 'user',
