@@ -13,61 +13,64 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.static('public'));
 
 // ════════════════════════════════════════
-// ROG 全系列「爆發破局者」視覺定義 (Avant-Garde Style)
+// ROG「爆發重裝 + 藝術人臉」視覺定義 (Aesthetic-Balance)
 // ════════════════════════════════════════
 
-// 1. BASE_PROMPT: 定義核心視覺底色：重裝、熔岩、不寫實人臉
+// 1. BASE_PROMPT: 定義藝術臉孔與 Burst重裝。
 const BASE_PROMPT = `[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
-You are the "ROG AVANT-GARDE ART DIRECTOR."
+You are the "ROG ELITE TEAM STYLIST." Generate a high-end "ROG Esports Pro-Player" illustration of the subject.
 
-Generate a high-end, cinematic character render that is an artistic, NON-REALISTIC interpretation of the subject.
-
-Core Visual Identity (Burst Breaker DNA):
-1. **THEME:** Power Surge, Explosion Moment, Heavy Industrial. The entire collection must embody the Burst Breaker energy.
-2. **FACE (DECONSTRUCTED & ARTISTIC):** - **NO REALISTIC SKIN. DO NOT follow the exact expression of the photo.** - **MATERIAL:** The face should be a deconstructed digital sculpture made of "Tinted Translucent Obsidian Glass."
-   - **Likeness:** Maintain the *facade* of the subject's contours but render it using organic, sprawling "ROG Red" micro-circuits that act like "neural blood vessels," defining the facial features (eyes, nose, mouth) through glowing lines. It must look like a high-precision, non-human tactical facade.
-   - **Under-lighting:** Dramatic upward-lighting from the chest core, making the face look heroic yet ominous.
-3. **BODY (HEAVY HARDWARE):** Constructed from heavy, realistic "ROG Strix" and "Ryujin" components. Visible heatsink fins, liquid cooling pipes with thick red coolant, and carbon fiber armor plates.
-4. **EFFECTS:** Scatter particles of "Melted Metal," "Ashes," and glowing "Energy Ripples" around the subject.
+Core Visual Specs:
+1. **THEME:** Power Overload, Energy Surge, Heavy Industrial. The entire collection embodies the "Burst Breaker" energy and weight.
+2. **FACE (ARTISTIC & RECOGNIZABLE):** - **MUST BE 100% RECOGNIZABLE HUMAN FACE.** - **MATERIAL:** NO realistic skin texture. Render the face as a "Polished Black Porcelain" surface, achieving a "Ceramic-smooth" and flawless look. It must look solid, clean, and handsome/beautiful.
+   - **LIKENESS:** The subject's exact contours and features are preserved, but in a refined, non-photorealistic finish. Think of a premium digital statue.
+3. **APPAREL (BURST ARMOR):** Dress the subject in "Heavy ROG Battle-Chassis." Integrate visible Strix GPU fins, Ryujin braided liquid-cooling tubes with internal red glow, and reinforced carbon-fiber plating. This is heavy armor.
+4. **EFFECTS:** Add intense energy particles and subtle "Melted Metal" effects at the edges of the armor plates.
 5. **CRITICAL:** Maintain EXACT same pose and composition for direct overlay.
+6. **COLOR:** Strictly ROG Red (#FF0000), Obsidian Black (#000000), and Titanium Gray.`;
 
-COLOR PALETTE: STRICTLY **ROG Red** (#FF0000), **Melted Orange/Lava**, **Deep Void Black** (#000000), and **Titanium Gray**.`;
-
-// 2. TYPE_STYLE: 在「爆發視覺」下，六種角色的職能演繹
+// 2. TYPE_STYLE: 在「爆發裝甲」下，六種角色的職能演繹。
 const TYPE_STYLE = {
-  // 爆發+指揮：資訊爆炸、戰術矩陣過載
-  tactical: `ROLE: BURST COMMANDER.
-HUD: A massive, complex holographic "TACTICAL MATRIX" that is FLASHING RED with "OVERLOAD" warnings, showing minimap grids.
-Visual: The commands are literally exploding from the HUD.
-Rim Light: Pulsating red-orange.`,
+  // 戰術指揮：重裝爆發+矩陣資訊
+  tactical: `TYPE: TACTICAL COMMANDER.
+Expression: Cold, authoritative gaze.
+HUD: Massive Holographic "TACTICAL MATRIX" flashing RED with minimap grids.
+Rim Light: Pulsating white-hot from above.`,
 
-  // 爆發+速度：電馭粉火花、 FPS過載
-  speedy: `ROLE: VOLTAGE SPEED HUNTER.
-Expression: Focused, single-side lighting. HUD: "VELOCITY SCANNER" with speed vectors and "1440Hz / OVERCLOCK" counter.
-Visual: Forward motion streaks made of electric-orange and ROG-red light, looking like the subject is breaking the sound barrier.
-Effects: The speed lines cause digital "glitch" artifacts.`,
+  // 速度獵手：重裝爆發+速度動態
+  speedy: `TYPE: SPEED HUNTER.
+Expression: Focused, single-side lighting.
+HUD: Holographic "VELOCITY SCANNER" with speed vectors and blurred "240Hz" text.
+Visual: Forward motion streaks in Electric Orange.
+Rim light: Electric cyan accents.`,
 
-  // 核心爆發：原本的 Burst風格，能量全開
-  burst: `ROLE: Burst Breaker (ORIGINAL).
+  // 原生爆發：重裝爆發+核心過載 (原本 Burst 風格)
+  burst: `TYPE: ORIGINAL BURST-BREAKER.
+Expression: Fierce, explosive expression.
 HUD: Holographic "POWER SURGE" energy bars at 100% CRITICAL.
-Visual: The arms and torso are literally ON FIRE with internal red-orange power conduits. Major parts of the hardware look like they are beginning to MELT.
-Rim Light: Intense, blinding lava-orange from below.`,
+Detail: Heatsinks Ventilating Heat (Steam). Internal conduit glow on chest and arms.
+Rim Light: Intense Lava-Orange from below.`,
 
-  // 爆發+精準：雷射鎖定、極限溫控
-  sniper: `ROLE: PRECISION BURST-SNIPER.
-HUD: A single, thin, intense ROG-RED laser-dot projected onto the deconstructed facade of the eye. Extreme-precision "OPTICAL TARGETING" crosshair.
-Visual: Most of the subject is in deep shadow. A single, super-thin beam of red light pierces the darkness. The armor plates around the chest are venting steam, simulating a stable heartbeat.`,
+  // 精準狙擊：重裝爆發+靜態鎖定
+  sniper: `TYPE: PRECISION SNIPER.
+Expression: Eerily calm, one eye in deep shadow.
+HUD: A single, intense ROG-RED laser-dot projected onto the eye; precision OPTICAL TARGETING crosshair.
+Visual: Extreme high-contrast; vent steam vents from chest armor.
+Rim Light: Ice-blue single-side highlight.`,
 
-  // 爆發+創造：模組化建築、電路過載
-  builder: `ROLE: VOLTAGE BUILDER.
-Expression: Slight smirk, confidently integrated. HUD: Holographic "SYNTHESIS ENGINE" with multiple build-nodes.
-Visual: Multiple ROG hardware components (fans, heatsinks) are seen ASSEMBLING around the subject, radiating heat.
-Detail: The wiring accents (originally purple/green) are now "HEAT-ORANGE" to fit the burst theme.`,
+  // 創造建築師：重裝爆發+模組化拼貼
+  builder: `TYPE: CREATIVE BUILDER.
+Expression: Confident smirk.
+HUD: Holographic "SYNTHESIS ENGINE" build-nodes and modular build-tree.
+Visual: ROG components (fans, heatsinks) are seen ASSEMBLING around arms and torso.
+Rim Light: Purple-green energy accents.`,
 
-  // 爆發+未來：數位投影、二進位過載
-  futurist: `ROLE: FUTURE CONTROLLER.
-Expression: Visionary. Faces facade has more "point cloud" texture. HUD: Holographic "AI CORE SYNC 99%" with collapsing neural network visualization.
-Visual: The subject is enveloped in an ethereal mist mixed with "Cyber-dust." Data streams (0 and 1) are exploding around the body. The eyes glow with an intense, non-human Teal/Red hybrid light.`,
+  // 未來控制：重裝爆發+數據全息
+  futurist: `TYPE: FUTURE OVERSEER.
+Expression: Serene and visionary gaze.
+HUD: Holographic "AI CORE SYNC 99%" with neural network visualization and data streams.
+Visual: Dissolving into subtle "Cyber-Dust" at the edges.
+Rim Light: Ethereal Teal and White halo.`,
 };
 
 // ════════════════════════════════════════
