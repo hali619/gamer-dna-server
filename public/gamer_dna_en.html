@@ -214,8 +214,8 @@ html, body {
 /* ── QR SECTION ── */
 .qr-section {
   border:1.5px solid rgba(0,0,0,0.3);
-  padding:36px 32px;
-  display:flex; align-items:center; gap:32px;
+  padding:40px 32px 32px;
+  display:flex; flex-direction:column; align-items:center; gap:20px;
   background:rgba(255,255,255,0.35);
   position:relative; flex-shrink:0;
   margin-bottom:40px;
@@ -232,13 +232,13 @@ html, body {
   border-top:1.5px solid rgba(0,0,0,0.2); border-right:1.5px solid rgba(0,0,0,0.2);
 }
 .qr-code-wrap {
-  width:160px; height:160px; flex-shrink:0;
+  width:380px; height:380px; flex-shrink:0;
   border:1.5px solid var(--ink);
   display:flex; align-items:center; justify-content:center;
   background:#fff; padding:10px;
 }
-.qr-info { flex:1; }
-.qr-info-title { font-size:34px; font-weight:700; color:var(--ink); letter-spacing:1px; margin-bottom:10px; }
+.qr-info { width:100%; text-align:center; }
+.qr-info-title { font-size:34px; font-weight:700; color:var(--ink); letter-spacing:1px; margin-bottom:8px; }
 .qr-info-sub { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:2px; line-height:1.8; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -316,7 +316,7 @@ html, body {
   <div class="q-num-big" id="q-num-bg">01</div>
   <div class="quiz-top-row">
     <div class="quiz-sys" id="quiz-sys-label">QUESTION 01 / 10</div>
-    <button class="home-btn" onclick="restart()">⌂ HOME</button>
+    <button class="home-btn" onclick="window.location.href='gamer_dna.html'">⌂ HOME</button>
   </div>
   <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
   <div class="progress-dots" id="progress-dots"></div>
@@ -663,14 +663,14 @@ function generateQR(url) {
   document.getElementById('qr-status').textContent = 'Scan to get your result';
   new QRCode(el, {
     text: url,
-    width: 150, height: 150,
+    width: 360, height: 360,
     colorDark: '#111111',
     colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.M
   });
 }
 
-function restart(){ capturedPhoto=null; currentQ=0; answers={}; showScreen('screen-intro'); }
+function restart(){ window.location.href='gamer_dna.html'; }
 
 /* ── SCALE ── */
 function scaleApp(){
