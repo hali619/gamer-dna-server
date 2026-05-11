@@ -13,41 +13,29 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.static('public'));
 
 const BASE_PROMPT = `[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
-
 You are the "ROG ELITE TEAM STYLIST." Generate a high-end "ROG Esports Pro-Player" illustration of the subject.
 
-
-
 Requirements:
-
-1. STYLE: High-end 2.5D digital illustration, cinematic character render, premium esports promotional art.
-
-2. LIKENESS: Maintain 100% facial structure of the subject in the photo. Refine features to be sharp, polished, and aesthetic (Heroic/Pro-player look).
-
-3. APPAREL: Dress the subject in a heavy "ROG Tactical Pro-Jacket" with carbon-fiber textures, glowing Aura Sync red piping, and the ROG logo as a glowing patch.
-
+1. STYLE: High-end 2.5D digital illustration, cinematic character render, premium esports promotional art. NOT photorealistic — use stylized illustration strokes while keeping the subject recognizable.
+2. LIKENESS: Capture the subject's key facial features (face shape, eyes, nose, mouth) in a stylized, heroic way. The result should look like a polished anime/game-art version of the person — clearly the same person but elevated and idealized.
+3. APPAREL: Dress the subject in a heavy "ROG Tactical Pro-Jacket" with carbon-fiber textures, glowing Aura Sync red piping, and the ROG logo as a glowing patch on the chest.
 4. COLOR: Strictly use ROG Brand Colors: ROG Red (#FF0000), Midnight Black (#000000), and Titanium Gray.
-
-5. CRITICAL: Maintain the EXACT same pose and silhouette as the source photo for direct overlay.
-
-6. BACKGROUND: Solid deep black with subtle digital grid or ROG "Cyber-dust" particles.`;
-
-
+5. LIGHTING: Strong orange-red rim light from below — dramatic, cinematic, like a forge or battle glow beneath the subject. This is the signature light for all types.
+6. CRITICAL: Maintain the EXACT same pose and silhouette as the source photo for direct overlay.
+7. BACKGROUND: Solid deep black with subtle digital grid or ROG "Cyber-dust" particles.`;
 
 const TYPE_STYLE = {
+  tactical: `TYPE: TACTICAL COMMANDER. Expression: Cold, focused, commanding — the calm before the storm. HUD: Holographic tactical matrix and minimap grid floating around subject. Secondary light: Cold blue-white fill from above to contrast the orange-red below.`,
 
-  tactical: `TYPE: TACTICAL COMMANDER. Expression: Cold and commanding. HUD: Holographic tactical matrix and minimap. Rim light: Cold white.`,
+  speedy:   `TYPE: SPEED HUNTER. Expression: Hyper-focused, sharp eyes, adrenaline rush — about to launch. HUD: Velocity scanner with speed vectors and 144Hz FPS counter. Effects: Electric cyan motion-blur light streaks trailing behind. Secondary light: Electric cyan accent from the side.`,
 
-  speedy:   `TYPE: SPEED HUNTER. Expression: Hyper-focused. HUD: Velocity scanner and FPS counter. Effects: Motion-blur light streaks. Rim light: Electric cyan.`,
+  burst:    `TYPE: BURST BREAKER. Expression: Fierce, jaw set, explosive energy barely contained. HUD: Power surge energy bars at CRITICAL percent, damage multiplier readout. Detail: Heavy shoulder armor plates glowing at the edges. The orange-red rim light is most intense for this type — almost volcanic.`,
 
-  burst:    `TYPE: BURST BREAKER. Expression: Fierce. HUD: Power surge energy bars. Detail: Heavy armor plates. Rim light: Intense orange-red from below.`,
+  sniper:   `TYPE: PRECISION SNIPER. Expression: Eerily calm, one eye slightly narrowed, absolute stillness and patience. HUD: Optical targeting crosshair overlay with wind and distance data. Detail: Tactical collar/hood framing the face. Secondary light: Ice-blue cold fill from one side, deep shadow on the other.`,
 
-  sniper:   `TYPE: PRECISION SNIPER. Expression: Calm and steady. HUD: Optical targeting crosshair. Detail: Tactical hood/collar. Rim light: Ice-blue.`,
+  builder:  `TYPE: CREATIVE BUILDER. Expression: Confident smirk, head slightly tilted — always thinking three steps ahead. HUD: Synthesis engine node map and circuit connections floating around the hands. Detail: Modular jacket panels with interchangeable components. Secondary light: Purple-green dual accent.`,
 
-  builder:  `TYPE: CREATIVE BUILDER. Expression: Confident smirk. HUD: Synthesis engine nodes and circuit maps. Detail: Modular gear. Rim light: Purple-green accents.`,
-
-  futurist: `TYPE: FUTURE CONTROLLER. Expression: Visionary, glowing eyes. HUD: AI Core Sync neural network. Detail: LED matrix jacket. Rim light: Teal/White.`,
-
+  futurist: `TYPE: FUTURE CONTROLLER. Expression: Serene and visionary, eyes with a faint digital teal glow — seeing what others cannot. HUD: AI Core Sync neural network visualization, data stream flows at 99%. Detail: Nano-material jacket with embedded LED matrix. Secondary light: Holographic teal from above.`,
 };
 
 // ════════════════════════════════════════
