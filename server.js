@@ -12,31 +12,42 @@ app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.static('public'));
 
-// ════════════════════════════════════════
-// ROG「爆發重裝 + 藝術人臉」視覺定義 (解決黑臉修正版)
-// ════════════════════════════════════════
-
-// 修正：必須將 Prompt 用反引號 `` 包起來並賦值給變數 BASE_PROMPT
 const BASE_PROMPT = `[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
+
 You are the "ROG ELITE TEAM STYLIST." Generate a high-end "ROG Esports Pro-Player" illustration of the subject.
 
-Core Visual Specs:
-1. **THEME:** Power Overload, Energy Surge, Heavy Industrial. The entire collection embodies the "Burst Breaker" energy and weight.
-2. **FACE (RECOGNIZABLE & WHITE JADE TONE):** - **STRICTLY 100% RECOGNIZABLE HUMAN FACE WITH HEALTHY SKIN TONE.** - **MATERIAL:** NO realistic skin texture. Render the face with a "Polished White Jade" or "Polished Ivory Porcelain" surface. This achieves a "Ceramic-smooth," flawless, and non-porous look while providing a healthy, fair complexion.
-   - **LIKENESS:** The subject's exact contours and features are preserved (looks like the person in the photo), but refined to be aesthetic (Heroic/Pro-player look). It should look solid, clean, and radiant.
-3. **APPAREL (BURST ARMOR):** Dress the subject in "Heavy ROG Battle-Chassis." Integrate visible Strix GPU fins, Ryujin braided liquid-cooling tubes with internal red glow, and reinforced carbon-fiber plating. This is heavy armor.
-4. **EFFECTS:** Scatter glowing "Melted Metal" sparks and subtle "Energy Ripples" around the silhouette.
-5. **CRITICAL:** Maintain EXACT same pose and composition for direct overlay.
-6. **COLOR:** Strictly ROG Red (#FF0000), Obsidian Black (#000000), and Titanium Gray.`;
 
-// 修正：必須補回 TYPE_STYLE 定義，否則 generateCyberFace 會報錯
+
+Requirements:
+
+1. STYLE: High-end 2.5D digital illustration, cinematic character render, premium esports promotional art.
+
+2. LIKENESS: Maintain 100% facial structure of the subject in the photo. Refine features to be sharp, polished, and aesthetic (Heroic/Pro-player look).
+
+3. APPAREL: Dress the subject in a heavy "ROG Tactical Pro-Jacket" with carbon-fiber textures, glowing Aura Sync red piping, and the ROG logo as a glowing patch.
+
+4. COLOR: Strictly use ROG Brand Colors: ROG Red (#FF0000), Midnight Black (#000000), and Titanium Gray.
+
+5. CRITICAL: Maintain the EXACT same pose and silhouette as the source photo for direct overlay.
+
+6. BACKGROUND: Solid deep black with subtle digital grid or ROG "Cyber-dust" particles.`;
+
+
+
 const TYPE_STYLE = {
-  tactical: `TYPE: BURST-COMMANDER. HUD: Holographic "TACTICAL MATRIX" flashing RED. Rim Light: Pulsating white-hot.`,
-  speedy: `TYPE: SPEED HUNTER. HUD: "VELOCITY SCANNER" with 240Hz counter. Visual: Motion-blur streaks. Rim light: Electric cyan.`,
-  burst: `TYPE: ORIGINAL BURST-BREAKER. HUD: "POWER SURGE" energy bars 100% CRITICAL. Detail: Venting steam. Rim Light: Lava-Orange.`,
-  sniper: `TYPE: PRECISION SNIPER. HUD: Intense red laser-dot and precision crosshair. Visual: High-contrast shadows. Rim light: Ice-blue.`,
-  builder: `TYPE: CREATIVE BUILDER. Expression: Confident smirk. HUD: "SYNTHESIS ENGINE" build-nodes. Rim light: Purple-green energy accents.`,
-  futurist: `TYPE: FUTURE OVERSEER. HUD: "AI CORE SYNC" neural network visualize. Visual: Subtle "Cyber-Dust" particles. Rim light: Teal halo.`,
+
+  tactical: `TYPE: TACTICAL COMMANDER. Expression: Cold and commanding. HUD: Holographic tactical matrix and minimap. Rim light: Cold white.`,
+
+  speedy:   `TYPE: SPEED HUNTER. Expression: Hyper-focused. HUD: Velocity scanner and FPS counter. Effects: Motion-blur light streaks. Rim light: Electric cyan.`,
+
+  burst:    `TYPE: BURST BREAKER. Expression: Fierce. HUD: Power surge energy bars. Detail: Heavy armor plates. Rim light: Intense orange-red from below.`,
+
+  sniper:   `TYPE: PRECISION SNIPER. Expression: Calm and steady. HUD: Optical targeting crosshair. Detail: Tactical hood/collar. Rim light: Ice-blue.`,
+
+  builder:  `TYPE: CREATIVE BUILDER. Expression: Confident smirk. HUD: Synthesis engine nodes and circuit maps. Detail: Modular gear. Rim light: Purple-green accents.`,
+
+  futurist: `TYPE: FUTURE CONTROLLER. Expression: Visionary, glowing eyes. HUD: AI Core Sync neural network. Detail: LED matrix jacket. Rim light: Teal/White.`,
+
 };
 
 // ════════════════════════════════════════
@@ -49,15 +60,12 @@ async function generateCyberFace(base64Image, type = 'tactical') {
 
   const ai = new GoogleGenAI({ apiKey });
   const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
-  
-  // 確保 BASE_PROMPT 有被定義
   const prompt = BASE_PROMPT + '\n\n' + (TYPE_STYLE[type] || TYPE_STYLE.tactical);
 
   console.log(`[ROG-GEN] 生成類型: ${type}`);
 
-  // 注意：這裡應確保使用的是官方推薦的 generationConfig 格式
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash-image', // 建議嘗試 gemini-3-flash 或繼續使用 gemini-2.5-flash-image
+    model: 'gemini-2.5-flash-image',
     contents: [
       {
         role: 'user',
@@ -68,11 +76,11 @@ async function generateCyberFace(base64Image, type = 'tactical') {
       },
     ],
     config: {
-      responseModalities: ['IMAGE'], // 為了穩定性建議只留 IMAGE
+      responseModalities: ['TEXT', 'IMAGE'],
       temperature: 0.8,
       safetySettings: [
-        { category: 'HARM_CATEGORY_HARASSMENT',         threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH',        threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_HARASSMENT',       threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH',       threshold: 'BLOCK_NONE' },
         { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
       ],
@@ -91,13 +99,15 @@ async function generateCyberFace(base64Image, type = 'tactical') {
     }
   }
 
-  if (reason === 'SAFETY') throw new Error('內容被安全過濾器攔截。');
+  if (reason === 'SAFETY') throw new Error('內容被安全過濾器攔截，請換一張照片。');
   const textPart = parts.find(p => p.text);
   if (textPart) throw new Error(`模型只回傳文字(${reason}): ${textPart.text.slice(0, 150)}`);
   throw new Error(`未回傳圖片 finishReason=${reason}`);
 }
 
-// ... API 路由部分維持不變 ...
+// ════════════════════════════════════════
+// API 路由
+// ════════════════════════════════════════
 
 app.post('/api/cyber-scan', async (req, res) => {
   const { photo, type } = req.body;
