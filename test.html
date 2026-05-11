@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROG DNA — 生成測試</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0a0a; color: #fff; font-family: 'Share Tech Mono', monospace; padding: 24px; min-height: 100vh; }
+h1 { font-size: 18px; letter-spacing: 6px; color: #ff0000; margin-bottom: 24px; }
+
+.row { display: flex; gap: 24px; flex-wrap: wrap; }
+.panel { flex: 1; min-width: 280px; background: #111; border: 1px solid #222; padding: 20px; }
+label { font-size: 11px; letter-spacing: 3px; color: #666; display: block; margin-bottom: 8px; }
+
+/* 上傳區 */
+#drop-zone {
+  border: 1.5px dashed #333; padding: 32px; text-align: center;
+  cursor: pointer; color: #555; font-size: 12px; letter-spacing: 2px;
+  transition: border-color 0.2s;
+}
+#drop-zone:hover, #drop-zone.drag { border-color: #ff0000; color: #ff0000; }
+#preview { width: 100%; max-height: 280px; object-fit: contain; display: none; margin-top: 12px; }
+
+/* 類型按鈕 */
+.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.type-btn {
+  padding: 12px 8px; background: #1a1a1a; border: 1px solid #333;
+  color: #888; font-family: inherit; font-size: 10px; letter-spacing: 2px;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.type-btn:hover { border-color: #ff0000; color: #fff; }
+.type-btn.active { background: #ff0000; border-color: #ff0000; color: #fff; }
+
+/* 生成按鈕 */
+#gen-btn {
+  width: 100%; margin-top: 20px; padding: 16px;
+  background: #ff0000; border: none; color: #fff;
+  font-family: inherit; font-size: 13px; letter-spacing: 4px;
+  cursor: pointer; transition: opacity 0.15s;
+}
+#gen-btn:hover { opacity: 0.85; }
+#gen-btn:disabled { background: #333; color: #666; cursor: not-allowed; opacity: 1; }
+
+/* 狀態 */
+#status { margin-top: 12px; font-size: 11px; letter-spacing: 2px; color: #666; min-height: 18px; }
+#status.ok  { color: #00ff88; }
+#status.err { color: #ff4444; }
+#status.loading { color: #ffaa00; }
+
+/* 結果 */
+#result-img { width: 100%; display: none; border: 1px solid #222; }
+.timer { font-size: 10px; color: #555; margin-top: 8px; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+
+<h1>▶ ROG DNA — IMAGE GENERATION TEST</h1>
+
+<div class="row">
+
+  <!-- 左：上傳 + 設定 -->
+  <div class="panel">
+    <label>UPLOAD PHOTO</label>
+    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+      點擊或拖曳上傳照片<br><span style="font-size:10px;opacity:0.5">JPG / PNG / WEBP</span>
+    </div>
+    <input type="file" id="file-input" accept="image/*" style="display:none">
+    <img id="preview" alt="preview"/>
+
+    <br>
+    <label>SELECT TYPE</label>
+    <div class="type-grid">
+      <button class="type-btn active" data-type="tactical">TACTICAL<br><span style="opacity:0.5">戰術指揮者</span></button>
+      <button class="type-btn" data-type="speedy">SPEED<br><span style="opacity:0.5">極速獵手</span></button>
+      <button class="type-btn" data-type="burst">BURST<br><span style="opacity:0.5">爆發破局者</span></button>
+      <button class="type-btn" data-type="sniper">SNIPER<br><span style="opacity:0.5">精準狙擊手</span></button>
+      <button class="type-btn" data-type="builder">BUILDER<br><span style="opacity:0.5">創造建構者</span></button>
+      <button class="type-btn" data-type="futurist">FUTURIST<br><span style="opacity:0.5">未來操控者</span></button>
+    </div>
+
+    <button id="gen-btn" disabled>▶ &nbsp; GENERATE</button>
+    <div id="status">請先上傳照片</div>
+  </div>
+
+  <!-- 右：結果 -->
+  <div class="panel">
+    <label>GENERATED RESULT</label>
+    <img id="result-img" alt="result"/>
+    <div class="timer" id="timer"></div>
+  </div>
+
+</div>
+
+<script>
+const API_URL = 'https://gamer-dna.zeabur.app';
+let photoBase64 = null;
+let selectedType = 'tactical';
+let startTime = null;
+
+// 上傳照片
+const fileInput = document.getElementById('file-input');
+const dropZone  = document.getElementById('drop-zone');
+const preview   = document.getElementById('preview');
+
+function loadFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    photoBase64 = e.target.result;
+    preview.src = photoBase64;
+    preview.style.display = 'block';
+    document.getElementById('gen-btn').disabled = false;
+    setStatus('照片已載入，選擇類型後按 GENERATE', '');
+  };
+  reader.readAsDataURL(file);
+}
+
+fileInput.addEventListener('change', e => loadFile(e.target.files[0]));
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag'); loadFile(e.dataTransfer.files[0]); });
+
+// 類型選擇
+document.querySelectorAll('.type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedType = btn.dataset.type;
+  });
+});
+
+// 生成
+document.getElementById('gen-btn').addEventListener('click', async () => {
+  if (!photoBase64) return;
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳  GENERATING...';
+  setStatus('生成中，請稍候（約 15-30 秒）...', 'loading');
+  startTime = Date.now();
+
+  // 計時器
+  const timerEl = document.getElementById('timer');
+  const timerInterval = setInterval(() => {
+    timerEl.textContent = `ELAPSED: ${((Date.now() - startTime) / 1000).toFixed(1)}s`;
+  }, 100);
+
+  try {
+    const res = await fetch(`${API_URL}/api/cyber-scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ photo: photoBase64, type: selectedType }),
+    });
+    const data = await res.json();
+    clearInterval(timerInterval);
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+    if (data.cyberPhoto) {
+      document.getElementById('result-img').src = data.cyberPhoto;
+      document.getElementById('result-img').style.display = 'block';
+      timerEl.textContent = `✅ 完成！耗時 ${elapsed}s`;
+      setStatus(`TYPE: ${selectedType.toUpperCase()} — 生成成功`, 'ok');
+    } else {
+      timerEl.textContent = `耗時 ${elapsed}s`;
+      setStatus('失敗：' + (data.error || '未知錯誤'), 'err');
+    }
+  } catch (e) {
+    clearInterval(timerInterval);
+    setStatus('網路錯誤：' + e.message, 'err');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▶ \u3000 GENERATE';
+});
+
+function setStatus(msg, cls) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = cls;
+}
+</script>
+</body>
+</html>
