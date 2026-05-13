@@ -257,6 +257,14 @@ html, body {
 <canvas id="capture-canvas" width="860" height="860"></canvas>
 
 <!-- ══ INTRO ══ -->
+<div class="screen" id="screen-full">
+  <div class="full-icon">⚠</div>
+  <div class="full-title">Today's Quota Is Full</div>
+  <div class="full-sub">Thank you for your interest!</div>
+  <div class="full-desc">All 500 spots for today have been taken.
+Come back tomorrow to discover your Gamer DNA!</div>
+</div>
+
 <div class="screen active" id="screen-intro">
   <!-- ▶ DNA LAB SYSTEM ONLINE  Y=660 -->
   <div style="position:absolute; top:660px; left:80px; font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--ink); letter-spacing:7px;">▶ DNA LAB &nbsp; SYSTEM ONLINE</div>
@@ -681,6 +689,23 @@ function scaleApp(){
   w.style.transform=`translate(${ox}px,${oy}px) scale(${s})`;
 }
 scaleApp(); window.addEventListener('resize',scaleApp);
+</script>
+<audio id="bgm" src="bgm.wav" loop preload="auto"></audio>
+
+<script>
+// 第一次用戶互動時啟動背景音樂
+const bgm = document.getElementById('bgm');
+bgm.volume = 0.4;
+
+function startBGM() {
+  if (bgm.paused) {
+    bgm.play().catch(() => {});
+  }
+  document.removeEventListener('click', startBGM);
+  document.removeEventListener('touchstart', startBGM);
+}
+document.addEventListener('click', startBGM);
+document.addEventListener('touchstart', startBGM);
 </script>
 </body>
 </html>
