@@ -130,7 +130,7 @@ html, body {
 .countdown-ring { width:160px; height:160px; position:relative; }
 .countdown-ring svg { position:absolute; top:0; left:0; transform:rotate(-90deg); }
 .ring-bg  { fill:none; stroke:rgba(0,0,0,0.1); stroke-width:6; }
-.ring-fill{ fill:none; stroke:var(--ink); stroke-width:6; stroke-dasharray:515; stroke-dashoffset:0; transition:stroke-dashoffset 0.95s linear; }
+.ring-fill{ fill:none; stroke:var(--ink); stroke-width:6; stroke-dasharray:452; stroke-dashoffset:0; transition:stroke-dashoffset 0.95s linear; }
 .countdown-num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:72px; font-weight:900; color:var(--ink); }
 .countdown-label { font-family:'Share Tech Mono',monospace; font-size:16px; color:var(--ink-light); letter-spacing:4px; }
 
@@ -256,7 +256,6 @@ html, body {
 <div class="flash-overlay" id="flash"></div>
 <canvas id="capture-canvas" width="860" height="860"></canvas>
 
-<!-- ══ INTRO ══ -->
 <div class="screen" id="screen-full">
   <div class="full-icon">⚠</div>
   <div class="full-title">今日體驗名額已額滿</div>
@@ -266,34 +265,25 @@ html, body {
 </div>
 
 <div class="screen active" id="screen-intro">
-  <!-- ▶ DNA LAB SYSTEM ONLINE  Y=660 -->
   <div style="position:absolute; top:660px; left:80px; font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--ink); letter-spacing:7px;">▶ DNA LAB &nbsp; SYSTEM ONLINE</div>
-  <!-- PLAYER ARCHETYPE ANALYSIS v2.6  Y=710 -->
   <div style="position:absolute; top:710px; left:80px; font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--ink-light); letter-spacing:5px;">PLAYER ARCHETYPE ANALYSIS &nbsp; v2.6</div>
-  <!-- GAMER  Y=760 -->
   <div style="position:absolute; top:760px; left:80px; font-family:'Roboto Condensed',sans-serif; font-size:160px; font-weight:900; color:var(--ink); line-height:0.86; letter-spacing:-2px;">GAMER<br>DNA</div>
-  <!-- 玩家基因鑑定系統  Y=1090 -->
   <div style="position:absolute; top:1080px; left:80px;">
   <div style="font-size:36px; color:var(--ink-mid); letter-spacing:18px; margin-bottom:8px;">玩 家 基 因 鑑 定 系 統</div>
   <div style="font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--ink-light); letter-spacing:6px;">PLAYER ARCHETYPE IDENTIFICATION SYSTEM</div>
 </div>
-  <!-- divider  Y=1160 -->
   <div style="position:absolute; top:1160px; left:80px; right:80px; height:2px; background:var(--ink);">
     <div style="position:absolute; width:8px; height:8px; background:var(--ink); border-radius:50%; top:-3px; left:0;"></div>
     <div style="position:absolute; width:8px; height:8px; background:var(--ink); border-radius:50%; top:-3px; right:0;"></div>
   </div>
-  <!-- desc  Y=1220 -->
   <div style="position:absolute; top:1200px; left:80px; padding-left:20px; border-left:3px solid var(--ink);">
   <div style="font-size:28px; color:var(--ink-mid); line-height:1.7; letter-spacing:2px;">每一位玩家都有屬於自己的戰鬥基因。<br>透過 10 道情境問題，找出你的玩家原型。</div>
   <div style="font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--ink-light); letter-spacing:2px; line-height:1.8; margin-top:14px;">Every player carries a unique combat DNA.<br>Answer 10 scenario questions to reveal your archetype.</div>
 </div>
-  <!-- button  Y=1430  920x140 -->
-  <!-- 語言選擇：中文 -->
   <button class="big-btn" style="position:absolute; top:1390px; left:80px; width:920px; height:140px; font-size:48px; letter-spacing:12px;" onclick="goCamera()">▶ &nbsp; 開始鑑定</button>
   <button class="big-btn outline" style="position:absolute; top:1560px; left:80px; width:920px; height:80px; font-size:22px; letter-spacing:6px; color:#111 !important; background:transparent !important; border:1px solid rgba(0,0,0,0.25);" onclick="window.location.href='gamer_dna.html'">← &nbsp; 重新選擇語言 &nbsp;/&nbsp; Change Language</button>
 </div>
 
-<!-- ══ CAMERA ══ -->
 <div class="screen" id="screen-camera">
   <div class="cam-sys">▶ IDENTITY SCAN</div>
   <div class="cam-sub">BIOMETRIC CAPTURE &nbsp; STEP 01/02</div>
@@ -321,7 +311,6 @@ html, body {
   </div>
 </div>
 
-<!-- ══ QUIZ ══ -->
 <div class="screen" id="screen-quiz">
   <div class="q-num-big" id="q-num-bg">01</div>
   <div class="quiz-top-row">
@@ -341,7 +330,6 @@ html, body {
   </div>
 </div>
 
-<!-- ══ RESULT ══ -->
 <div class="screen" id="screen-result">
   <div class="result-sys">── DNA CLASSIFICATION COMPLETE ──</div>
   <div class="result-top">
@@ -356,14 +344,12 @@ html, body {
       <div class="result-type-num" id="r-type-num"></div>
       <div class="result-name"     id="r-name"></div>
       <div style="position:absolute;bottom:0;right:0;"><svg width="200" height="120" viewBox="0 0 240 144" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 64.6633C0 64.6633 8.16511 90.0315 15.5878 98.4874C23.0105 106.943 49.4848 114.902 49.4848 114.902L0.247666 64.6633H0ZM214.762 0C195.958 0 168.247 4.22864 147.464 14.6742C130.391 23.1302 79.9171 81.5756 76.4531 85.3062C71.5047 90.7776 70.0189 92.0213 62.8436 89.2855C51.2147 85.0575 33.4016 73.617 33.4016 73.617C33.4016 73.617 52.9468 108.684 59.8747 119.13C70.5139 135.544 88.5767 144 88.5767 144C88.5767 144 75.2145 127.337 71.7505 120.125C68.534 113.41 72.494 107.689 91.5456 91.0259C122.721 63.4197 150.432 41.0367 177.896 24.6222C203.876 9.20257 218.473 4.97433 229.607 0.248947C226.885 0.248947 220.948 0.248947 214.762 0.248947V0ZM179.875 44.5183C136.575 69.14 79.4221 115.15 79.4221 115.15C95.7521 127.088 137.32 144 166.516 144C198.928 144 229.607 51.7309 229.607 51.7309C173.689 77.8449 136.575 100.228 136.575 100.228L195.215 79.8346C195.215 79.8346 176.658 127.585 155.38 127.585C130.638 127.585 101.939 114.404 101.939 114.404C151.671 75.855 228.37 40.788 232.576 38.5496C236.782 36.56 240 28.3528 240 24.6222C237.773 24.6222 208.579 28.3525 179.63 44.5183H179.875Z" fill="#686868"/></svg></div>
-
     </div>
   </div>
   <div class="result-tags"    id="r-tags"></div>
   <div class="result-divider"></div>
   <div class="result-desc"    id="r-desc"></div>
-  <div class="score-grid"     id="r-scores"></div>
-
+  <div class="score-grid"      id="r-scores"></div>
   <div class="qr-section">
       <div class="qr-code-wrap" id="qr-code-box" style="display:flex;align-items:center;justify-content:center;padding:4px">
         <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Share Tech Mono',monospace;font-size:14px;color:#999;letter-spacing:2px">生成中...</div>
@@ -373,7 +359,6 @@ html, body {
         <div class="qr-info-sub" id="qr-status">答題完成後自動生成</div>
       </div>
     </div>
-
   <button class="big-btn outline" style="position:absolute;top:1720px;left:80px;width:920px;height:120px;font-size:42px;letter-spacing:8px;color:#111111 !important;background:#ffffff !important;border:2px solid #111111;" onclick="restart()">重新鑑定</button>
 </div>
 
@@ -446,7 +431,7 @@ const QUESTIONS = [
 const TYPES = {
   tactical:{ num:'01',name:'戰術指揮者',nameEn:'TACTICAL COMMANDER',tags:['#策略','#掌控','#全局意識'],desc:'你天生具備統籌全局的能力，能在混亂中找出秩序。習慣在行動前建立心理地圖，優先考量整體利益而非個人表現。你是隊伍的大腦，指揮、資源分配與時機判斷是你的核心優勢，高壓下反而更冷靜。',icon:`<circle cx="16" cy="16" r="13" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="16" r="5" stroke="#111" stroke-width="1.8"/><line x1="16" y1="3" x2="16" y2="11" stroke="#111" stroke-width="1.8"/><line x1="16" y1="21" x2="16" y2="29" stroke="#111" stroke-width="1.8"/><line x1="3" y1="16" x2="11" y2="16" stroke="#111" stroke-width="1.8"/><line x1="21" y1="16" x2="29" y2="16" stroke="#111" stroke-width="1.8"/>` },
   speedy:  { num:'02',name:'極速獵手',nameEn:'SPEED HUNTER',tags:['#反應','#機動','#快速出擊'],desc:'你的神經反射比常人快一拍，機動性是你的天賦。享受毫秒間決策的快感，透過速度壓制對手節奏。打法流暢且直覺導向，對手還在思考的時候，你已完成了三個動作。',icon:`<polyline points="2,26 8,10 14,18 22,6" stroke="#111" stroke-width="2" fill="none" stroke-linejoin="round"/><polygon points="26,4 20,5 23,10" fill="#111"/><line x1="2" y1="29" x2="30" y2="29" stroke="#111" stroke-width="1.2"/>` },
-  burst:   { num:'03',name:'爆發破局者',nameEn:'BURST BREAKER',tags:['#效能','#侵略','#衝擊力'],desc:'你是場上的破壞者，專為打破僵局而生。喜歡集中火力在關鍵節點發動壓倒性攻勢。遊戲節奏是蓄力→爆發→重置，你相信主動出擊永遠優於被動等待。',icon:`<polygon points="16,2 30,16 16,30 2,16" stroke="#111" stroke-width="1.8" fill="none"/><polygon points="16,9 23,16 16,23 9,16" fill="rgba(0,0,0,0.15)" stroke="#111" stroke-width="1.2"/><line x1="16" y1="2" x2="16" y2="9" stroke="#111" stroke-width="1.8"/><line x1="23" y1="16" x2="30" y2="16" stroke="#111" stroke-width="1.8"/>` },
+  burst:   { num:'03',name:'爆發破局者',nameEn:'BURST BREAKER',tags:['#效能','#侵略','#衝擊力'],desc:'你是場上的破壞者，專為打破僵局而生。喜歡集中火力在關鍵節節點發動壓倒性攻勢。遊戲節奏是蓄力→爆發→重置，你相信主動出擊永遠優於被動等待。',icon:`<polygon points="16,2 30,16 16,30 2,16" stroke="#111" stroke-width="1.8" fill="none"/><polygon points="16,9 23,16 16,23 9,16" fill="rgba(0,0,0,0.15)" stroke="#111" stroke-width="1.2"/><line x1="16" y1="2" x2="16" y2="9" stroke="#111" stroke-width="1.8"/><line x1="23" y1="16" x2="30" y2="16" stroke="#111" stroke-width="1.8"/>` },
   sniper:  { num:'04',name:'精準狙擊手',nameEn:'PRECISION SNIPER',tags:['#準確','#專注','#時機掌握'],desc:'你不相信運氣，只相信精準。每一個動作背後都有充分的觀察與計算，比任何人都更有耐心等待最佳時機。一擊必殺不是巧合，是積累的必然結果。',icon:`<rect x="2" y="12" width="16" height="8" stroke="#111" stroke-width="1.8"/><line x1="18" y1="16" x2="28" y2="16" stroke="#111" stroke-width="2.5"/><circle cx="29" cy="16" r="2.5" fill="#111"/><line x1="8" y1="5" x2="8" y2="12" stroke="#111" stroke-width="1.2"/><line x1="8" y1="20" x2="8" y2="27" stroke="#111" stroke-width="1.2"/>` },
   builder: { num:'05',name:'創造建構者',nameEn:'CREATIVE BUILDER',tags:['#創造','#靈活','#組合思維'],desc:'你享受設計系統與組合可能性的過程。善於發現常規套路的漏洞並創造非預期打法，你的風格既有趣又難以被反制，因為你本身就是不可預測的變數。',icon:`<rect x="1" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="1" y="18" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="18" width="13" height="13" stroke="#111" stroke-width="1" stroke-dasharray="2 1.5"/><line x1="14" y1="7.5" x2="18" y2="7.5" stroke="#111" stroke-width="1.2"/><line x1="7.5" y1="14" x2="7.5" y2="18" stroke="#111" stroke-width="1.2"/>` },
   futurist:{ num:'06',name:'未來操控者',nameEn:'FUTURE CONTROLLER',tags:['#AI','#適應','#次世代'],desc:'你是最接近「人機共生」型態的玩家。擅長學習對手行為模式並即時調整，像演算法一樣持續優化策略。你看的不是這一局，而是下一個版本。',icon:`<circle cx="16" cy="16" r="10" stroke="#111" stroke-width="1.8"/><path d="M16 6 C20 6,24 11,24 16 C24 21,20 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><path d="M16 6 C12 6,8 11,8 16 C8 21,12 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><line x1="6" y1="16" x2="26" y2="16" stroke="#111" stroke-width="1.2"/><line x1="16" y1="1" x2="16" y2="6" stroke="#111" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="31" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="1" r="2" fill="#111"/><circle cx="16" cy="31" r="2" fill="#111"/>` },
@@ -464,7 +449,7 @@ function showScreen(id) {
 /* ── CAMERA ── */
 async function goCamera() {
   showScreen('screen-camera');
-  resetCD(3);
+  resetCD(5); // 改為 5
   document.getElementById('cam-error-msg').style.display = 'none';
   document.getElementById('shoot-btn').disabled = true;
 
@@ -524,15 +509,27 @@ function startCountdown() {
   if(counting) return;
   counting=true;
   document.getElementById('shoot-btn').disabled=true;
-  const CIRC=452, TOTAL=5;
+  const CIRC=452, TOTAL=5; // 總秒數設為 5
   let rem=TOTAL;
   document.getElementById('countdown-num').textContent=rem;
   document.getElementById('countdown-label').textContent='正在倒數…';
+  
+  // 倒數開始前先歸零進度條
+  document.getElementById('ring-fill').style.strokeDashoffset = '0';
+  
   countdownTimer=setInterval(()=>{
     rem--;
-    document.getElementById('ring-fill').style.strokeDashoffset = CIRC*(1-rem/TOTAL);
-    if(rem<=0){ clearInterval(countdownTimer); countdownTimer=null; takePhoto(); }
-    else document.getElementById('countdown-num').textContent=rem;
+    // 更新環狀進度條
+    document.getElementById('ring-fill').style.strokeDashoffset = CIRC * (1 - rem/TOTAL);
+    
+    if(rem<=0){ 
+      clearInterval(countdownTimer); 
+      countdownTimer=null; 
+      takePhoto(); 
+    }
+    else {
+      document.getElementById('countdown-num').textContent=rem;
+    }
   },1000);
 }
 
@@ -546,7 +543,7 @@ function takePhoto() {
   ctx.save(); ctx.translate(canvas.width,0); ctx.scale(-1,1);
   ctx.drawImage(video,0,0,canvas.width,canvas.height);
   ctx.restore();
-  capturedPhoto = canvas.toDataURL('image/jpeg',0.9); // 只存原始照片
+  capturedPhoto = canvas.toDataURL('image/jpeg',0.9);
   document.getElementById('countdown-num').textContent='✓';
   document.getElementById('countdown-label').textContent='拍攝完成！';
   setTimeout(()=>{ stopCamera(); startQuiz(); },700);
@@ -585,7 +582,6 @@ function prevQ(){ if(currentQ>0){ currentQ--; renderQ(); } }
 function nextQ(){ if(!answers[currentQ]) return; if(currentQ<QUESTIONS.length-1){ currentQ++; renderQ(); } else showResult(); }
 
 /* ── RESULT ── */
-// ── API ──
 const API_URL = 'https://gamer-dna.zeabur.app';
 
 async function showResult() {
@@ -609,7 +605,6 @@ async function showResult() {
   document.getElementById('screen-result').scrollTop=0;
   setTimeout(()=>{ document.querySelectorAll('.score-bar-fill').forEach(b=>{ b.style.width=b.dataset.pct+'%'; }); },300);
 
-  // ── 答完題才呼叫 Gemini 生成機械臉，再存檔拿 QR Code ──
   generateQR(null);
   document.getElementById('qr-status').textContent = 'AI 生成機械臉中...';
 
@@ -617,7 +612,6 @@ async function showResult() {
   TYPE_ORDER.forEach(t => { scores[t] = totals[t]; });
 
   try {
-    // Step 1: 有拍照才呼叫 Gemini
     let finalPhoto = capturedPhoto || null;
     if (capturedPhoto) {
       try {
@@ -629,7 +623,6 @@ async function showResult() {
         const cyberData = await cyberRes.json();
         if (cyberData.cyberPhoto) {
           finalPhoto = cyberData.cyberPhoto;
-          // 更新結果頁的照片為機械臉
           const img = document.getElementById('result-photo');
           if (img) { img.src = finalPhoto; img.style.display='block'; }
           const nm = document.getElementById('no-photo-msg');
@@ -642,7 +635,6 @@ async function showResult() {
 
     document.getElementById('qr-status').textContent = '儲存結果中...';
 
-    // Step 2: 存結果拿 QR Code
     const saveRes = await fetch(`${API_URL}/api/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -683,7 +675,6 @@ function generateQR(url) {
 
 function restart(){ window.location.href='gamer_dna.html'; }
 
-/* ── SCALE ── */
 function scaleApp(){
   const w=document.getElementById('app-wrapper');
   const s=Math.min(window.innerWidth/1080,window.innerHeight/1920);
@@ -695,7 +686,6 @@ scaleApp(); window.addEventListener('resize',scaleApp);
 <audio id="bgm" src="bgm.wav" loop preload="auto"></audio>
 
 <script>
-// 第一次用戶互動時啟動背景音樂
 const bgm = document.getElementById('bgm');
 bgm.volume = 0.4;
 
