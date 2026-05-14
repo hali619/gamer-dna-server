@@ -12,6 +12,24 @@ app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.static('public'));
 
+// ── 每日人數上限 ──
+const DAILY_LIMIT = parseInt(process.env.DAILY_LIMIT || '500');
+let dailyCount = 0;
+let dailyDate  = new Date().toDateString();
+
+function checkAndCount() {
+  const today = new Date().toDateString();
+  if (today !== dailyDate) {
+    dailyDate  = today;
+    dailyCount = 0;
+    console.log('[QUOTA] 新的一天，計數重置');
+  }
+  if (dailyCount >= DAILY_LIMIT) return false;
+  dailyCount++;
+  console.log(`[QUOTA] 今日第 ${dailyCount} / ${DAILY_LIMIT} 人`);
+  return true;
+}
+
 const BASE_PROMPT = `[SYSTEM: OUTPUT IMAGE ONLY. NO TEXT.]
 You are the "ROG ELITE TEAM STYLIST." Generate a high-end "ROG Esports Pro-Player" illustration of the subject.
 
@@ -26,15 +44,10 @@ Requirements:
 
 const TYPE_STYLE = {
   tactical: `TYPE: TACTICAL COMMANDER. Expression: Cold, focused, commanding — the calm before the storm. HUD: Holographic tactical matrix and minimap grid floating around subject. Secondary light: Cold blue-white fill from above to contrast the orange-red below.`,
-
   speedy:   `TYPE: SPEED HUNTER. Expression: Hyper-focused, sharp eyes, adrenaline rush — about to launch. HUD: Velocity scanner with speed vectors and 144Hz FPS counter. Effects: Electric cyan motion-blur light streaks trailing behind. Secondary light: Electric cyan accent from the side.`,
-
   burst:    `TYPE: BURST BREAKER. Expression: Fierce, jaw set, explosive energy barely contained. HUD: Power surge energy bars at CRITICAL percent, damage multiplier readout. Detail: Heavy shoulder armor plates glowing at the edges. The orange-red rim light is most intense for this type — almost volcanic.`,
-
   sniper:   `TYPE: PRECISION SNIPER. Expression: Eerily calm, one eye slightly narrowed, absolute stillness and patience. HUD: Optical targeting crosshair overlay with wind and distance data. Detail: Tactical collar/hood framing the face. Secondary light: Ice-blue cold fill from one side, deep shadow on the other.`,
-
   builder:  `TYPE: CREATIVE BUILDER. Expression: Confident smirk, head slightly tilted — always thinking three steps ahead. HUD: Synthesis engine node map and circuit connections floating around the hands. Detail: Modular jacket panels with interchangeable components. Secondary light: Purple-green dual accent.`,
-
   futurist: `TYPE: FUTURE CONTROLLER. Expression: Serene and visionary, eyes with a faint digital teal glow — seeing what others cannot. HUD: AI Core Sync neural network visualization, data stream flows at 99%. Detail: Nano-material jacket with embedded LED matrix. Secondary light: Holographic teal from above.`,
 };
 
@@ -100,11 +113,17 @@ async function generateCyberFace(base64Image, type = 'tactical') {
 app.post('/api/cyber-scan', async (req, res) => {
   const { photo, type } = req.body;
   if (!photo) return res.status(400).json({ error: '缺少照片資料' });
+
+  if (!checkAndCount()) {
+    return res.status(429).json({ error: 'DAILY_LIMIT_REACHED' });
+  }
+
   const finalType = TYPE_STYLE[type] ? type : 'tactical';
   try {
     const cyberPhoto = await generateCyberFace(photo, finalType);
     res.json({ cyberPhoto });
   } catch (err) {
+    dailyCount = Math.max(0, dailyCount - 1);
     console.error('[SERVER ERROR]:', err.message);
     res.status(500).json({ error: err.message });
   }
@@ -124,6 +143,18 @@ app.get('/api/result/:id', (req, res) => {
   const data = store.get(req.params.id);
   if (!data) return res.status(404).json({ error: '找不到結果' });
   res.json(data);
+});
+
+app.get('/api/quota', (req, res) => {
+  const today = new Date().toDateString();
+  if (today !== dailyDate) { dailyDate = today; dailyCount = 0; }
+  const remaining = DAILY_LIMIT - dailyCount;
+  res.json({
+    limit: DAILY_LIMIT,
+    used: dailyCount,
+    remaining,
+    full: remaining <= 0,
+  });
 });
 
 app.get('/result/:id', (req, res) => {
