@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAMER DNA — 今日名額</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Roboto+Condensed:wght@900&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#0a0a0a; color:#fff; min-height:100vh;
+  font-family:'Share Tech Mono', monospace;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:24px;
+}
+
+.card {
+  width:100%; max-width:480px;
+  background:#111; border:1px solid #1e1e1e;
+  padding:40px 36px;
+  text-align:center;
+}
+
+.sys-label {
+  font-size:10px; letter-spacing:5px; color:#444;
+  margin-bottom:32px;
+}
+
+.big-num {
+  font-family:'Roboto Condensed', sans-serif;
+  font-size:96px; font-weight:900; line-height:1;
+  color:#fff; margin-bottom:8px;
+}
+.big-num span { color:#ff0000; }
+
+.denom {
+  font-size:13px; letter-spacing:3px; color:#555;
+  margin-bottom:32px;
+}
+
+/* 進度條 */
+.bar-wrap { width:100%; height:6px; background:#222; margin-bottom:32px; }
+.bar-fill  { height:100%; background:#ff0000; transition:width 0.8s ease; }
+
+/* 狀態 */
+.status-badge {
+  display:inline-block; padding:8px 24px;
+  font-size:11px; letter-spacing:4px;
+  margin-bottom:40px;
+}
+.status-badge.open   { border:1px solid #00ff88; color:#00ff88; }
+.status-badge.full   { border:1px solid #ff4444; color:#ff4444; }
+.status-badge.loading{ border:1px solid #444;    color:#444; }
+
+/* 詳細資訊 */
+.detail-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:1px;
+  background:#1e1e1e; margin-bottom:32px;
+}
+.detail-item {
+  background:#111; padding:16px;
+}
+.detail-label { font-size:9px; letter-spacing:3px; color:#555; margin-bottom:6px; }
+.detail-val   { font-size:20px; color:#fff; }
+
+/* 更新按鈕 */
+.refresh-btn {
+  width:100%; padding:14px;
+  background:transparent; border:1px solid #333;
+  color:#666; font-family:inherit; font-size:11px; letter-spacing:4px;
+  cursor:pointer; transition:all 0.15s;
+}
+.refresh-btn:hover { border-color:#ff0000; color:#ff0000; }
+.refresh-btn:active { background:#ff0000; color:#fff; border-color:#ff0000; }
+
+.last-update { font-size:9px; color:#333; letter-spacing:2px; margin-top:16px; }
+
+/* ROG 紅線 */
+.top-bar { width:100%; max-width:480px; height:3px; background:#ff0000; margin-bottom:0; }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+<div class="card">
+  <div class="sys-label">▶ GAMER DNA LAB — DAILY QUOTA STATUS</div>
+
+  <div class="big-num" id="remaining-num">—</div>
+  <div class="denom" id="denom-txt">— / — 名額剩餘</div>
+
+  <div class="bar-wrap"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
+
+  <div class="status-badge loading" id="status-badge">LOADING...</div>
+
+  <div class="detail-grid">
+    <div class="detail-item">
+      <div class="detail-label">TODAY USED</div>
+      <div class="detail-val" id="used-val">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">DAILY LIMIT</div>
+      <div class="detail-val" id="limit-val">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">REMAINING</div>
+      <div class="detail-val" id="remain-val">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">USAGE %</div>
+      <div class="detail-val" id="pct-val">—</div>
+    </div>
+  </div>
+
+  <button class="refresh-btn" onclick="loadQuota()">↻ &nbsp; 更新名額</button>
+  <div class="last-update" id="last-update"></div>
+</div>
+
+<script>
+const API = 'https://gamer-dna.zeabur.app';
+
+async function loadQuota() {
+  document.getElementById('status-badge').textContent = 'LOADING...';
+  document.getElementById('status-badge').className = 'status-badge loading';
+
+  try {
+    const res  = await fetch(API + '/api/quota');
+    const data = await res.json();
+    const pct  = Math.round((data.used / data.limit) * 100);
+
+    document.getElementById('remaining-num').textContent = data.remaining;
+    document.getElementById('denom-txt').textContent = `${data.remaining} / ${data.limit} 名額剩餘`;
+    document.getElementById('bar-fill').style.width = pct + '%';
+    document.getElementById('used-val').textContent   = data.used;
+    document.getElementById('limit-val').textContent  = data.limit;
+    document.getElementById('remain-val').textContent = data.remaining;
+    document.getElementById('pct-val').textContent    = pct + '%';
+    document.getElementById('last-update').textContent =
+      '最後更新：' + new Date().toLocaleTimeString('zh-TW');
+
+    const badge = document.getElementById('status-badge');
+    if (data.full) {
+      badge.textContent  = '今日名額已額滿';
+      badge.className    = 'status-badge full';
+    } else {
+      badge.textContent  = '開放體驗中';
+      badge.className    = 'status-badge open';
+    }
+  } catch(e) {
+    document.getElementById('status-badge').textContent = 'ERROR — 無法連線';
+    document.getElementById('status-badge').className   = 'status-badge full';
+  }
+}
+
+// 載入時自動查，每 30 秒自動更新
+loadQuota();
+setInterval(loadQuota, 30000);
+</script>
+</body>
+</html>
