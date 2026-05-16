@@ -187,7 +187,7 @@ html, body {
 .result-icon-wrap { width:100px; height:100px; border:2px solid var(--ink); display:flex; align-items:center; justify-content:center; position:relative; flex-shrink:0; }
 .result-icon-wrap::before { content:''; position:absolute; top:-1px; right:-1px; width:14px; height:14px; border-top:2px solid var(--ink); border-right:2px solid var(--ink); }
 .result-type-num { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--ink-light); letter-spacing:4px; }
-.result-name { font-size:80px; font-weight:900; color:var(--ink); line-height:0.88; letter-spacing:-2px; }
+.result-name { font-size:58px; font-weight:900; color:var(--ink); line-height:1.0; letter-spacing:-1px; word-break:break-word; }
 
 
 .result-tags { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; flex-shrink:0; }
@@ -605,6 +605,21 @@ async function showResult() {
 
   showScreen('screen-result');
   document.getElementById('screen-result').scrollTop=0;
+
+  // 結果頁 30 秒後自動跳回語言選擇首頁
+  if (window._resultTimer) clearInterval(window._resultTimer);
+  let _t = 30;
+  const _btn = document.querySelector('#screen-result .big-btn.outline');
+  const _origTxt = _btn ? _btn.textContent : '';
+  if (_btn) _btn.textContent = `${_origTxt.trim()} (30s)`;
+  window._resultTimer = setInterval(() => {
+    _t--;
+    if (_btn) _btn.textContent = `${_origTxt.trim()} (${_t}s)`;
+    if (_t <= 0) {
+      clearInterval(window._resultTimer);
+      window.location.href = 'gamer_dna.html';
+    }
+  }, 1000);
   setTimeout(()=>{ document.querySelectorAll('.score-bar-fill').forEach(b=>{ b.style.width=b.dataset.pct+'%'; }); },300);
 
   // ── 答完題才呼叫 Gemini 生成機械臉，再存檔拿 QR Code ──
@@ -689,6 +704,36 @@ function scaleApp(){
   w.style.transform=`translate(${ox}px,${oy}px) scale(${s})`;
 }
 scaleApp(); window.addEventListener('resize',scaleApp);
+
+// ── 閒置偵測：30秒無操作跳回首頁 ──
+let _idleTimer = null;
+const IDLE_SEC = 30;
+
+function resetIdle() {
+  if (_idleTimer) clearTimeout(_idleTimer);
+  // 只在答題頁和拍照頁才計時
+  const active = document.querySelector('.screen.active');
+  if (!active) return;
+  const id = active.id;
+  if (id !== 'screen-quiz' && id !== 'screen-camera' && id !== 'screen-intro') return;
+  _idleTimer = setTimeout(() => {
+    window.location.href = 'gamer_dna.html';
+  }, IDLE_SEC * 1000);
+}
+
+// 任何互動都重置計時器
+['click','touchstart','touchmove','keydown','mousemove','scroll'].forEach(evt => {
+  document.addEventListener(evt, resetIdle, { passive: true });
+});
+
+// 換頁時重新計時
+const _origShowScreen = showScreen;
+window.showScreen = function(id) {
+  _origShowScreen(id);
+  resetIdle();
+};
+
+resetIdle();
 </script>
 <audio id="bgm" src="bgm.wav" loop preload="auto"></audio>
 
