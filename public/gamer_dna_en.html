@@ -707,7 +707,7 @@ scaleApp(); window.addEventListener('resize',scaleApp);
 
 // ── 閒置偵測：30秒無操作跳回首頁 ──
 let _idleTimer = null;
-const IDLE_SEC = 30;
+const IDLE_SEC = 60;
 
 function resetIdle() {
   if (_idleTimer) clearTimeout(_idleTimer);
