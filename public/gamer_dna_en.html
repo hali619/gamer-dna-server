@@ -608,10 +608,10 @@ async function showResult() {
 
   // 結果頁 30 秒後自動跳回語言選擇首頁
   if (window._resultTimer) clearInterval(window._resultTimer);
-  let _t = 30;
+  let _t = 60;
   const _btn = document.querySelector('#screen-result .big-btn.outline');
   const _origTxt = _btn ? _btn.textContent : '';
-  if (_btn) _btn.textContent = `${_origTxt.trim()} (30s)`;
+  if (_btn) _btn.textContent = `${_origTxt.trim()} (60s)`;
   window._resultTimer = setInterval(() => {
     _t--;
     if (_btn) _btn.textContent = `${_origTxt.trim()} (${_t}s)`;
