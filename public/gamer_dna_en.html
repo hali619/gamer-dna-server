@@ -373,6 +373,7 @@ Come back tomorrow to discover your Gamer DNA!</div>
       </div>
     </div>
 
+  <button id="retry-ai-btn" class="big-btn outline" style="display:none;position:absolute;top:1580px;left:80px;width:920px;height:100px;font-size:28px;letter-spacing:4px;color:#111 !important;background:#fff !important;border:1.5px solid #111;" onclick="retryAI()">↻ &nbsp; Retry AI Generation</button>
   <button class="big-btn outline" style="position:absolute;top:1720px;left:80px;width:920px;height:120px;font-size:42px;letter-spacing:8px;color:#111111 !important;background:#ffffff !important;border:2px solid #111111;" onclick="restart()">重新鑑定</button>
 </div>
 
@@ -590,6 +591,7 @@ async function showResult() {
   const totals={}; TYPE_ORDER.forEach(t=>totals[t]=0);
   QUESTIONS.forEach((q,i)=>{ const opt=q.opts.find(o=>o.key===answers[i]); if(!opt) return; Object.entries(opt.scores).forEach(([t,v])=>{ totals[t]=(totals[t]||0)+v; }); });
   const winner=Object.entries(totals).sort((a,b)=>b[1]-a[1])[0][0];
+  window._lastWinner = winner;
   const type=TYPES[winner], max=Math.max(...Object.values(totals));
 
   const img=document.getElementById('result-photo'), nm=document.getElementById('no-photo-msg');
@@ -650,6 +652,9 @@ async function showResult() {
         }
       } catch(e) {
         console.warn('機械臉生成失敗，使用原始照片', e);
+        document.getElementById('qr-status').textContent = 'AI generation failed, showing original photo';
+        const retryBtn = document.getElementById('retry-ai-btn');
+        if (retryBtn) retryBtn.style.display = 'block';
       }
     }
 
@@ -691,6 +696,33 @@ function generateQR(url) {
     colorDark: '#111111',
     colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.M
+  });
+}
+
+function retryAI() {
+  const btn = document.getElementById('retry-ai-btn');
+  if (btn) btn.style.display = 'none';
+  document.getElementById('qr-status').textContent = 'AI generating...';
+  fetch(`${API_URL}/api/cyber-scan`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ photo: capturedPhoto, type: window._lastWinner })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.cyberPhoto) {
+      const img = document.getElementById('result-photo');
+      if (img) { img.src = data.cyberPhoto; img.style.display = 'block'; }
+      document.getElementById('no-photo-msg').style.display = 'none';
+      document.getElementById('qr-status').textContent = 'Scan to get your result';
+    } else {
+      document.getElementById('qr-status').textContent = 'AI generation failed, showing original photo';
+      if (btn) btn.style.display = 'block';
+    }
+  })
+  .catch(() => {
+    document.getElementById('qr-status').textContent = 'AI generation failed, showing original photo';
+    if (btn) btn.style.display = 'block';
   });
 }
 
