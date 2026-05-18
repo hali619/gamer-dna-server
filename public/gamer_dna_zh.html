@@ -259,10 +259,10 @@ html, body {
 <!-- ══ INTRO ══ -->
 <div class="screen" id="screen-full">
   <div class="full-icon">⚠</div>
-  <div class="full-title">Today's Quota Is Full</div>
-  <div class="full-sub">Thank you for your interest!</div>
-  <div class="full-desc">All 500 spots for today have been taken.
-Come back tomorrow to discover your Gamer DNA!</div>
+  <div class="full-title">今日體驗名額已額滿</div>
+  <div class="full-sub">感謝你的參與！</div>
+  <div class="full-desc">今日 500 個體驗名額已全數使用完畢。
+明天歡迎再來挑戰，找出你的玩家基因！</div>
 </div>
 
 <div class="screen active" id="screen-intro">
@@ -288,8 +288,9 @@ Come back tomorrow to discover your Gamer DNA!</div>
   <div style="font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--ink-light); letter-spacing:2px; line-height:1.8; margin-top:14px;">Every player carries a unique combat DNA.<br>Answer 10 scenario questions to reveal your archetype.</div>
 </div>
   <!-- button  Y=1430  920x140 -->
-  <button class="big-btn" style="position:absolute; top:1390px; left:80px; width:920px; height:140px; font-size:48px; letter-spacing:12px;" onclick="goCamera()">▶ &nbsp; START</button>
-  <button class="big-btn outline" style="position:absolute; top:1560px; left:80px; width:920px; height:80px; font-size:22px; letter-spacing:6px; color:#111 !important; background:transparent !important; border:1px solid rgba(0,0,0,0.25);" onclick="window.location.href='gamer_dna.html'">← &nbsp; Change Language &nbsp;/&nbsp; 重新選擇語言</button>
+  <!-- 語言選擇：中文 -->
+  <button class="big-btn" style="position:absolute; top:1390px; left:80px; width:920px; height:140px; font-size:48px; letter-spacing:12px;" onclick="goCamera()">▶ &nbsp; 開始鑑定</button>
+  <button class="big-btn outline" style="position:absolute; top:1560px; left:80px; width:920px; height:80px; font-size:22px; letter-spacing:6px; color:#111 !important; background:transparent !important; border:1px solid rgba(0,0,0,0.25);" onclick="window.location.href='gamer_dna.html'">← &nbsp; 重新選擇語言 &nbsp;/&nbsp; Change Language</button>
 </div>
 
 <!-- ══ CAMERA ══ -->
@@ -312,11 +313,11 @@ Come back tomorrow to discover your Gamer DNA!</div>
       </svg>
       <div class="countdown-num" id="countdown-num">5</div>
     </div>
-    <div class="countdown-label" id="countdown-label">READY? HIT SHOOT</div>
+    <div class="countdown-label" id="countdown-label">準備好後按下拍照</div>
   </div>
   <div class="cam-btns" style="position:absolute; top:1430px; left:80px; right:80px; width:920px;">
-    <button class="big-btn outline" style="width:220px;font-size:28px;letter-spacing:4px;height:140px" onclick="skipPhoto()">SKIP</button>
-    <button class="big-btn" style="flex:1;font-size:32px;letter-spacing:6px;height:140px" id="shoot-btn" onclick="startCountdown()">📷 &nbsp; SHOOT</button>
+    <button class="big-btn outline" style="width:220px;font-size:28px;letter-spacing:4px;height:140px" onclick="skipPhoto()">略過</button>
+    <button class="big-btn" style="flex:1;font-size:32px;letter-spacing:6px;height:140px" id="shoot-btn" onclick="startCountdown()">📷 &nbsp; 拍照</button>
   </div>
 </div>
 
@@ -380,77 +381,78 @@ Come back tomorrow to discover your Gamer DNA!</div>
 
 <script>
 const QUESTIONS = [
-  { text:'Your team just lost a critical round. Your first reaction?', opts:[
-    { key:'A', text:'Immediately analyze the timing mistake and adjust the overall strategy', scores:{tactical:4,sniper:2} },
-    { key:'B', text:'Quickly adjust your positioning and speed to reset the rhythm', scores:{speedy:4,burst:1} },
-    { key:'C', text:'Initiate the next push right away and disrupt their momentum', scores:{burst:4,speedy:2} },
-    { key:'D', text:'Observe their patterns and wait for the perfect counter-moment', scores:{sniper:4,tactical:2} },
+  { text:'隊伍剛剛輸掉一個關鍵回合，你的第一反應是？', opts:[
+    { key:'A', text:'馬上分析哪個時機點出了問題，調整整體策略', scores:{tactical:4,sniper:2} },
+    { key:'B', text:'立刻調整自己的走位與速度，重整節奏', scores:{speedy:4,burst:1} },
+    { key:'C', text:'主動發起下一波攻勢，打亂對手節奏', scores:{burst:4,speedy:2} },
+    { key:'D', text:'觀察對手規律，等待反制的最佳時機', scores:{sniper:4,tactical:2} },
   ]},
-  { text:'When picking a character, which type do you lean toward?', opts:[
-    { key:'A', text:'Commander — full information control, directs the team', scores:{tactical:5,builder:1} },
-    { key:'B', text:'Scout — fastest movement, maximum mobility', scores:{speedy:5} },
-    { key:'C', text:'Assault — highest burst damage, one-shot carry potential', scores:{burst:5} },
-    { key:'D', text:'Sniper — long-range precision, requires patience and observation', scores:{sniper:5} },
+  { text:'選角色時，你最傾向哪種類型？', opts:[
+    { key:'A', text:'掌握全場信息、能指揮隊友的指揮官型', scores:{tactical:5,builder:1} },
+    { key:'B', text:'移動速度最快、機動性最高的角色', scores:{speedy:5} },
+    { key:'C', text:'爆發傷害最高、能一擊翻盤的強攻型', scores:{burst:5} },
+    { key:'D', text:'遠程精準型，需要觀察才能發揮最大效益', scores:{sniper:5} },
   ]},
-  { text:'What is your usual role in team fights?', opts:[
-    { key:'A', text:'Call targets and decide when to push or pull back', scores:{tactical:5,sniper:1} },
-    { key:'B', text:'Flank and create chaos for your team to follow up', scores:{speedy:3,burst:2} },
-    { key:'C', text:'Lead the charge and break the line first', scores:{burst:4,speedy:1} },
-    { key:'D', text:'Deliver precise damage from a safe position', scores:{sniper:4,tactical:1} },
+  { text:'你在群戰中最常扮演什麼角色？', opts:[
+    { key:'A', text:'指揮大家集火目標、決定進退時機', scores:{tactical:5,sniper:1} },
+    { key:'B', text:'遊擊側翼，製造混亂讓隊友跟進', scores:{speedy:3,burst:2} },
+    { key:'C', text:'衝鋒陷陣，先手破局讓對方崩潰', scores:{burst:4,speedy:1} },
+    { key:'D', text:'從安全位置提供精準輸出支援', scores:{sniper:4,tactical:1} },
   ]},
-  { text:'Facing a powerful new strategy you have never seen, you:', opts:[
-    { key:'A', text:'Quickly break down the logic and find the best counter', scores:{tactical:4,futurist:2} },
-    { key:'B', text:'Trust your instincts and adapt on the fly', scores:{speedy:4,burst:1} },
-    { key:'C', text:'Force through it — give them zero breathing room', scores:{burst:3,speedy:2} },
-    { key:'D', text:'Track their patterns and find a systematic opening', scores:{futurist:4,sniper:2} },
+  { text:'面對從未見過的強勢新戰術，你如何應對？', opts:[
+    { key:'A', text:'快速拆解其邏輯，找出最佳反制方案', scores:{tactical:4,futurist:2} },
+    { key:'B', text:'憑直覺快速應變，邊打邊調整', scores:{speedy:4,burst:1} },
+    { key:'C', text:'直接強行突破，不給對方喘息機會', scores:{burst:3,speedy:2} },
+    { key:'D', text:'記錄對手行為，系統化找到破口', scores:{futurist:4,sniper:2} },
   ]},
-  { text:'What is your favorite way to win a match?', opts:[
-    { key:'A', text:'Perfect deployment — they lose before they realize it', scores:{tactical:5,builder:1} },
-    { key:'B', text:'Speed and rhythm they simply cannot keep up with', scores:{speedy:4,burst:1} },
-    { key:'C', text:'A devastating strike at the moment they least expect', scores:{burst:4,sniper:1} },
-    { key:'D', text:'A combo they never anticipated, leaving them completely lost', scores:{builder:5,futurist:2} },
+  { text:'你最享受哪種方式贏得對局？', opts:[
+    { key:'A', text:'透過完美部署，讓對手在結構上就輸了', scores:{tactical:5,builder:1} },
+    { key:'B', text:'以速度和節奏讓對手完全跟不上', scores:{speedy:4,burst:1} },
+    { key:'C', text:'在對手最措手不及時發動毀滅性攻擊', scores:{burst:4,sniper:1} },
+    { key:'D', text:'用對手想不到的組合打法讓他摸不著頭緒', scores:{builder:5,futurist:2} },
   ]},
-  { text:'How do you prepare before an important match?', opts:[
-    { key:'A', text:'Study opponent history and build a targeted game plan', scores:{tactical:4,sniper:2} },
-    { key:'B', text:'Drill mechanics and reaction speed until fully in the zone', scores:{speedy:4} },
-    { key:'C', text:'No prep — trust instinct and willpower in the moment', scores:{burst:3,speedy:2} },
-    { key:'D', text:'Test unconventional strategies to find unexpected edges', scores:{builder:4,futurist:2} },
+  { text:'重要對局前，你通常如何準備？', opts:[
+    { key:'A', text:'研究對手過往比賽，制定針對性計畫', scores:{tactical:4,sniper:2} },
+    { key:'B', text:'反覆練習手感和反應速度直到進入狀態', scores:{speedy:4} },
+    { key:'C', text:'不特別準備，相信臨場發揮和意志力', scores:{burst:3,speedy:2} },
+    { key:'D', text:'測試各種非主流打法，尋找意外優勢', scores:{builder:4,futurist:2} },
   ]},
-  { text:'How do you view resource management in games?', opts:[
-    { key:'A', text:'Resources extend overall strategy and need precise allocation', scores:{tactical:5} },
-    { key:'B', text:'Enough to get by — mobility is always the top priority', scores:{speedy:4,burst:1} },
-    { key:'C', text:'Concentrate everything at the single most critical burst point', scores:{burst:4,tactical:1} },
-    { key:'D', text:'Stay flexible and keep adjusting to whatever the game demands', scores:{builder:3,futurist:3} },
+  { text:'你如何看待遊戲中的資源管理？', opts:[
+    { key:'A', text:'資源是整體戰略的延伸，需要精算分配', scores:{tactical:5} },
+    { key:'B', text:'資源夠用就好，行動力才是第一優先', scores:{speedy:4,burst:1} },
+    { key:'C', text:'把資源集中在最關鍵的爆發點上', scores:{burst:4,tactical:1} },
+    { key:'D', text:'靈活分配，根據局勢不斷調整用途', scores:{builder:3,futurist:3} },
   ]},
-  { text:'Your attitude toward AI-assisted analysis tools?', opts:[
-    { key:'A', text:'Very useful — makes tactical planning sharper and faster', scores:{tactical:3,futurist:2} },
-    { key:'B', text:"Don't need them — my instincts and speed are the real weapon", scores:{speedy:4} },
-    { key:'C', text:'Love it — data is the key to finding hidden winning patterns', scores:{futurist:5,builder:1} },
-    { key:'D', text:'I check them, but always trust my own observation in the end', scores:{sniper:3,tactical:2} },
+  { text:'你對 AI 輔助分析工具的態度是？', opts:[
+    { key:'A', text:'很有用，能讓戰術制定更精準', scores:{tactical:3,futurist:2} },
+    { key:'B', text:'不需要，我的直覺和速度就是最強武器', scores:{speedy:4} },
+    { key:'C', text:'有趣，我喜歡用數據找到隱藏制勝模式', scores:{futurist:5,builder:1} },
+    { key:'D', text:'會參考，但最終靠自己的觀察判斷', scores:{sniper:3,tactical:2} },
   ]},
-  { text:'Facing a heavily defended opponent you cannot break through, you:', opts:[
-    { key:'A', text:'Wait patiently for their mistake — one gap is all you need', scores:{sniper:5,tactical:1} },
-    { key:'B', text:'Rapid movement creates multiple angles they struggle to cover', scores:{speedy:4,burst:1} },
-    { key:'C', text:'Apply relentless pressure until their structure collapses', scores:{burst:4} },
-    { key:'D', text:'Take an unconventional route that makes their whole defense useless', scores:{builder:4,futurist:2} },
+  { text:'面對防守嚴密打不進去的對手，你會？', opts:[
+    { key:'A', text:'耐心等待他們犯錯，一個破綻就夠了', scores:{sniper:5,tactical:1} },
+    { key:'B', text:'快速移動創造多個攻擊角度讓他難防', scores:{speedy:4,burst:1} },
+    { key:'C', text:'用大量壓力讓防守結構自己崩潰', scores:{burst:4} },
+    { key:'D', text:'嘗試非常規路線讓他的防守體系失效', scores:{builder:4,futurist:2} },
   ]},
-  { text:'How would you define your gaming style?', opts:[
-    { key:'A', text:'Meticulous planner — every decision has a clear reason behind it', scores:{tactical:5,sniper:1} },
-    { key:'B', text:'Speed-first intuitive — fast beats stable every time', scores:{speedy:5} },
-    { key:'C', text:'Burst breaker — go absolutely all out at the critical moment', scores:{burst:5} },
-    { key:'D', text:'Future-tech minded — fully embrace data and AI tools', scores:{futurist:5,builder:1} },
+  { text:'如果可以設計一個遊戲機制，你最想加入？', opts:[
+    { key:'A', text:'即時戰略地圖，讓指揮更有深度', scores:{tactical:5} },
+    { key:'B', text:'以速度與反應為核心的純粹對決系統', scores:{speedy:5} },
+    { key:'C', text:'高風險高報酬的爆發型技能機制', scores:{burst:4,builder:1} },
+    { key:'D', text:'自適應 AI 對手，會學習你的打法', scores:{futurist:5} },
   ]},
 ];
+
 const TYPES = {
-  tactical:{ num:'01',name:'Tactical Commander',nameEn:'TACTICAL COMMANDER',tags:['#Strategy','#Control','#Macro'],desc:'You naturally command the big picture and find order in chaos. Before every move, you map out the terrain and prioritize team outcome over personal glory. You are the brain of the squad — direction, resource allocation, and timing are your core strengths. Pressure only makes you sharper.',icon:`<circle cx="16" cy="16" r="13" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="16" r="5" stroke="#111" stroke-width="1.8"/><line x1="16" y1="3" x2="16" y2="11" stroke="#111" stroke-width="1.8"/><line x1="16" y1="21" x2="16" y2="29" stroke="#111" stroke-width="1.8"/><line x1="3" y1="16" x2="11" y2="16" stroke="#111" stroke-width="1.8"/><line x1="21" y1="16" x2="29" y2="16" stroke="#111" stroke-width="1.8"/>` },
-  speedy:  { num:'02',name:'Speed Hunter',nameEn:'SPEED HUNTER',tags:['#Reaction','#Mobility','#Fast Strike'],desc:'Your reflexes fire a beat faster than everyone else — mobility is your birthright. You thrive in millisecond decisions, using pure speed to dictate the pace. By the time opponents are thinking, you have already made three moves.',icon:`<polyline points="2,26 8,10 14,18 22,6" stroke="#111" stroke-width="2" fill="none" stroke-linejoin="round"/><polygon points="26,4 20,5 23,10" fill="#111"/><line x1="2" y1="29" x2="30" y2="29" stroke="#111" stroke-width="1.2"/>` },
-  burst:   { num:'03',name:'Burst Breaker',nameEn:'BURST BREAKER',tags:['#Power','#Aggression','#Impact'],desc:'You are the disruptor — born to shatter stalemates. You concentrate firepower at critical nodes and unleash overwhelming force. Your rhythm: charge, burst, reset. You believe that initiating is always better than waiting.',icon:`<polygon points="16,2 30,16 16,30 2,16" stroke="#111" stroke-width="1.8" fill="none"/><polygon points="16,9 23,16 16,23 9,16" fill="rgba(0,0,0,0.15)" stroke="#111" stroke-width="1.2"/><line x1="16" y1="2" x2="16" y2="9" stroke="#111" stroke-width="1.8"/><line x1="23" y1="16" x2="30" y2="16" stroke="#111" stroke-width="1.8"/>` },
-  sniper:  { num:'04',name:'Precision Sniper',nameEn:'PRECISION SNIPER',tags:['#Precision','#Focus','#Timing'],desc:'You do not believe in luck — only precision. Every action is backed by thorough observation and calculation. You outlast anyone in patience, waiting for the perfect moment. One-shot kills are not coincidence — they are the inevitable result of preparation.',icon:`<rect x="2" y="12" width="16" height="8" stroke="#111" stroke-width="1.8"/><line x1="18" y1="16" x2="28" y2="16" stroke="#111" stroke-width="2.5"/><circle cx="29" cy="16" r="2.5" fill="#111"/><line x1="8" y1="5" x2="8" y2="12" stroke="#111" stroke-width="1.2"/><line x1="8" y1="20" x2="8" y2="27" stroke="#111" stroke-width="1.2"/>` },
-  builder: { num:'05',name:'Creative Builder',nameEn:'CREATIVE BUILDER',tags:['#Creative','#Flexible','#Systems'],desc:'You love designing systems and exploring every combination. You spot the gaps in conventional metas and craft unexpected playstyles that are both fascinating and impossible to counter — because you yourself are the unpredictable variable.',icon:`<rect x="1" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="1" y="18" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="18" width="13" height="13" stroke="#111" stroke-width="1" stroke-dasharray="2 1.5"/><line x1="14" y1="7.5" x2="18" y2="7.5" stroke="#111" stroke-width="1.2"/><line x1="7.5" y1="14" x2="7.5" y2="18" stroke="#111" stroke-width="1.2"/>` },
-  futurist:{ num:'06',name:'Future Controller',nameEn:'FUTURE CONTROLLER',tags:['#AI','#Adaptive','#Next-Gen'],desc:'You are the closest thing to human-machine symbiosis. You learn opponent behavior patterns in real time and adjust like an algorithm continuously optimizing. You are not thinking about this match — you are thinking about the next meta.',icon:`<circle cx="16" cy="16" r="10" stroke="#111" stroke-width="1.8"/><path d="M16 6 C20 6,24 11,24 16 C24 21,20 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><path d="M16 6 C12 6,8 11,8 16 C8 21,12 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><line x1="6" y1="16" x2="26" y2="16" stroke="#111" stroke-width="1.2"/><line x1="16" y1="1" x2="16" y2="6" stroke="#111" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="31" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="1" r="2" fill="#111"/><circle cx="16" cy="31" r="2" fill="#111"/>` },
+  tactical:{ num:'01',name:'戰術指揮者',nameEn:'TACTICAL COMMANDER',tags:['#策略','#掌控','#全局意識'],desc:'你天生具備統籌全局的能力，能在混亂中找出秩序。習慣在行動前建立心理地圖，優先考量整體利益而非個人表現。你是隊伍的大腦，指揮、資源分配與時機判斷是你的核心優勢，高壓下反而更冷靜。',icon:`<circle cx="16" cy="16" r="13" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="16" r="5" stroke="#111" stroke-width="1.8"/><line x1="16" y1="3" x2="16" y2="11" stroke="#111" stroke-width="1.8"/><line x1="16" y1="21" x2="16" y2="29" stroke="#111" stroke-width="1.8"/><line x1="3" y1="16" x2="11" y2="16" stroke="#111" stroke-width="1.8"/><line x1="21" y1="16" x2="29" y2="16" stroke="#111" stroke-width="1.8"/>` },
+  speedy:  { num:'02',name:'極速獵手',nameEn:'SPEED HUNTER',tags:['#反應','#機動','#快速出擊'],desc:'你的神經反射比常人快一拍，機動性是你的天賦。享受毫秒間決策的快感，透過速度壓制對手節奏。打法流暢且直覺導向，對手還在思考的時候，你已完成了三個動作。',icon:`<polyline points="2,26 8,10 14,18 22,6" stroke="#111" stroke-width="2" fill="none" stroke-linejoin="round"/><polygon points="26,4 20,5 23,10" fill="#111"/><line x1="2" y1="29" x2="30" y2="29" stroke="#111" stroke-width="1.2"/>` },
+  burst:   { num:'03',name:'爆發破局者',nameEn:'BURST BREAKER',tags:['#效能','#侵略','#衝擊力'],desc:'你是場上的破壞者，專為打破僵局而生。喜歡集中火力在關鍵節點發動壓倒性攻勢。遊戲節奏是蓄力→爆發→重置，你相信主動出擊永遠優於被動等待。',icon:`<polygon points="16,2 30,16 16,30 2,16" stroke="#111" stroke-width="1.8" fill="none"/><polygon points="16,9 23,16 16,23 9,16" fill="rgba(0,0,0,0.15)" stroke="#111" stroke-width="1.2"/><line x1="16" y1="2" x2="16" y2="9" stroke="#111" stroke-width="1.8"/><line x1="23" y1="16" x2="30" y2="16" stroke="#111" stroke-width="1.8"/>` },
+  sniper:  { num:'04',name:'精準狙擊手',nameEn:'PRECISION SNIPER',tags:['#準確','#專注','#時機掌握'],desc:'你不相信運氣，只相信精準。每一個動作背後都有充分的觀察與計算，比任何人都更有耐心等待最佳時機。一擊必殺不是巧合，是積累的必然結果。',icon:`<rect x="2" y="12" width="16" height="8" stroke="#111" stroke-width="1.8"/><line x1="18" y1="16" x2="28" y2="16" stroke="#111" stroke-width="2.5"/><circle cx="29" cy="16" r="2.5" fill="#111"/><line x1="8" y1="5" x2="8" y2="12" stroke="#111" stroke-width="1.2"/><line x1="8" y1="20" x2="8" y2="27" stroke="#111" stroke-width="1.2"/>` },
+  builder: { num:'05',name:'創造建構者',nameEn:'CREATIVE BUILDER',tags:['#創造','#靈活','#組合思維'],desc:'你享受設計系統與組合可能性的過程。善於發現常規套路的漏洞並創造非預期打法，你的風格既有趣又難以被反制，因為你本身就是不可預測的變數。',icon:`<rect x="1" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="1" y="18" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="18" width="13" height="13" stroke="#111" stroke-width="1" stroke-dasharray="2 1.5"/><line x1="14" y1="7.5" x2="18" y2="7.5" stroke="#111" stroke-width="1.2"/><line x1="7.5" y1="14" x2="7.5" y2="18" stroke="#111" stroke-width="1.2"/>` },
+  futurist:{ num:'06',name:'未來操控者',nameEn:'FUTURE CONTROLLER',tags:['#AI','#適應','#次世代'],desc:'你是最接近「人機共生」型態的玩家。擅長學習對手行為模式並即時調整，像演算法一樣持續優化策略。你看的不是這一局，而是下一個版本。',icon:`<circle cx="16" cy="16" r="10" stroke="#111" stroke-width="1.8"/><path d="M16 6 C20 6,24 11,24 16 C24 21,20 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><path d="M16 6 C12 6,8 11,8 16 C8 21,12 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><line x1="6" y1="16" x2="26" y2="16" stroke="#111" stroke-width="1.2"/><line x1="16" y1="1" x2="16" y2="6" stroke="#111" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="31" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="1" r="2" fill="#111"/><circle cx="16" cy="31" r="2" fill="#111"/>` },
 };
 const TYPE_ORDER = ['tactical','speedy','burst','sniper','builder','futurist'];
-const TYPE_NAMES = { tactical:'Tactical Commander',speedy:'Speed Hunter',burst:'Burst Breaker',sniper:'Precision Sniper',builder:'Creative Builder',futurist:'Future Controller' };
+const TYPE_NAMES = { tactical:'戰術指揮者',speedy:'極速獵手',burst:'爆發破局者',sniper:'精準狙擊手',builder:'創造建構者',futurist:'未來操控者' };
 
 let currentQ=0, answers={}, capturedPhoto=null, stream=null, countdownTimer=null, counting=false;
 
@@ -512,7 +514,7 @@ function stopCamera() {
 
 function resetCD(n) {
   document.getElementById('countdown-num').textContent = n;
-  document.getElementById('countdown-label').textContent = 'READY? HIT SHOOT';
+  document.getElementById('countdown-label').textContent = '準備好後按下拍照';
   document.getElementById('ring-fill').style.strokeDashoffset = '0';
   document.getElementById('shoot-btn').disabled = false;
   counting=false;
@@ -630,7 +632,7 @@ async function showResult() {
   TYPE_ORDER.forEach(t => { scores[t] = totals[t]; });
 
   try {
-    // Step 1: call Gemini if photo was taken
+    // Step 1: 有拍照才呼叫 Gemini
     let finalPhoto = capturedPhoto || null;
     if (capturedPhoto) {
       try {
@@ -653,7 +655,7 @@ async function showResult() {
       }
     }
 
-    document.getElementById('qr-status').textContent = 'Saving result...';
+    document.getElementById('qr-status').textContent = '儲存結果中...';
 
     // Step 2: 存結果拿 QR Code
     const saveRes = await fetch(`${API_URL}/api/save`, {
@@ -669,7 +671,7 @@ async function showResult() {
       })
     });
     const saveData = await saveRes.json();
-    if (saveData.url) generateQR(saveData.url + '?lang=en');
+    if (saveData.url) generateQR(saveData.url + '?lang=zh');
 
   } catch(e) {
     console.warn('API 失敗', e);
@@ -684,7 +686,7 @@ function generateQR(url) {
     el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:Share Tech Mono,monospace;font-size:14px;color:#999;letter-spacing:2px">生成中...</div>';
     return;
   }
-  document.getElementById('qr-status').textContent = 'Scan to get your result';
+  document.getElementById('qr-status').textContent = '掃描取得你的結果照片';
   new QRCode(el, {
     text: url,
     width: 360, height: 360,
