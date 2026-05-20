@@ -368,8 +368,8 @@ Come back tomorrow to discover your Gamer DNA!</div>
         <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Share Tech Mono',monospace;font-size:14px;color:#999;letter-spacing:2px">生成中...</div>
       </div>
       <div class="qr-info">
-        <div class="qr-info-title">取得照片</div>
-        <div class="qr-info-sub" id="qr-status">答題完成後自動生成</div>
+        <div class="qr-info-title">Get Picture</div>
+        <div class="qr-info-sub" id="qr-status">Automatically generated after answering the questions.</div>
       </div>
     </div>
 
@@ -624,7 +624,7 @@ async function showResult() {
 
   // ── 答完題才呼叫 Gemini 生成機械臉，再存檔拿 QR Code ──
   generateQR(null);
-  document.getElementById('qr-status').textContent = 'AI 生成機械臉中...';
+  document.getElementById('qr-status').textContent = 'AI-generated faces...';
 
   const scores = {};
   TYPE_ORDER.forEach(t => { scores[t] = totals[t]; });
@@ -681,7 +681,7 @@ function generateQR(url) {
   const el = document.getElementById('qr-code-box');
   el.innerHTML = '';
   if (!url) {
-    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:Share Tech Mono,monospace;font-size:14px;color:#999;letter-spacing:2px">生成中...</div>';
+    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:Share Tech Mono,monospace;font-size:14px;color:#999;letter-spacing:2px">Generating...</div>';
     return;
   }
   document.getElementById('qr-status').textContent = 'Scan to get your result';
@@ -705,9 +705,9 @@ function scaleApp(){
 }
 scaleApp(); window.addEventListener('resize',scaleApp);
 
-// ── 閒置偵測：30秒無操作跳回首頁 ──
+// ── 閒置偵測：60秒無操作跳回首頁 ──
 let _idleTimer = null;
-const IDLE_SEC = 60;
+const IDLE_SEC = 120;
 
 function resetIdle() {
   if (_idleTimer) clearTimeout(_idleTimer);
