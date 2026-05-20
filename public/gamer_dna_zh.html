@@ -608,9 +608,9 @@ async function showResult() {
   showScreen('screen-result');
   document.getElementById('screen-result').scrollTop=0;
 
-  // 結果頁 30 秒後自動跳回語言選擇首頁
+  // 結果頁 120 秒後自動跳回語言選擇首頁
   if (window._resultTimer) clearInterval(window._resultTimer);
-  let _t = 60;
+  let _t = 120;
   const _btn = document.querySelector('#screen-result .big-btn.outline');
   const _origTxt = _btn ? _btn.textContent : '';
   if (_btn) _btn.textContent = `${_origTxt.trim()} (60s)`;
@@ -707,9 +707,9 @@ function scaleApp(){
 }
 scaleApp(); window.addEventListener('resize',scaleApp);
 
-// ── 閒置偵測：30秒無操作跳回首頁 ──
+// ── 閒置偵測：120秒無操作跳回首頁 ──
 let _idleTimer = null;
-const IDLE_SEC = 60;
+const IDLE_SEC = 120;
 
 function resetIdle() {
   if (_idleTimer) clearTimeout(_idleTimer);
