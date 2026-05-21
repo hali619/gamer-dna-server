@@ -122,26 +122,14 @@ app.post('/api/cyber-scan', async (req, res) => {
   const finalType = TYPE_STYLE[type] ? type : 'tactical';
   const MAX_RETRY = 3;
   let lastErr = null;
-  let aborted = false;
-
-  // 偵測用戶是否提前離開
-  req.on('close', () => {
-    if (!res.headersSent) {
-      aborted = true;
-      dailyCount = Math.max(0, dailyCount - 1);
-      console.log('[ROG-GEN] 用戶已離開，退回配額');
-    }
-  });
 
   for (let i = 0; i < MAX_RETRY; i++) {
-    if (aborted) return;
     try {
       if (i > 0) {
         console.log(`[ROG-GEN] 重試第 ${i} 次...`);
         await new Promise(r => setTimeout(r, 2000 * i));
       }
       const cyberPhoto = await generateCyberFace(photo, finalType);
-      if (aborted) return;
       return res.json({ cyberPhoto });
     } catch (err) {
       lastErr = err;
@@ -151,8 +139,6 @@ app.post('/api/cyber-scan', async (req, res) => {
     }
   }
 
-  if (aborted) return;
-  // 全部失敗，退回配額
   dailyCount = Math.max(0, dailyCount - 1);
   console.error('[SERVER ERROR] 最終失敗，退回配額');
   res.status(500).json({ error: lastErr?.message || '生成失敗' });
