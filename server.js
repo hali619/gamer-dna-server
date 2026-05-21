@@ -49,6 +49,7 @@ const TYPE_STYLE = {
   sniper:   `TYPE: PRECISION SNIPER. Expression: Eerily calm, one eye slightly narrowed, absolute stillness and patience. HUD: Optical targeting crosshair overlay with wind and distance data. Detail: Tactical collar/hood framing the face. Secondary light: Ice-blue cold fill from one side, deep shadow on the other.`,
   builder:  `TYPE: CREATIVE BUILDER. Expression: Confident smirk, head slightly tilted — always thinking three steps ahead. HUD: Synthesis engine node map and circuit connections floating around the hands. Detail: Modular jacket panels with interchangeable components. Secondary light: Purple-green dual accent.`,
   futurist: `TYPE: FUTURE CONTROLLER. Expression: Serene and visionary, eyes with a faint digital teal glow — seeing what others cannot. HUD: AI Core Sync neural network visualization, data stream flows at 99%. Detail: Nano-material jacket with embedded LED matrix. Secondary light: Holographic teal from above.`,
+  support:  `TYPE: SUPPORT GUARDIAN. Expression: Warm, calm, and reassuring — the steady presence that holds the team together. HUD: Team status overlay showing ally HP bars, buff timers, and shield icons surrounding the subject. Detail: ROG jacket with glowing support-module badges, medical cross emblem on the shoulder. Secondary light: Soft warm gold from above, protective and nurturing aura.`,
 };
 
 // ════════════════════════════════════════
@@ -121,23 +122,36 @@ app.post('/api/cyber-scan', async (req, res) => {
   const finalType = TYPE_STYLE[type] ? type : 'tactical';
   const MAX_RETRY = 3;
   let lastErr = null;
+  let aborted = false;
+
+  // 偵測用戶是否提前離開
+  req.on('close', () => {
+    if (!res.headersSent) {
+      aborted = true;
+      dailyCount = Math.max(0, dailyCount - 1);
+      console.log('[ROG-GEN] 用戶已離開，退回配額');
+    }
+  });
 
   for (let i = 0; i < MAX_RETRY; i++) {
+    if (aborted) return;
     try {
       if (i > 0) {
         console.log(`[ROG-GEN] 重試第 ${i} 次...`);
         await new Promise(r => setTimeout(r, 2000 * i));
       }
       const cyberPhoto = await generateCyberFace(photo, finalType);
+      if (aborted) return;
       return res.json({ cyberPhoto });
     } catch (err) {
       lastErr = err;
       const isRetryable = err.message && (err.message.includes('503') || err.message.includes('500') || err.message.includes('INTERNAL') || err.message.includes('UNAVAILABLE'));
       console.error(`[SERVER ERROR] 第${i+1}次: ${err.message}`);
-      if (!isRetryable) break; // 非暫時性錯誤不重試
+      if (!isRetryable) break;
     }
   }
 
+  if (aborted) return;
   // 全部失敗，退回配額
   dailyCount = Math.max(0, dailyCount - 1);
   console.error('[SERVER ERROR] 最終失敗，退回配額');
