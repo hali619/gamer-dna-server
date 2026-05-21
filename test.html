@@ -57,6 +57,15 @@ label { font-size: 11px; letter-spacing: 3px; color: #666; display: block; margi
 
 <h1>▶ ROG DNA — IMAGE GENERATION TEST</h1>
 
+<div id="quota-bar" style="background:#111;border:1px solid #222;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+  <span style="font-size:11px;letter-spacing:3px;color:#666">TODAY'S QUOTA</span>
+  <span id="quota-txt" style="font-size:14px;letter-spacing:2px;color:#fff">載入中...</span>
+  <div style="flex:1;height:4px;background:#222;border-radius:2px;min-width:100px;">
+    <div id="quota-fill" style="height:100%;background:#ff0000;border-radius:2px;width:0%;transition:width 0.5s ease;"></div>
+  </div>
+  <button onclick="loadQuota()" style="background:transparent;border:1px solid #333;color:#666;font-family:inherit;font-size:10px;letter-spacing:2px;padding:6px 12px;cursor:pointer;">↻ 更新</button>
+</div>
+
 <div class="row">
 
   <!-- 左：上傳 + 設定 -->
@@ -77,6 +86,7 @@ label { font-size: 11px; letter-spacing: 3px; color: #666; display: block; margi
       <button class="type-btn" data-type="sniper">SNIPER<br><span style="opacity:0.5">精準狙擊手</span></button>
       <button class="type-btn" data-type="builder">BUILDER<br><span style="opacity:0.5">創造建構者</span></button>
       <button class="type-btn" data-type="futurist">FUTURIST<br><span style="opacity:0.5">未來操控者</span></button>
+      <button class="type-btn" data-type="support">SUPPORT<br><span style="opacity:0.5">支援守護者</span></button>
     </div>
 
     <button id="gen-btn" disabled>▶ &nbsp; GENERATE</button>
@@ -94,6 +104,21 @@ label { font-size: 11px; letter-spacing: 3px; color: #666; display: block; margi
 
 <script>
 const API_URL = 'https://gamer-dna.zeabur.app';
+
+async function loadQuota() {
+  try {
+    const res  = await fetch(API_URL + '/api/quota');
+    const data = await res.json();
+    const pct  = Math.round((data.used / data.limit) * 100);
+    document.getElementById('quota-txt').textContent =
+      `${data.used} / ${data.limit} 人 (剩餘 ${data.remaining}) ${data.full ? '🔴 額滿' : '🟢 開放中'}`;
+    document.getElementById('quota-txt').style.color = data.full ? '#ff4444' : '#00ff88';
+    document.getElementById('quota-fill').style.width = pct + '%';
+  } catch(e) {
+    document.getElementById('quota-txt').textContent = '無法取得名額資訊';
+  }
+}
+loadQuota();
 let photoBase64 = null;
 let selectedType = 'tactical';
 let startTime = null;
