@@ -368,11 +368,12 @@ Come back tomorrow to discover your Gamer DNA!</div>
         <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Share Tech Mono',monospace;font-size:14px;color:#999;letter-spacing:2px">生成中...</div>
       </div>
       <div class="qr-info">
-        <div class="qr-info-title">Get Picture</div>
-        <div class="qr-info-sub" id="qr-status">Automatically generated after answering the questions.</div>
+        <div class="qr-info-title">取得照片</div>
+        <div class="qr-info-sub" id="qr-status">答題完成後自動生成</div>
       </div>
     </div>
 
+  <button id="retry-ai-btn" class="big-btn outline" style="display:none;position:absolute;top:1580px;left:80px;width:920px;height:100px;font-size:28px;letter-spacing:4px;color:#111 !important;background:#fff !important;border:1.5px solid #111;" onclick="retryAI()">↻ &nbsp; Retry AI Generation</button>
   <button class="big-btn outline" style="position:absolute;top:1720px;left:80px;width:920px;height:120px;font-size:42px;letter-spacing:8px;color:#111111 !important;background:#ffffff !important;border:2px solid #111111;" onclick="restart()">重新鑑定</button>
 </div>
 
@@ -391,12 +392,14 @@ const QUESTIONS = [
     { key:'B', text:'Scout — fastest movement, maximum mobility', scores:{speedy:5} },
     { key:'C', text:'Assault — highest burst damage, one-shot carry potential', scores:{burst:5} },
     { key:'D', text:'Sniper — long-range precision, requires patience and observation', scores:{sniper:5} },
+    { key:'E', text:'Support — healer or buffer who keeps teammates at peak performance', scores:{support:5} },
   ]},
   { text:'What is your usual role in team fights?', opts:[
     { key:'A', text:'Call targets and decide when to push or pull back', scores:{tactical:5,sniper:1} },
     { key:'B', text:'Flank and create chaos for your team to follow up', scores:{speedy:3,burst:2} },
     { key:'C', text:'Lead the charge and break the line first', scores:{burst:4,speedy:1} },
     { key:'D', text:'Deliver precise damage from a safe position', scores:{sniper:4,tactical:1} },
+    { key:'E', text:'Protect teammates and keep everyone alive and buffed', scores:{support:5} },
   ]},
   { text:'Facing a powerful new strategy you have never seen, you:', opts:[
     { key:'A', text:'Quickly break down the logic and find the best counter', scores:{tactical:4,futurist:2} },
@@ -409,6 +412,7 @@ const QUESTIONS = [
     { key:'B', text:'Speed and rhythm they simply cannot keep up with', scores:{speedy:4,burst:1} },
     { key:'C', text:'A devastating strike at the moment they least expect', scores:{burst:4,sniper:1} },
     { key:'D', text:'A combo they never anticipated, leaving them completely lost', scores:{builder:5,futurist:2} },
+    { key:'E', text:'Enable every teammate to shine — win together as a unit', scores:{support:5} },
   ]},
   { text:'How do you prepare before an important match?', opts:[
     { key:'A', text:'Study opponent history and build a targeted game plan', scores:{tactical:4,sniper:2} },
@@ -447,10 +451,11 @@ const TYPES = {
   burst:   { num:'03',name:'Burst Breaker',nameEn:'BURST BREAKER',tags:['#Power','#Aggression','#Impact'],desc:'You are the disruptor — born to shatter stalemates. You concentrate firepower at critical nodes and unleash overwhelming force. Your rhythm: charge, burst, reset. You believe that initiating is always better than waiting.',icon:`<polygon points="16,2 30,16 16,30 2,16" stroke="#111" stroke-width="1.8" fill="none"/><polygon points="16,9 23,16 16,23 9,16" fill="rgba(0,0,0,0.15)" stroke="#111" stroke-width="1.2"/><line x1="16" y1="2" x2="16" y2="9" stroke="#111" stroke-width="1.8"/><line x1="23" y1="16" x2="30" y2="16" stroke="#111" stroke-width="1.8"/>` },
   sniper:  { num:'04',name:'Precision Sniper',nameEn:'PRECISION SNIPER',tags:['#Precision','#Focus','#Timing'],desc:'You do not believe in luck — only precision. Every action is backed by thorough observation and calculation. You outlast anyone in patience, waiting for the perfect moment. One-shot kills are not coincidence — they are the inevitable result of preparation.',icon:`<rect x="2" y="12" width="16" height="8" stroke="#111" stroke-width="1.8"/><line x1="18" y1="16" x2="28" y2="16" stroke="#111" stroke-width="2.5"/><circle cx="29" cy="16" r="2.5" fill="#111"/><line x1="8" y1="5" x2="8" y2="12" stroke="#111" stroke-width="1.2"/><line x1="8" y1="20" x2="8" y2="27" stroke="#111" stroke-width="1.2"/>` },
   builder: { num:'05',name:'Creative Builder',nameEn:'CREATIVE BUILDER',tags:['#Creative','#Flexible','#Systems'],desc:'You love designing systems and exploring every combination. You spot the gaps in conventional metas and craft unexpected playstyles that are both fascinating and impossible to counter — because you yourself are the unpredictable variable.',icon:`<rect x="1" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="1" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="1" y="18" width="13" height="13" stroke="#111" stroke-width="1.8"/><rect x="18" y="18" width="13" height="13" stroke="#111" stroke-width="1" stroke-dasharray="2 1.5"/><line x1="14" y1="7.5" x2="18" y2="7.5" stroke="#111" stroke-width="1.2"/><line x1="7.5" y1="14" x2="7.5" y2="18" stroke="#111" stroke-width="1.2"/>` },
-  futurist:{ num:'06',name:'Future Controller',nameEn:'FUTURE CONTROLLER',tags:['#AI','#Adaptive','#Next-Gen'],desc:'You are the closest thing to human-machine symbiosis. You learn opponent behavior patterns in real time and adjust like an algorithm continuously optimizing. You are not thinking about this match — you are thinking about the next meta.',icon:`<circle cx="16" cy="16" r="10" stroke="#111" stroke-width="1.8"/><path d="M16 6 C20 6,24 11,24 16 C24 21,20 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><path d="M16 6 C12 6,8 11,8 16 C8 21,12 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><line x1="6" y1="16" x2="26" y2="16" stroke="#111" stroke-width="1.2"/><line x1="16" y1="1" x2="16" y2="6" stroke="#111" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="31" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="1" r="2" fill="#111"/><circle cx="16" cy="31" r="2" fill="#111"/>` },
+  futurist:{ num:'06',name:'Future Controller',nameEn:'FUTURE CONTROLLER',tags:['#AI','#Adaptive','#Next-Gen'],desc:'You are the closest thing to human-machine symbiosis. You learn opponent behavior patterns in real time and adjust like an algorithm continuously optimizing. You are not thinking about this match — you are thinking about the next meta.',icon:`<circle cx="16" cy="16" r="10" stroke="#111" stroke-width="1.8"/><path d="M16 6 C20 6,24 11,24 16 C24 21,20 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><path d="M16 6 C12 6,8 11,8 16 C8 21,12 26,16 26" stroke="#111" stroke-width="1.2" fill="none"/><line x1="6" y1="16" x2="26" y2="16" stroke="#111" stroke-width="1.2"/><line x1="16" y1="1" x2="16" y2="6" stroke="#111" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="31" stroke="#111" stroke-width="1.8"/><circle cx="16" cy="1" r="2" fill="#111"/><circle cx="16" cy="31" r="2" fill="#111"/>` },,
+  support: { num:'07',name:'Support Guardian',nameEn:'SUPPORT GUARDIAN',tags:['#Support','#Teamwork','#Guardian'],desc:'Your presence enables your teammates to perform at their peak. You do not chase personal kill counts — every decision you make raises the team survival rate. Victory for you is a collective achievement, not personal glory. You are the force behind making others shine.',icon:`<circle cx='16' cy='16' r='13' stroke='#111' stroke-width='1.8' fill='none'/><path d='M10 16 C10 12,13 9,16 9 C19 9,22 12,22 16' stroke='#111' stroke-width='1.8' fill='none'/><line x1='16' y1='9' x2='16' y2='5' stroke='#111' stroke-width='1.8'/><circle cx='16' cy='4' r='2' fill='#111'/><line x1='10' y1='16' x2='10' y2='22' stroke='#111' stroke-width='1.5'/><line x1='22' y1='16' x2='22' y2='22' stroke='#111' stroke-width='1.5'/><line x1='8' y1='22' x2='24' y2='22' stroke='#111' stroke-width='1.8'/>` },
 };
-const TYPE_ORDER = ['tactical','speedy','burst','sniper','builder','futurist'];
-const TYPE_NAMES = { tactical:'Tactical Commander',speedy:'Speed Hunter',burst:'Burst Breaker',sniper:'Precision Sniper',builder:'Creative Builder',futurist:'Future Controller' };
+const TYPE_ORDER = ['tactical','speedy','burst','sniper','builder','futurist','support'];
+const TYPE_NAMES = { tactical:'Tactical Commander',speedy:'Speed Hunter',burst:'Burst Breaker',sniper:'Precision Sniper',builder:'Creative Builder',futurist:'Future Controller',support:'Support Guardian' };
 
 let currentQ=0, answers={}, capturedPhoto=null, stream=null, countdownTimer=null, counting=false;
 
@@ -590,6 +595,7 @@ async function showResult() {
   const totals={}; TYPE_ORDER.forEach(t=>totals[t]=0);
   QUESTIONS.forEach((q,i)=>{ const opt=q.opts.find(o=>o.key===answers[i]); if(!opt) return; Object.entries(opt.scores).forEach(([t,v])=>{ totals[t]=(totals[t]||0)+v; }); });
   const winner=Object.entries(totals).sort((a,b)=>b[1]-a[1])[0][0];
+  window._lastWinner = winner;
   const type=TYPES[winner], max=Math.max(...Object.values(totals));
 
   const img=document.getElementById('result-photo'), nm=document.getElementById('no-photo-msg');
@@ -606,12 +612,12 @@ async function showResult() {
   showScreen('screen-result');
   document.getElementById('screen-result').scrollTop=0;
 
-  // 結果頁 120 秒後自動跳回語言選擇首頁
+  // 結果頁 30 秒後自動跳回語言選擇首頁
   if (window._resultTimer) clearInterval(window._resultTimer);
-  let _t = 120;
+  let _t = 180;
   const _btn = document.querySelector('#screen-result .big-btn.outline');
   const _origTxt = _btn ? _btn.textContent : '';
-  if (_btn) _btn.textContent = `${_origTxt.trim()} (60s)`;
+  if (_btn) _btn.textContent = `${_origTxt.trim()} (180s)`;
   window._resultTimer = setInterval(() => {
     _t--;
     if (_btn) _btn.textContent = `${_origTxt.trim()} (${_t}s)`;
@@ -624,7 +630,7 @@ async function showResult() {
 
   // ── 答完題才呼叫 Gemini 生成機械臉，再存檔拿 QR Code ──
   generateQR(null);
-  document.getElementById('qr-status').textContent = 'AI-generated faces...';
+  document.getElementById('qr-status').textContent = 'AI 生成機械臉中...';
 
   const scores = {};
   TYPE_ORDER.forEach(t => { scores[t] = totals[t]; });
@@ -650,6 +656,9 @@ async function showResult() {
         }
       } catch(e) {
         console.warn('機械臉生成失敗，使用原始照片', e);
+        document.getElementById('qr-status').textContent = 'AI generation failed, showing original photo';
+        const retryBtn = document.getElementById('retry-ai-btn');
+        if (retryBtn) retryBtn.style.display = 'block';
       }
     }
 
@@ -681,7 +690,7 @@ function generateQR(url) {
   const el = document.getElementById('qr-code-box');
   el.innerHTML = '';
   if (!url) {
-    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:Share Tech Mono,monospace;font-size:14px;color:#999;letter-spacing:2px">Generating...</div>';
+    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:Share Tech Mono,monospace;font-size:14px;color:#999;letter-spacing:2px">生成中...</div>';
     return;
   }
   document.getElementById('qr-status').textContent = 'Scan to get your result';
@@ -691,6 +700,33 @@ function generateQR(url) {
     colorDark: '#111111',
     colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.M
+  });
+}
+
+function retryAI() {
+  const btn = document.getElementById('retry-ai-btn');
+  if (btn) btn.style.display = 'none';
+  document.getElementById('qr-status').textContent = 'AI generating...';
+  fetch(`${API_URL}/api/cyber-scan`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ photo: capturedPhoto, type: window._lastWinner })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.cyberPhoto) {
+      const img = document.getElementById('result-photo');
+      if (img) { img.src = data.cyberPhoto; img.style.display = 'block'; }
+      document.getElementById('no-photo-msg').style.display = 'none';
+      document.getElementById('qr-status').textContent = 'Scan to get your result';
+    } else {
+      document.getElementById('qr-status').textContent = 'AI generation failed, showing original photo';
+      if (btn) btn.style.display = 'block';
+    }
+  })
+  .catch(() => {
+    document.getElementById('qr-status').textContent = 'AI generation failed, showing original photo';
+    if (btn) btn.style.display = 'block';
   });
 }
 
@@ -705,9 +741,9 @@ function scaleApp(){
 }
 scaleApp(); window.addEventListener('resize',scaleApp);
 
-// ── 閒置偵測：120秒無操作跳回首頁 ──
+// ── 閒置偵測：180秒無操作跳回首頁 ──
 let _idleTimer = null;
-const IDLE_SEC = 120;
+const IDLE_SEC = 180;
 
 function resetIdle() {
   if (_idleTimer) clearTimeout(_idleTimer);
