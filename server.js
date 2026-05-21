@@ -119,14 +119,29 @@ app.post('/api/cyber-scan', async (req, res) => {
   }
 
   const finalType = TYPE_STYLE[type] ? type : 'tactical';
-  try {
-    const cyberPhoto = await generateCyberFace(photo, finalType);
-    res.json({ cyberPhoto });
-  } catch (err) {
-    dailyCount = Math.max(0, dailyCount - 1);
-    console.error('[SERVER ERROR]:', err.message);
-    res.status(500).json({ error: err.message });
+  const MAX_RETRY = 3;
+  let lastErr = null;
+
+  for (let i = 0; i < MAX_RETRY; i++) {
+    try {
+      if (i > 0) {
+        console.log(`[ROG-GEN] 重試第 ${i} 次...`);
+        await new Promise(r => setTimeout(r, 2000 * i));
+      }
+      const cyberPhoto = await generateCyberFace(photo, finalType);
+      return res.json({ cyberPhoto });
+    } catch (err) {
+      lastErr = err;
+      const isRetryable = err.message && (err.message.includes('503') || err.message.includes('500') || err.message.includes('INTERNAL') || err.message.includes('UNAVAILABLE'));
+      console.error(`[SERVER ERROR] 第${i+1}次: ${err.message}`);
+      if (!isRetryable) break; // 非暫時性錯誤不重試
+    }
   }
+
+  // 全部失敗，退回配額
+  dailyCount = Math.max(0, dailyCount - 1);
+  console.error('[SERVER ERROR] 最終失敗，退回配額');
+  res.status(500).json({ error: lastErr?.message || '生成失敗' });
 });
 
 app.post('/api/save', (req, res) => {
