@@ -741,16 +741,21 @@ function restart(){ window.location.href='gamer_dna.html'; }
 function scaleApp(){
   const w=document.getElementById('app-wrapper');
   const s=Math.min(window.innerWidth/1080,window.innerHeight/1920);
-  const ox=Math.max(0,(window.innerWidth -1080*s)/2);
-  const oy=Math.max(0,(window.innerHeight-1920*s)/2);
-  w.style.transformOrigin='0 0';
-  w.style.transform=`scale(${s})`;
-  w.style.left=ox+'px';
-  w.style.top =oy+'px';
+  const ox=(window.innerWidth-1080*s)/2, oy=(window.innerHeight-1920*s)/2;
+  w.style.transform=`translate(${ox}px,${oy}px) scale(${s})`;
 }
 scaleApp(); window.addEventListener('resize',scaleApp);
 
-// ── 閒置偵測：180秒無操作跳回首頁 ──
+// 頁面載入時檢查今日配額
+(async () => {
+  try {
+    const res  = await fetch(API_URL + '/api/quota');
+    const data = await res.json();
+    if (data.full) showScreen('screen-full');
+  } catch(e) {}
+})();
+
+// ── 閒置偵測：30秒無操作跳回首頁 ──
 let _idleTimer = null;
 const IDLE_SEC = 180;
 
