@@ -17,11 +17,19 @@ const DAILY_LIMIT = parseInt(process.env.DAILY_LIMIT || '500');
 let dailyCount = 0;
 let dailyDate  = new Date().toDateString();
 
+// ── 類型統計 ──
+const TYPE_KEYS = ['tactical','speedy','burst','sniper','builder','futurist','support'];
+let typeStats = {};
+TYPE_KEYS.forEach(t => typeStats[t] = 0);
+let totalGenerated = 0;
+
 function checkAndCount() {
   const today = new Date().toDateString();
   if (today !== dailyDate) {
     dailyDate  = today;
     dailyCount = 0;
+    TYPE_KEYS.forEach(t => typeStats[t] = 0);
+    totalGenerated = 0;
     console.log('[QUOTA] 新的一天，計數重置');
   }
   if (dailyCount >= DAILY_LIMIT) return false;
@@ -130,6 +138,8 @@ app.post('/api/cyber-scan', async (req, res) => {
         await new Promise(r => setTimeout(r, 2000 * i));
       }
       const cyberPhoto = await generateCyberFace(photo, finalType);
+      typeStats[finalType] = (typeStats[finalType] || 0) + 1;
+      totalGenerated++;
       return res.json({ cyberPhoto });
     } catch (err) {
       lastErr = err;
@@ -169,6 +179,15 @@ app.get('/api/quota', (req, res) => {
     used: dailyCount,
     remaining,
     full: remaining <= 0,
+  });
+});
+
+app.get('/api/stats', (req, res) => {
+  const today = new Date().toDateString();
+  if (today !== dailyDate) { dailyDate = today; dailyCount = 0; TYPE_KEYS.forEach(t => typeStats[t] = 0); totalGenerated = 0; }
+  res.json({
+    total: totalGenerated,
+    types: { ...typeStats },
   });
 });
 
