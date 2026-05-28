@@ -75,6 +75,16 @@ body {
 
 .last-update { font-size:9px; color:#333; letter-spacing:2px; margin-top:16px; }
 
+/* 類型統計 */
+.stats-card { width:100%; max-width:480px; background:#111; border:1px solid #1e1e1e; padding:32px 36px; margin-top:1px; }
+.stats-title { font-size:10px; letter-spacing:5px; color:#444; margin-bottom:24px; }
+.stat-row { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.stat-label { font-size:10px; letter-spacing:1px; color:#666; width:160px; flex-shrink:0; }
+.stat-bar-bg { flex:1; height:5px; background:#1e1e1e; }
+.stat-bar-fill { height:100%; background:#ff0000; transition:width 0.6s ease; }
+.stat-num { font-size:12px; color:#fff; width:30px; text-align:right; flex-shrink:0; }
+.stat-pct { font-size:10px; color:#444; width:40px; text-align:right; flex-shrink:0; }
+
 /* ROG 紅線 */
 .top-bar { width:100%; max-width:480px; height:3px; background:#ff0000; margin-bottom:0; }
 </style>
@@ -115,6 +125,12 @@ body {
   <div class="last-update" id="last-update"></div>
 </div>
 
+<div class="stats-card">
+  <div class="stats-title">▶ TODAY'S TYPE BREAKDOWN</div>
+  <div id="stats-rows"><div style="font-size:10px;color:#333;letter-spacing:2px">載入中...</div></div>
+  <div class="last-update" id="stats-total"></div>
+</div>
+
 <script>
 const API = 'https://gamer-dna.zeabur.app';
 
@@ -123,8 +139,13 @@ async function loadQuota() {
   document.getElementById('status-badge').className = 'status-badge loading';
 
   try {
-    const res  = await fetch(API + '/api/quota');
-    const data = await res.json();
+    const [res, sres] = await Promise.all([
+      fetch(API + '/api/quota'),
+      fetch(API + '/api/stats'),
+    ]);
+    const data  = await res.json();
+    const stats = await sres.json();
+    renderStats(stats);
     const pct  = Math.round((data.used / data.limit) * 100);
 
     document.getElementById('remaining-num').textContent = data.remaining;
@@ -152,6 +173,36 @@ async function loadQuota() {
 }
 
 // 載入時自動查，每 30 秒自動更新
+const TYPE_LABELS = {
+  tactical:'戰術指揮者 TACTICAL',
+  speedy:  '極速獵手 SPEED',
+  burst:   '爆發破局者 BURST',
+  sniper:  '精準狙擊手 SNIPER',
+  builder: '創造建構者 BUILDER',
+  futurist:'未來操控者 FUTURIST',
+  support: '支援守護者 SUPPORT',
+};
+
+function renderStats(stats) {
+  const total = stats.total || 0;
+  document.getElementById('stats-total').textContent = 'TOTAL GENERATED: ' + total;
+  const rows = document.getElementById('stats-rows');
+  if (total === 0) {
+    rows.innerHTML = '<div style="font-size:10px;color:#333;letter-spacing:2px">尚無生成紀錄</div>';
+    return;
+  }
+  rows.innerHTML = Object.entries(TYPE_LABELS).map(([key, label]) => {
+    const n   = stats.types[key] || 0;
+    const pct = total > 0 ? Math.round(n / total * 100) : 0;
+    return `<div class="stat-row">
+      <div class="stat-label">${label}</div>
+      <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%"></div></div>
+      <div class="stat-num">${n}</div>
+      <div class="stat-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
 loadQuota();
 setInterval(loadQuota, 30000);
 </script>
