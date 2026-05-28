@@ -124,7 +124,7 @@ label { font-size: 11px; letter-spacing: 3px; color: #666; display: block; margi
     <h3>▶ GENERATION STATS</h3>
     <div id="counter-rows"></div>
     <div class="counter-total" id="counter-total">TOTAL: 0</div>
-    <button class="counter-reset" onclick="resetCounters()">↺ RESET</button>
+    <button class="counter-reset" onclick="loadStats()">↻ 更新</button>
   </div>
     <div class="timer" id="timer"></div>
   </div>
@@ -151,7 +151,7 @@ loadQuota();
 let photoBase64 = null;
 let selectedType = 'tactical';
 
-// 計數板
+// 計數板 — 從 server /api/stats 拿
 const TYPES_LIST = [
   {key:'tactical', label:'戰術指揮者 TACTICAL'},
   {key:'speedy',   label:'極速獵手 SPEED'},
@@ -161,18 +161,27 @@ const TYPES_LIST = [
   {key:'futurist', label:'未來操控者 FUTURIST'},
   {key:'support',  label:'支援守護者 SUPPORT'},
 ];
-let counters = JSON.parse(localStorage.getItem('dna_counters') || '{}');
-TYPES_LIST.forEach(t => { if (!counters[t.key]) counters[t.key] = 0; });
 
-function saveCounters() { localStorage.setItem('dna_counters', JSON.stringify(counters)); }
-function resetCounters() { TYPES_LIST.forEach(t => counters[t.key] = 0); saveCounters(); renderCounters(); }
+async function loadStats() {
+  try {
+    const res   = await fetch(API_URL + '/api/stats');
+    const stats = await res.json();
+    renderCounters(stats);
+  } catch(e) {
+    document.getElementById('counter-total').textContent = 'ERROR';
+  }
+}
 
-function renderCounters() {
-  const total = TYPES_LIST.reduce((s, t) => s + counters[t.key], 0);
+function renderCounters(stats) {
+  const total = stats.total || 0;
   document.getElementById('counter-total').textContent = 'TOTAL: ' + total;
   const rows = document.getElementById('counter-rows');
+  if (total === 0) {
+    rows.innerHTML = '<div style="color:#555;font-size:11px;letter-spacing:2px">尚無生成紀錄</div>';
+    return;
+  }
   rows.innerHTML = TYPES_LIST.map(t => {
-    const n = counters[t.key];
+    const n   = stats.types[t.key] || 0;
     const pct = total > 0 ? Math.round(n / total * 100) : 0;
     return `<div class="counter-row">
       <div class="counter-label">${t.label}</div>
@@ -182,7 +191,8 @@ function renderCounters() {
     </div>`;
   }).join('');
 }
-renderCounters();
+
+loadStats();
 let startTime = null;
 
 // 上傳照片
@@ -247,9 +257,7 @@ document.getElementById('gen-btn').addEventListener('click', async () => {
       document.getElementById('result-img').style.display = 'block';
       timerEl.textContent = `✅ 完成！耗時 ${elapsed}s`;
       setStatus(`TYPE: ${selectedType.toUpperCase()} — 生成成功`, 'ok');
-      counters[selectedType] = (counters[selectedType] || 0) + 1;
-      saveCounters();
-      renderCounters();
+      loadStats();
     } else {
       timerEl.textContent = `耗時 ${elapsed}s`;
       setStatus('失敗：' + (data.error || '未知錯誤'), 'err');
