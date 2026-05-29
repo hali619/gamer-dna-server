@@ -23,7 +23,7 @@ let typeStats = {};
 TYPE_KEYS.forEach(t => typeStats[t] = 0);
 let totalGenerated = 0;
 
-function checkAndCount() {
+function resetIfNewDay() {
   const today = new Date().toDateString();
   if (today !== dailyDate) {
     dailyDate  = today;
@@ -32,6 +32,10 @@ function checkAndCount() {
     totalGenerated = 0;
     console.log('[QUOTA] 新的一天，計數重置');
   }
+}
+
+function checkAndCount() {
+  resetIfNewDay();
   if (dailyCount >= DAILY_LIMIT) return false;
   dailyCount++;
   console.log(`[QUOTA] 今日第 ${dailyCount} / ${DAILY_LIMIT} 人`);
@@ -171,8 +175,7 @@ app.get('/api/result/:id', (req, res) => {
 });
 
 app.get('/api/quota', (req, res) => {
-  const today = new Date().toDateString();
-  if (today !== dailyDate) { dailyDate = today; dailyCount = 0; }
+  resetIfNewDay();
   const remaining = DAILY_LIMIT - dailyCount;
   res.json({
     limit: DAILY_LIMIT,
@@ -183,8 +186,7 @@ app.get('/api/quota', (req, res) => {
 });
 
 app.get('/api/stats', (req, res) => {
-  const today = new Date().toDateString();
-  if (today !== dailyDate) { dailyDate = today; dailyCount = 0; TYPE_KEYS.forEach(t => typeStats[t] = 0); totalGenerated = 0; }
+  resetIfNewDay();
   res.json({
     total: totalGenerated,
     types: { ...typeStats },
